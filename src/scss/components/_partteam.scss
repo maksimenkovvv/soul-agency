@@ -1,0 +1,16 @@
+.team {
+    margin-bottom: 160px;
+    padding: 40px;
+    border-radius: 20px;
+    background-color: $lightbllue;
+    border: 1px solid $blue;
+
+    &__title {
+        margin-bottom: 20px;
+    }
+
+    &__contacts {
+        font-size: 40px;
+        color: $white;
+    }
+}

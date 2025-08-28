@@ -1,0 +1,46 @@
+@import './variables';
+@import './libs/normalize';
+@import './components/all';
+
+.wrapper {
+    max-width: 1690px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.gray-bg {
+    background-color: $gray;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+
+.b-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: max-content;
+    color: $white;
+    background-color: $blue;
+    padding: 15px 45px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 8px;
+}
+
+.list__faq {
+    display: flex;
+    flex-direction: column;
+
+    &-item {
+        font-size: 28px;
+        padding: 20px;
+        background-color: $white;
+        border-radius: 4px;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
