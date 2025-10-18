@@ -2,7 +2,7 @@ import React from 'react';
 
 function Faq() {
     return (
-        <div className="faq gray-bg">
+        <div className="faq">
             <h2 className="faq__title">FAQ</h2>
             <ul className="faq__list list__faq">
                 <li className="faq__list-item list__faq-item">1. Что такое онлайн - терапия и как это работает?</li>

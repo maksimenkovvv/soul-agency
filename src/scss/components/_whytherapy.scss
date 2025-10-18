@@ -1,7 +1,70 @@
 .therapy {
     margin-bottom: 160px;
 
-    &__title {
-        margin-bottom: 80px;
+    &__nav {
+        display: flex;
+        flex-wrap: wrap;
+
+        &-button {
+            background-color: $whiteBg;
+            max-width: 495px;
+            width: 100%;
+            padding: 15px 50px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            color: $black;
+            opacity: 0.8;
+            text-align: left;
+            font-weight: 700;
+
+            &--mint {
+                background-color: $mintBg;
+            }
+        }
+    }
+
+    &__content {
+        &-item {
+            &__description {
+                &-wrapper {
+                    background-color: $whiteBg;
+                    min-height: 318px;
+                    display: flex;
+                    gap: 24px;
+                    padding-top: 44px;
+                    padding-right: 60px;
+
+                    &--mint {
+                        background-color: $mintBg;
+                    }
+                }
+
+                &-item {
+                    &__subtitle {
+                        font-size: 22px;
+                        line-height: 120%;
+                    }
+                }
+            }
+
+            &__button {
+                max-width: 740px;
+                width: 100%;
+                margin-left: auto;
+                background-color: $whiteBg;
+                padding: 25px;
+                border-bottom-left-radius: 20px;
+                border-bottom-right-radius: 20px;
+
+                &--mint {
+                    background-color: $mintBg;
+                }
+
+                .b-btn {
+                    max-width: 342px;
+                    width: 100%;
+                }
+            }
+        }
     }
 }

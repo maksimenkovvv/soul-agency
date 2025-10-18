@@ -2,7 +2,7 @@ import React from 'react';
 
 function HowToStart() {
     return (
-        <div className="how-to-start gray-bg">
+        <div className="how-to-start">
             <h2 className="how-to-start__title">
                 Как начать терапию?
             </h2>

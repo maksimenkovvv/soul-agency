@@ -1,8 +1,8 @@
 .psychologists {
     margin-bottom: 160px;
 
-    &__title {
-        margin-bottom: 20px;
+    &__header {
+        display: flex;
     }
 
     &__item-wrapper {
@@ -13,47 +13,72 @@
 
         .psychologists {
             &__item {
-                border-radius: 14px;
+                border-radius: 18px;
                 overflow: hidden;
+                position: relative;
+                height: fit-content;
 
-                &-top {
-                    min-height: 390px;
-                    background-color: $grayDark;
+                &-image {
+                    max-height: 670px;
+                    overflow: hidden;
+
+                    img {
+                        max-width: 100%;
+                    }
                 }
 
-                &-bottom {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 20px;
+                &-content {
+                    position: absolute;
+                    inset: auto 20px 20px 20px;
+                    background-color: $whiteBg;
                     padding: 20px;
-                    background-color: $gray;
+                    border-radius: 14px;
 
-                    &__method-wrapper {
+                    &__favourites {
                         display: flex;
-                        flex-wrap: wrap;
-                        gap: 12px;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                        position: absolute;
+                        border-top-left-radius: 10px;
+                        border-top-right-radius: 10px;
+                        background-color: $whiteBg;
+                        top: -40px;
+                        left: 20px;
                     }
 
-                    &__method-tag {
-                        font-size: 16px;
-                        padding: 10px;
-                        background-color: $white;
+                    &__arrow {
+                        display: flex;
+                        width: 40px;
+                        height: 40px;
+                        background-color: $blackBg;
                         border-radius: 10px;
+                        align-items: center;
+                        justify-content: center;
+                        position: absolute;
+                        right: 20px;
+                        top: 20px;
                     }
 
-                    &__button {
-                        width: 100%;
-                        font-size: 16px;
-                        padding: 7px 45px;
-                        margin-top: 80px;
+                    &__name {
+                        margin-bottom: 20px;
+                        font-weight: 700;
+                    }
+
+                    &__experience {
+                        margin-bottom: 8px;
+
+                        span {
+                            font-weight: 700;
+                        }
+                    }
+
+                    &__price {
+                        font-weight: 700;
                     }
                 }
             }
         }
-    }
-
-    &__button {
-        justify-self: center;
-
     }
 }
