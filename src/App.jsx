@@ -1,14 +1,15 @@
 import React from 'react';
 
-import Header from './components/Header';
-import TitleSection from './components/TitleSection';
-import WhyTherapy from './components/WhyTherapy';
-import OurPsychologists from './components/OurPsychologists';
-import HowToStart from './components/HowToStart';
-import PartTeam from './components/PartTeam';
-import Faq from './components/Faq';
-import Footer from './components/Footer';
+import { Routes, Route } from "react-router-dom";
+
 import AuthReg from './components/AuthReg'
+import Header from './components/Header';
+import Main from './pages/Main'
+import Footer from './components/Footer';
+
+import About from './pages/About'
+import Psychologist from './pages/Psychologist'
+import Sessions from './pages/Sessions'
 
 import './scss/app.scss'
 
@@ -18,12 +19,12 @@ function App() {
       <div className="wrapper">
         <AuthReg />
         <Header />
-        <TitleSection />
-        <WhyTherapy />
-        <OurPsychologists />
-        <HowToStart />
-        <PartTeam />
-        <Faq />
+        <Routes>
+          <Route path='/' element={<Main />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/psychologist' element={<Psychologist />} />
+          <Route path='/sessions' element={<Sessions />} />
+        </Routes>
         <Footer />
       </div>
     </div>

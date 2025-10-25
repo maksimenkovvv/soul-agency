@@ -1,11 +1,54 @@
 .faq {
     margin-bottom: 160px;
 
-    &__title {
-        margin-bottom: 40px;
+    &__header {
+        display: flex;
     }
 
     &__list {
-        gap: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        &-item {
+            background-color: $whiteBg;
+            padding: 25px;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+
+            &__arrow {
+                position: absolute;
+                top: 34px;
+                right: 30px;
+                transition: transform 0.3s ease;
+            }
+
+            &__title {
+                font-weight: 700;
+            }
+
+            &__description {
+                font-size: 18px;
+                line-height: 22px;
+                max-width: 865px;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: max-height 0.5s ease, opacity 0.3s ease;
+            }
+
+            &.open {
+                .faq__list-item__arrow {
+                    transform: rotate(180deg);
+                }
+
+                .faq__list-item__description {
+                    max-height: 500px;
+                    opacity: 1;
+                }
+            }
+        }
     }
 }

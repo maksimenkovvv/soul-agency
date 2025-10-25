@@ -2,11 +2,103 @@
     position: relative;
     margin-bottom: 160px;
 
-    &__title {
-        margin-bottom: 60px;
+    &__header {
+        display: flex;
     }
 
     &__list {
-        gap: 20px;
+        position: relative;
+        min-height: 840px;
+
+        &-item {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 48px 48px 56px;
+            width: 100%;
+
+            &:last-child {
+                border-radius: 20px;
+            }
+
+            &--white {
+                background-color: $whiteBg;
+            }
+
+            &--mint {
+                background-color: $mintBg;
+            }
+
+            &--purple {
+                background-color: $purpleBg;
+            }
+
+            &--black {
+                background-color: $blackBg;
+
+                .how-to-start {
+                    &__list {
+                        &-item {
+                            &__header {
+                                &-step {
+                                    color: $gray;
+                                }
+
+                                &-title {
+                                    color: $gray;
+                                }
+
+                            }
+
+                            &__content {
+
+                                &-title {
+                                    color: $gray;
+                                }
+
+                                &-description {
+                                    color: $gray;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            &__header {
+                padding-bottom: 56px;
+                display: flex;
+
+                &-step {
+                    font-weight: 700;
+                    margin-right: 24px;
+                    max-width: 252px;
+                    width: 100%;
+                    font-size: 32px;
+                    line-height: 1.2;
+                    color: $black;
+                }
+
+                &-title {
+                    margin: 0;
+                }
+            }
+
+            &__content {
+                &-wrapper {
+                    display: flex;
+                    gap: 24px;
+                }
+
+                &-title {
+                    font-weight: 700;
+                    margin-bottom: 20px;
+                }
+
+                &-description {
+                    font-size: 18px;
+                    line-height: 22px;
+                }
+            }
+        }
     }
 }

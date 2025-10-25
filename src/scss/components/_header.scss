@@ -7,6 +7,15 @@
     margin-top: 15px;
     margin-bottom: 100px;
 
+    .b-btn {
+
+        &,
+        &:link,
+        &:visited {
+            font-size: 14px;
+        }
+    }
+
     &__logo {
         p {
             font-size: 20px;
@@ -26,6 +35,10 @@
                 &:link,
                 &:visited {
                     color: $grayLight;
+                }
+
+                &:hover {
+                    color: $black;
                 }
             }
         }

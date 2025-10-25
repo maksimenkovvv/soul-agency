@@ -17,7 +17,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: max-content;
         color: $white;
         background-color: $blackBg;
         padding: 11px;
@@ -27,6 +26,18 @@
         border-radius: 12px;
     }
 }
+
+.b-btn--transparent {
+
+    &,
+    a:link,
+    a:visited {
+        background-color: transparent;
+        border: 1px solid #31323566;
+        color: $black;
+    }
+}
+
 
 .b-tabs {
     .tabs {
@@ -60,21 +71,7 @@
     line-height: 100%;
     font-weight: 700;
     color: $black;
-    margin-right: 200px;
-}
-
-.list__faq {
-    display: flex;
-    flex-direction: column;
-
-    &-item {
-        font-size: 28px;
-        padding: 20px;
-        background-color: $white;
-        border-radius: 4px;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
+    margin-right: 24px;
+    max-width: 252px;
+    width: 100%;
 }
