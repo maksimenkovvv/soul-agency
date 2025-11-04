@@ -1,0 +1,25 @@
+.b-search {
+    max-width: 528px;
+    width: 100%;
+
+    .search {
+        &-input {
+            height: 100%;
+            width: 100%;
+            border-radius: 10px;
+            padding-left: 10px;
+            border-width: 0;
+            padding-left: 52px;
+            outline: none;
+            color: #D2D7DB;
+            font-size: 18px;
+            line-height: 22px;
+            background: url('../../assets/img/search.png') #fff no-repeat 16px center;
+
+            &::placeholder {
+                color: #D2D7DB;
+
+            }
+        }
+    }
+}

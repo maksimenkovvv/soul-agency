@@ -1,0 +1,111 @@
+.b-filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 50px;
+
+    .filter {
+        position: relative;
+
+        &:has(.filter-options) {
+            .filter {
+                &-header {
+                    &-marker {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+
+        &-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 18px;
+            line-height: 22px;
+            padding: 13px 16px 13px 20px;
+            border: 1px solid #31323566;
+            border-radius: 12px;
+            cursor: pointer;
+
+            &.selected {
+                background-color: #FFFFFF;
+            }
+
+            &-marker {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                transition: transform $transition;
+            }
+        }
+
+        &-options {
+            position: absolute;
+            z-index: 10;
+            padding: 18px 16px;
+            background-color: #FFFFFFD9;
+            border-radius: 18px;
+            backdrop-filter: blur(32px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: max-content;
+            top: calc(100% + 11px);
+        }
+
+        &-option {
+            font-size: 18px;
+            line-height: 22px;
+            padding: 13px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-radius: 12px;
+            transition: background $transition;
+
+            &.selected {
+                background-color: #FFFFFF;
+            }
+
+            &:hover {
+                background-color: #FFFFFF;
+            }
+        }
+
+        .clear {
+            &-button {
+                background: transparent;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                color: #8885FF;
+                font-size: 18px;
+                line-height: 22px;
+                padding: 13px 16px;
+            }
+
+            &-mark {
+                display: flex;
+                width: 24px;
+                height: 24px;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .b-btn {
+
+            &,
+            a:link,
+            a:visited {
+                font-size: 18px;
+                line-height: 22px;
+            }
+        }
+    }
+}

@@ -8,7 +8,7 @@ import Main from './pages/Main'
 import Footer from './components/Footer';
 
 import About from './pages/About'
-import Psychologist from './pages/Psychologist'
+import Psychologist from './pages/Psychologists'
 import Sessions from './pages/Sessions'
 
 import './scss/app.scss'

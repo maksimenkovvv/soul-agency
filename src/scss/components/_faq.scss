@@ -22,11 +22,13 @@
                 position: absolute;
                 top: 34px;
                 right: 30px;
-                transition: transform 0.3s ease;
+                transition: transform $transition;
             }
 
             &__title {
                 font-weight: 700;
+                font-size: 22px;
+                line-height: 26px;
             }
 
             &__description {
@@ -34,9 +36,13 @@
                 line-height: 22px;
                 max-width: 865px;
                 max-height: 0;
+                margin-top: 0;
                 overflow: hidden;
                 opacity: 0;
-                transition: max-height 0.5s ease, opacity 0.3s ease;
+                transition:
+                    max-height $transition,
+                    opacity $transition,
+                    margin-top $transition;
             }
 
             &.open {
@@ -47,6 +53,7 @@
                 .faq__list-item__description {
                     max-height: 500px;
                     opacity: 1;
+                    margin-top: 16px;
                 }
             }
         }

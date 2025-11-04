@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import arrow from '../assets/img/arrow_faq.svg';
 
 function Faq() {
-    const [openIndex, setOpenIndex] = useState(null);
+    const [openIndex, setOpenIndex] = React.useState(null);
 
     const toggleItem = (index) => {
         setOpenIndex(openIndex === index ? null : index);
