@@ -1,15 +1,32 @@
 .login {
+    margin: 40px 0;
+
     &__wrapper {
-        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
         max-width: 800px;
+        min-height: 970px;
         width: 100%;
         background-color: #fff;
         border-radius: 24px;
         padding: 100px;
+
+        &:has(.login__subtitle) {
+            .login__title {
+                margin-bottom: 32px;
+            }
+        }
     }
 
     &__title {
         font-size: 32px;
+        margin-bottom: 60px;
+    }
+
+
+    &__subtitle {
+        font-size: 18px;
+        line-height: 22px;
         margin-bottom: 60px;
     }
 
@@ -46,5 +63,78 @@
             border: 1px solid #8885FF;
         }
 
+    }
+
+    &__policy {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 48px 0 48px;
+    }
+
+    &__button {
+        width: 100%;
+    }
+
+    &__footer {
+        display: flex;
+        margin-top: auto;
+        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+
+        p,
+        button {
+            font-size: 18px;
+            line-height: 22px;
+            font-weight: 700;
+        }
+
+        button {
+            color: #6755E0;
+        }
+
+        &-title {
+            margin-top: 60px;
+        }
+    }
+
+    &__code-inputs {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 32px;
+    }
+
+    &__code-input {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        text-align: center;
+        border: 1px rgba($gray, 0.4);
+        border-radius: 10px;
+        outline: none;
+        background-color: rgba($gray, 0.4);
+
+
+        &:focus {
+            border-color: #8885FF;
+        }
+    }
+
+    &__resend-code {
+        text-align: center;
+        color: $blue;
+        font-size: 14px;
+        margin-bottom: 60px;
+    }
+
+    &__group {
+        display: flex;
+        gap: 15px;
+
+        &-btn {
+            width: 50%;
+        }
     }
 }
