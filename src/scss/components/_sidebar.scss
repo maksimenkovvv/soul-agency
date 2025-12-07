@@ -1,0 +1,36 @@
+.b-sidebar {
+    display: flex;
+    flex-direction: column;
+    max-width: 390px;
+    width: 100%;
+    background-color: $whiteBg;
+    border-radius: 18px;
+    padding: 30px;
+    gap: 40px;
+
+    .sidebar {
+        &__info {
+            &-photo {
+                margin-bottom: 20px;
+            }
+
+            &-name {
+                font-weight: 700;
+                margin-bottom: 8px;
+            }
+
+            &-email {
+                font-size: 18px;
+                line-height: 22px;
+            }
+        }
+
+        &__tabs {
+            &-item {
+                font-size: 18px;
+                line-height: 22px;
+                padding: 16px 15px;
+            }
+        }
+    }
+}

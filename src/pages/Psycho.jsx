@@ -1,8 +1,10 @@
 import React from 'react';
 
+import Sidebar from '../components/Sidebar';
+
 function Psycho() {
     return (
-        <div>Лк для психологов</div>
+        <Sidebar />
     );
 }
 
