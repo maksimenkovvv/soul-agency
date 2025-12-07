@@ -31,6 +31,7 @@
     }
 
     &__form-group {
+        position: relative;
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -57,6 +58,14 @@
         padding: 13px 20px;
         font-size: 18px;
         line-height: 22px;
+
+        &-visible {
+            display: flex;
+            position: absolute;
+            bottom: 16px;
+            right: 22px;
+            cursor: pointer;
+        }
 
         &:hover,
         &:focus {
@@ -116,9 +125,10 @@
         outline: none;
         background-color: rgba($gray, 0.4);
 
-
-        &:focus {
-            border-color: #8885FF;
+        &:focus,
+        &:hover,
+        &[value]:not([value=""]) {
+            border: 1px solid #8885FF;
         }
     }
 
@@ -129,12 +139,14 @@
         margin-bottom: 60px;
     }
 
-    &__group {
-        display: flex;
-        gap: 15px;
+    &:has(.login__code-inputs-wrapper) {
+        .login__group {
+            display: flex;
+            gap: 15px;
 
-        &-btn {
-            width: 50%;
+            &-btn {
+                width: 50%;
+            }
         }
     }
 }
