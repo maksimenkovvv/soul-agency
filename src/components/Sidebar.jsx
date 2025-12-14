@@ -1,16 +1,47 @@
 import React from 'react';
 
-function Sidebar() {
+function Sidebar({ user, setActiveTab, activeTab }) {
     return (
         <div className="b-sidebar">
             <div className="sidebar__info">
-                <img src="" alt="фото" className="sidebar__info-photo" />
-                <p className="sidebar__info-name">Мария Иванова</p>
-                <p className="sideba__info-email">example@google.com</p>
+                <div className="sidebar__info-photo">
+                    <img src={user.avatar} alt="фото" />
+                </div>
+                <p className="sidebar__info-name">{user.name}</p>
+                <p className="sidebar__info-email">{user.email}</p>
             </div>
             <ul className="sidebar__tabs">
-                <li className="sidebar__tabs-item">Записи</li>
-                <li className="sidebar__tabs-item">Избранное</li>
+                {user.role === 'client' ? (
+                    <>
+                        <li
+                            className={`sidebar__tabs-item ${activeTab === 'Записи' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('Записи')}
+                        >
+                            Записи
+                        </li>
+                        <li
+                            className={`sidebar__tabs-item ${activeTab === 'Избранное' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('Избранное')}
+                        >
+                            Избранное
+                        </li>
+                    </>
+                ) : (
+                    <>
+                        <li
+                            className={`sidebar__tabs-item ${activeTab === 'Записи' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('Записи')}
+                        >
+                            Записи
+                        </li>
+                        <li
+                            className={`sidebar__tabs-item ${activeTab === 'График работы' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('График работы')}
+                        >
+                            График работы
+                        </li>
+                    </>
+                )}
             </ul>
         </div>
     );

@@ -12,6 +12,13 @@
         &__info {
             &-photo {
                 margin-bottom: 20px;
+                max-width: 114px;
+                width: 100%;
+
+                img {
+                    max-width: 100%;
+                    border-radius: 12px;
+                }
             }
 
             &-name {
@@ -29,7 +36,16 @@
             &-item {
                 font-size: 18px;
                 line-height: 22px;
-                padding: 16px 15px;
+                padding: 15px 0;
+
+                &:hover {
+                    cursor: pointer;
+                    font-weight: 700;
+                }
+
+                &.active {
+                    font-weight: 700;
+                }
             }
         }
     }
