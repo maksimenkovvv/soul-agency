@@ -1,0 +1,576 @@
+.b-sessions-page {
+    margin-bottom: 160px;
+
+    &__head {
+        margin-bottom: 32px;
+
+        p {
+            max-width: 860px;
+            opacity: 0.85;
+            margin-top: 12px;
+        }
+    }
+}
+
+.b-alert {
+    background-color: $mintBg;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+}
+
+.b-sessions-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 24px;
+
+    &--psycho {
+        grid-template-columns: 520px 1fr;
+    }
+
+    &__side {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    &__main {
+        min-width: 0;
+    }
+}
+
+.b-sessions__tips {
+    background-color: $whiteBg;
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid rgba($gray, 0.45);
+
+    .b-sessions__tip {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.9;
+
+        &:not(:last-child) {
+            margin-bottom: 12px;
+        }
+
+        b {
+            font-weight: 700;
+        }
+    }
+}
+
+// --- Psychologist picker ---
+.b-psy-picker {
+    background-color: $whiteBg;
+    border-radius: 18px;
+    padding: 20px;
+    border: 1px solid rgba($gray, 0.45);
+
+    &__title {
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__empty {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.75;
+    }
+}
+
+.b-psy-card {
+    display: grid;
+    grid-template-columns: 56px 1fr 24px;
+    gap: 12px;
+    align-items: center;
+    text-align: left;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba($gray, 0.55);
+    transition: transform $transition, border-color $transition, background $transition;
+
+    &:hover {
+        transform: translateY(-1px);
+        border-color: rgba($black, 0.25);
+    }
+
+    &.is-active {
+        border-color: rgba($black, 0.6);
+        background-color: rgba($lightbllue, 0.55);
+    }
+
+    &__avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: rgba($gray, 0.4);
+    }
+
+    &__name {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    &__sub {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.8;
+        margin-bottom: 4px;
+    }
+
+    &__price {
+        font-size: 18px;
+        line-height: 22px;
+        font-weight: 700;
+    }
+
+    &__chev {
+        font-size: 30px;
+        line-height: 1;
+        opacity: 0.6;
+        text-align: center;
+    }
+}
+
+// --- Calendar wrapper + FullCalendar theme ---
+.b-calendar {
+    background-color: $whiteBg;
+    border-radius: 18px;
+    padding: 18px;
+    border: 1px solid rgba($gray, 0.45);
+
+    &__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    &__title {
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    &__subtitle {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.8;
+    }
+
+    &__legend {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    &__empty {
+        background-color: $whiteBg;
+        border-radius: 18px;
+        padding: 28px;
+        border: 1px solid rgba($gray, 0.45);
+
+        p {
+            margin-top: 12px;
+            opacity: 0.85;
+        }
+    }
+
+    &.is-loading {
+        opacity: 0.85;
+        pointer-events: none;
+    }
+
+    // FC theme
+    .fc {
+        font-family: 'Circe', sans-serif;
+    }
+
+    .fc-toolbar-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .fc-button {
+        border-radius: 12px !important;
+        border: 1px solid rgba($gray, 0.55) !important;
+        background: transparent !important;
+        color: $black !important;
+        box-shadow: none !important;
+        padding: 8px 12px !important;
+        font-size: 16px !important;
+
+        &:hover {
+            background-color: rgba($gray, 0.25) !important;
+        }
+
+        &.fc-button-active {
+            background-color: $blackBg !important;
+            color: $white !important;
+            border-color: $blackBg !important;
+        }
+    }
+
+    .fc-scrollgrid,
+    .fc-scrollgrid-section > td {
+        border-color: rgba($gray, 0.55) !important;
+    }
+
+    .fc-col-header-cell {
+        background-color: rgba($grayDark, 0.35);
+    }
+
+    // Events
+    .fc-event {
+        border-radius: 10px;
+        padding: 3px 6px;
+        border-width: 1px;
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+    .fc-slot {
+        border: 1px dashed rgba($mintBg, 0.95) !important;
+        background-color: rgba($mintBg, 0.35) !important;
+        color: $black !important;
+    }
+
+    .fc-booking {
+        border: 1px solid rgba($purpleBg, 0.95) !important;
+        background-color: rgba($purpleBg, 0.35) !important;
+        color: $black !important;
+    }
+
+    .fc-booking--pending,
+    .fc-booking--pending_payment {
+        border: 1px solid rgba($lightbllue, 0.95) !important;
+        background-color: rgba($lightbllue, 0.75) !important;
+    }
+
+    .fc-booking--cancelled,
+    .fc-booking--canceled {
+        opacity: 0.55;
+        text-decoration: line-through;
+    }
+
+    .fc-dayoff {
+        background-color: rgba($redBg, 0.18) !important;
+    }
+}
+
+.b-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 16px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba($gray, 0.55);
+
+    &--slot {
+        background-color: rgba($mintBg, 0.35);
+    }
+
+    &--booking {
+        background-color: rgba($purpleBg, 0.35);
+    }
+
+    &--dayoff {
+        background-color: rgba($redBg, 0.18);
+    }
+}
+
+// --- Schedule editor ---
+.b-schedule-editor {
+    &__card {
+        background-color: $whiteBg;
+        border-radius: 18px;
+        padding: 20px;
+        border: 1px solid rgba($gray, 0.45);
+    }
+
+    &__title {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    &__subtitle {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.8;
+        margin-bottom: 16px;
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    &__days {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 68vh;
+        overflow: auto;
+        padding-right: 6px;
+    }
+
+    &__day {
+        border: 1px solid rgba($gray, 0.55);
+        border-radius: 14px;
+        padding: 12px;
+    }
+
+    &__day-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    &__day-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+    }
+
+    &__intervals {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    &__interval {
+        display: grid;
+        grid-template-columns: 1fr 24px 1fr 32px;
+        gap: 10px;
+        align-items: center;
+    }
+
+    &__dash {
+        text-align: center;
+        opacity: 0.75;
+    }
+
+    &__disabled {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.75;
+    }
+
+    &__foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    &__meta {
+        font-size: 18px;
+        line-height: 22px;
+        opacity: 0.8;
+    }
+
+    &__note {
+        font-size: 16px;
+        line-height: 20px;
+        opacity: 0.75;
+        margin-top: 16px;
+    }
+}
+
+.b-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__label {
+        font-size: 16px;
+        line-height: 20px;
+        opacity: 0.8;
+    }
+}
+
+.b-input {
+    width: 100%;
+    border: 1px solid rgba($gray, 0.65);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 18px;
+    line-height: 22px;
+}
+
+.b-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba($gray, 0.25);
+
+    &:hover {
+        background-color: rgba($gray, 0.35);
+    }
+}
+
+.b-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 28px;
+    border-radius: 10px;
+    background-color: rgba($lightbllue, 0.55);
+    font-size: 14px;
+    line-height: 16px;
+}
+
+.b-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    input {
+        display: none;
+    }
+
+    &__ui {
+        width: 44px;
+        height: 26px;
+        border-radius: 999px;
+        background-color: rgba($gray, 0.45);
+        position: relative;
+        transition: background $transition;
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: $white;
+            transition: transform $transition;
+        }
+    }
+
+    input:checked + .b-switch__ui {
+        background-color: $blackBg;
+    }
+
+    input:checked + .b-switch__ui:before {
+        transform: translateX(18px);
+    }
+}
+
+// --- Modal ---
+.b-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    &__backdrop {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.35);
+    }
+
+    &__card {
+        position: relative;
+        background-color: $whiteBg;
+        border-radius: 18px;
+        width: min(640px, calc(100vw - 32px));
+        margin: 10vh auto 0;
+        border: 1px solid rgba($gray, 0.55);
+        overflow: hidden;
+    }
+
+    &__head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 18px;
+        border-bottom: 1px solid rgba($gray, 0.45);
+    }
+
+    &__title {
+        font-weight: 700;
+    }
+
+    &__close {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background-color: rgba($gray, 0.25);
+        font-size: 22px;
+        line-height: 1;
+
+        &:hover {
+            background-color: rgba($gray, 0.35);
+        }
+    }
+
+    &__body {
+        padding: 18px;
+    }
+
+    &__foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 18px;
+        border-top: 1px solid rgba($gray, 0.45);
+    }
+
+    &__grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 12px;
+        align-items: center;
+    }
+
+    &__label {
+        font-size: 16px;
+        line-height: 20px;
+        opacity: 0.75;
+    }
+
+    &__hint {
+        font-size: 16px;
+        line-height: 20px;
+        opacity: 0.75;
+    }
+}
