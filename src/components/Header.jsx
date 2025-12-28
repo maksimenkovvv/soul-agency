@@ -25,14 +25,6 @@ function Header() {
                 <li className="header__menu-item"><Link to="/psychologist">Психологи</Link></li>
                 <li className="header__menu-item"><Link to="/sessions">Сессии</Link></li>
 
-                {/* защищённые пункты по ролям */}
-                {(role === "PSYCHOLOGIST" || role === "ADMIN") && (
-                    <li className="header__menu-item"><Link to="/psycho">Лк для психологов</Link></li>
-                )}
-                {(role === "CLIENT" || role === "ADMIN") && (
-                    <li className="header__menu-item"><Link to="/user">Лк для пользователя</Link></li>
-                )}
-
                 {/* чаты */}
                 {(role === "CLIENT" || role === "PSYCHOLOGIST" || role === "ADMIN") && (
                     <li className="header__menu-item"><Link to="/chat">Чаты</Link></li>

@@ -1,0 +1,138 @@
+.b-settings {
+    .settings {
+        &__button {
+            display: flex;
+            gap: 17px;
+            align-items: center;
+            max-width: max-content;
+            margin-bottom: 26px;
+            margin-left: 20px;
+
+            span {
+                font-size: 18px;
+                line-height: 22px;
+                font-weight: 700;
+            }
+        }
+
+        &__wrapper {
+            background-color: $whiteBg;
+            padding: 48px;
+            border-radius: 24px;
+        }
+
+        &__content {
+            display: flex;
+            gap: 160px;
+
+            &-photo {
+                max-width: 342px;
+                max-height: 342px;
+                display: flex;
+                position: relative;
+                border-radius: 12px;
+                overflow: hidden;
+
+                &:hover {
+                    .settings__content-photo__blur {
+                        opacity: 1;
+                    }
+                }
+
+                &__blur {
+                    opacity: 0;
+                    position: absolute;
+                    background-color: rgba($whiteBg, 0.40);
+                    width: 100%;
+                    height: 100%;
+                    backdrop-filter: blur(32px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 48px;
+                    transition: $transition;
+
+
+                    &-btn {
+                        width: 48px;
+                        height: 48px;
+                        background-color: $whiteBg;
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: $transition;
+
+                        &:hover {
+                            background-color: rgba($whiteBg, 0.40);
+                        }
+                    }
+                }
+
+                img {
+                    width: 100%;
+                    object-fit: cover;
+                    border-radius: 12px;
+                }
+            }
+
+            &-form {
+                width: 100%;
+                max-width: 665px;
+
+                .login {
+                    &__form {
+                        &-group {
+                            &--reset {
+                                .login {
+                                    &__input {
+                                        &-visible {
+                                            bottom: 49px !important;
+                                        }
+
+                                        &-link {
+                                            width: fit-content;
+                                            font-size: 18px;
+                                            line-height: 22px;
+                                            font-weight: 700;
+                                            color: #6755E0;
+                                        }
+                                    }
+                                }
+                            }
+
+                            .login {
+                                &__input {
+                                    &-wrapper {
+                                        display: flex;
+                                        justify-content: space-between;
+
+                                        .login {
+                                            &__input {
+                                                max-width: 390px;
+                                                width: 100%;
+
+                                                &-button {
+                                                    max-width: 250px;
+                                                    width: 100%;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    &-visible {
+                                        transform: translateX(-50%);
+                                        right: 43%;
+                                        bottom: 17px;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}

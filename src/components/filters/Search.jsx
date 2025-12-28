@@ -1,6 +1,13 @@
 import React from 'react';
+import AppointmentFilters from './AppointmentsFilter';
 
-const Search = ({ onSearch }) => {
+const Search = ({
+    showAppointmentFilters = false, // Показывать ли фильтры записей
+    onSearch, // Колбэк для обработки поиска
+    onFilterChange, // Колбэк для обработки изменения фильтра
+    currentFilter, // текущий фильтр
+}) => {
+
     // const [searchTerm, setSearchTerm] = React.useState('');
 
     // React.useEffect(() => {
@@ -30,6 +37,14 @@ const Search = ({ onSearch }) => {
             // value={searchTerm}
             // onChange={handleSearchChange}
             />
+
+            {/* Фильтры записей отображаются только если showAppointmentFilters=true */}
+            {showAppointmentFilters && (
+                <AppointmentFilters
+                    onFilterChange={onFilterChange}
+                    currentFilter={currentFilter}
+                />
+            )}
         </div>
     );
 };

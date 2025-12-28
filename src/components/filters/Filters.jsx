@@ -39,7 +39,7 @@ const Filters = ({ onFilterChange }) => {
 
     return (
         <div className="b-filters">
-            <Search />
+            <Search showAppointmentFilters={false} />
             <ThemeFilter onApply={handleThemeChange} />
             <MethodFilter onApply={handleMethodChange} />
             <ExperienceFilter onApply={handleExperienceChange} />

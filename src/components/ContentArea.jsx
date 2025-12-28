@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Appointments from './Appointments';
+import Appointments from './appointments/Appointments';
 import Favorites from './Favorites';
 import Schedule from './Schedule';
 

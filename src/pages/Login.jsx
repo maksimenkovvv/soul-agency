@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom"; /* useSearchParams для перехода из настроек ЛК на форму в состоянии сброса пароля */
 import { authApi } from "../api/authApi";
 import { useAuth } from "../auth/authStore";
 
@@ -655,22 +655,22 @@ export default function Login() {
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
                                     {isLocked ? (
                                         <span className="login__badge login__badge--danger" style={badgeStyle("danger")}>
-                      Блокировка: {formatMMSS(lockLeft || 0)}
-                    </span>
+                                            Блокировка: {formatMMSS(lockLeft || 0)}
+                                        </span>
                                     ) : (
                                         <span className="login__badge login__badge--info" style={badgeStyle("info")}>
-                      Попыток: {attemptsLeft}{attemptsLeft > 0 ? ` / ${DEFAULT_MAX_ATTEMPTS}` : ""}
-                    </span>
+                                            Попыток: {attemptsLeft}{attemptsLeft > 0 ? ` / ${DEFAULT_MAX_ATTEMPTS}` : ""}
+                                        </span>
                                     )}
 
                                     {!canResend ? (
                                         <span className="login__badge login__badge--muted" style={badgeStyle("muted")}>
-                      Повтор через: {formatMMSS(resendLeft || 0)}
-                    </span>
+                                            Повтор через: {formatMMSS(resendLeft || 0)}
+                                        </span>
                                     ) : (
                                         <span className="login__badge login__badge--muted" style={badgeStyle("muted")}>
-                      Код: {CODE_LEN} цифр
-                    </span>
+                                            Код: {CODE_LEN} цифр
+                                        </span>
                                     )}
                                 </div>
 
@@ -833,8 +833,8 @@ export default function Login() {
                                         />
                                         <span className="label__checkbox-custom"></span>
                                         <span className="label__text">
-                      Я ознакомлен(а) с Политикой обработки персональных данных и даю согласие на их обработку.
-                    </span>
+                                            Я ознакомлен(а) с Политикой обработки персональных данных и даю согласие на их обработку.
+                                        </span>
                                     </label>
 
                                     <label className="login__policy-label label">

@@ -1,0 +1,22 @@
+.b-appointment-filters {
+    display: flex;
+    gap: 12px;
+
+    .appointment-filters {
+        &__button {
+            padding: 13px 20px;
+            font-size: 18px;
+            line-height: 22px;
+            color: $black;
+            border: 1px solid $grayLight;
+            border-radius: 12px;
+            transition: $transition;
+
+            &.active,
+            &:hover {
+                background-color: $whiteBg;
+                border: 1px solid $whiteBg;
+            }
+        }
+    }
+}

@@ -5,7 +5,7 @@ import ContentArea from '../components/ContentArea';
 
 import photo from '../assets/img/psychologist-1.webp'
 
-function Psycho() {
+function Dashboard() {
     const [activeTab, setActiveTab] = useState('Записи');
     const [user, setUser] = useState({
         name: 'Мария Иванова',
@@ -18,11 +18,11 @@ function Psycho() {
     });
 
     return (
-        <div className="psycho-page">
+        <div className="dashboard">
             <Sidebar user={user} setActiveTab={setActiveTab} activeTab={activeTab} />
             <ContentArea activeTab={activeTab} user={user} />
         </div>
     );
 }
 
-export default Psycho;
+export default Dashboard;

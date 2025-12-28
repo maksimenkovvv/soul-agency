@@ -1,0 +1,24 @@
+.b-appointments {
+    width: 100%;
+    height: fit-content;
+
+    .appointments {
+        &-client {
+            height: 100%;
+
+            .b-search {
+                display: flex;
+                max-width: none;
+                gap: 24px;
+                margin-bottom: 32px;
+
+                .search {
+                    &-input {
+                        max-width: 390px;
+                        height: auto;
+                    }
+                }
+            }
+        }
+    }
+}
