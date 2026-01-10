@@ -1,22 +1,53 @@
 import React from 'react';
+import { dictApi } from "../../api/dictApi";
 
-const ThemeFilter = ({ onApply }) => {
+const ThemeFilter = ({ onApply, value }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedOptions, setSelectedOptions] = React.useState([]);
     const filterRef = React.useRef(null);
 
-    const themes = [
-        "Тревожность",
-        "Эмоциональное выгорание",
-        "Низкая самооценка",
-        "Проблемы в отношениях",
-        "Поиск себя / профориентация",
-        "Посттравматическое восстановление",
-        "Панические атаки",
-        "Родительские сценарии",
-        "Психосоматика",
-        "Просто поговорить",
-    ];
+    const [themes, setThemes] = React.useState([]);
+    const [loading, setLoading] = React.useState(true);
+    const [loadError, setLoadError] = React.useState("");
+
+    // sync controlled value -> local state
+    React.useEffect(() => {
+        if (!value) return;
+        setSelectedOptions(Array.isArray(value) ? value : []);
+    }, [value]);
+
+    // load themes dictionary
+    React.useEffect(() => {
+        let alive = true;
+        (async () => {
+            try {
+                setLoading(true);
+                setLoadError("");
+                const res = await dictApi.themes();
+                const arr = Array.isArray(res) ? res : (res?.content || res?.items || []);
+                const norm = (arr || [])
+                    .map((x) => ({
+                        id: x?.id,
+                        code: x?.code,
+                        title: x?.title ?? x?.name ?? x?.label,
+                        isActive: x?.isActive ?? x?.active ?? true,
+                    }))
+                    .filter((x) => x?.id != null && x?.title);
+                if (!alive) return;
+                // only active, but keep inactive too if already selected (so UI doesn't jump)
+                setThemes(norm);
+            } catch (e) {
+                if (!alive) return;
+                setLoadError(e?.message || "Не удалось загрузить темы");
+                setThemes([]);
+            } finally {
+                if (alive) setLoading(false);
+            }
+        })();
+        return () => {
+            alive = false;
+        };
+    }, []);
 
     React.useEffect(() => {
         const handleClickOutside = (event) => {
@@ -31,11 +62,19 @@ const ThemeFilter = ({ onApply }) => {
         };
     }, []);
 
-    const toggleOption = (option) => {
-        if (selectedOptions.includes(option)) {
-            setSelectedOptions(selectedOptions.filter((item) => item !== option));
+    const isSelected = (opt) => {
+        const id = opt?.id;
+        return selectedOptions.some((x) => (x?.id ?? x) === id);
+    };
+
+    const toggleOption = (opt) => {
+        const id = opt?.id;
+        if (id == null) return;
+
+        if (isSelected(opt)) {
+            setSelectedOptions(selectedOptions.filter((x) => (x?.id ?? x) !== id));
         } else {
-            setSelectedOptions([...selectedOptions, option]);
+            setSelectedOptions([...selectedOptions, opt]);
         }
     };
 
@@ -51,7 +90,7 @@ const ThemeFilter = ({ onApply }) => {
 
 
     return (
-        <div className="filter" ref={filterRef}>
+        <div className={`filter ${isOpen ? 'is-open' : ''}`} ref={filterRef}>
             <div
                 className={`filter-header ${selectedOptions.length > 0 ? 'selected' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
@@ -79,16 +118,27 @@ const ThemeFilter = ({ onApply }) => {
                     </>
                 )}
             </div>
-            {isOpen && (
-                <div className="filter-options">
-                    {themes.map((theme, index) => (
+            <div className="filter-options" aria-hidden={!isOpen}>
+                    {loading ? (
+                        <div style={{ padding: 12, opacity: 0.7 }}>Загрузка…</div>
+                    ) : loadError ? (
+                        <div style={{ padding: 12, opacity: 0.9 }}>{loadError}</div>
+                    ) : null}
+
+                    {(themes || []).map((theme, index) => {
+                        const title = theme?.title;
+                        const selected = isSelected(theme);
+                        const disabled = theme?.isActive === false;
+                        return (
                         <div
                             key={index}
-                            className={`filter-option ${selectedOptions.includes(theme) ? 'selected' : ''}`}
-                            onClick={() => toggleOption(theme)}
+                            className={`filter-option ${selected ? 'selected' : ''} ${disabled ? 'is-disabled' : ''}`}
+                            onClick={() => {
+                                if (!disabled) toggleOption(theme);
+                            }}
                         >
-                            {theme}
-                            {selectedOptions.includes(theme) && (
+                            {title}
+                            {selected && (
                                 <div className="filter-mark">
                                     <svg width="18" height="13" viewBox="0 0 18 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M17 1L6 12L1 7" stroke="#8885FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -96,7 +146,8 @@ const ThemeFilter = ({ onApply }) => {
                                 </div>
                             )}
                         </div>
-                    ))}
+                        );
+                    })}
                     {selectedOptions.length > 0 && (
                         <button className="clear-button" onClick={clearSelection}>
                             <div className="clear-mark">
@@ -115,8 +166,7 @@ const ThemeFilter = ({ onApply }) => {
                             Применить
                         </button>
                     )}
-                </div>
-            )}
+            </div>
         </div>
     );
 };

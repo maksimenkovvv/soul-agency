@@ -1,0 +1,318 @@
+/* src/scss/components/_errors.scss */
+
+.b-error {
+  margin: 60px 0 180px;
+
+  .error {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 60px;
+    align-items: center;
+
+    &__card {
+      position: relative;
+      background-color: $whiteBg;
+      border-radius: 24px;
+      padding: 64px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+
+      &--forbidden {
+        background: linear-gradient(
+                        180deg,
+                        rgba($purpleBg, 0.18) 0%,
+                        rgba($whiteBg, 1) 46%
+        );
+      }
+
+      &--notfound {
+        background: linear-gradient(
+                        180deg,
+                        rgba($lightbllue, 0.55) 0%,
+                        rgba($whiteBg, 1) 46%
+        );
+      }
+
+      &:before,
+      &:after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        opacity: 0.55;
+        filter: blur(1px);
+        pointer-events: none;
+      }
+
+      &:before {
+        width: 220px;
+        height: 220px;
+        right: -110px;
+        top: -110px;
+        background-color: rgba($mintBg, 0.65);
+      }
+
+      &:after {
+        width: 180px;
+        height: 180px;
+        left: -90px;
+        bottom: -90px;
+        background-color: rgba($purpleBg, 0.5);
+      }
+    }
+
+    &__top {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 28px;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 116px;
+      height: 86px;
+      padding: 0 18px;
+      border-radius: 18px;
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background-color: rgba($blackBg, 0.95);
+      color: $white;
+      flex: 0 0 auto;
+    }
+
+    &__titles {
+      min-width: 0;
+    }
+
+    &__title {
+      margin-bottom: 10px;
+    }
+
+    &__subtitle {
+      color: rgba($black, 0.82);
+      max-width: 620px;
+    }
+
+    &__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0 28px;
+    }
+
+    &__meta-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    &__meta-label {
+      font-size: 16px;
+      line-height: 20px;
+      font-weight: 700;
+      opacity: 0.75;
+      flex: 0 0 auto;
+    }
+
+    &__meta-value {
+      font-size: 16px;
+      line-height: 20px;
+      font-weight: 700;
+      min-width: 0;
+
+      /* ✅ чтобы длинный path не ломал верстку */
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    /* ✅ если внутри meta-value есть <code> */
+    &__meta-value code {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    &__pill {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 999px;
+      margin-left: 10px;
+      background-color: rgba($blackBg, 0.08);
+      font-size: 13px;
+      line-height: 16px;
+      flex: 0 0 auto;
+    }
+
+    &__actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+
+      .b-btn {
+        width: fit-content;
+        padding: 12px 18px;
+        font-size: 18px;
+        line-height: 22px;
+      }
+    }
+
+    &__hint {
+      font-size: 16px;
+      line-height: 20px;
+      opacity: 0.72;
+      max-width: 660px;
+    }
+
+    &__art {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &__svg {
+      max-width: 520px;
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+/* ✅ Tablet / small desktop */
+@media (max-width: 1100px) {
+  .b-error {
+    margin: 42px 0 140px;
+
+    .error {
+      grid-template-columns: 1fr;
+      gap: 28px;
+
+      &__art {
+        order: -1;
+      }
+
+      &__card {
+        padding: 40px;
+      }
+
+      &__badge {
+        min-width: 104px;
+        height: 78px;
+        font-size: 44px;
+      }
+
+      &__svg {
+        max-width: 420px;
+      }
+
+      &__actions {
+        .b-btn {
+          font-size: 16px;
+          line-height: 20px;
+          padding: 12px 16px;
+        }
+      }
+    }
+  }
+}
+
+/* ✅ Mobile */
+@media (max-width: 640px) {
+  .b-error {
+    margin: 28px 0 110px;
+
+    .error {
+      gap: 18px;
+
+      &__card {
+        padding: 22px;
+        border-radius: 20px;
+      }
+
+      /* ✅ badge + title stack */
+      &__top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      &__badge {
+        min-width: 88px;
+        height: 64px;
+        font-size: 36px;
+        border-radius: 16px;
+      }
+
+      &__title {
+        font-size: 22px;
+        line-height: 1.15;
+        margin-bottom: 8px;
+      }
+
+      &__subtitle {
+        font-size: 14px;
+        line-height: 18px;
+      }
+
+      &__meta {
+        margin: 14px 0 20px;
+      }
+
+      &__meta-label,
+      &__meta-value {
+        font-size: 14px;
+        line-height: 18px;
+      }
+
+      /* ✅ actions as full-width buttons */
+      &__actions {
+        flex-direction: column;
+        gap: 10px;
+
+        .b-btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      &__hint {
+        font-size: 14px;
+        line-height: 18px;
+      }
+
+      &__svg {
+        max-width: 340px;
+      }
+    }
+  }
+}
+
+/* ✅ Very small phones */
+@media (max-width: 420px) {
+  .b-error {
+    .error {
+      &__card {
+        padding: 18px;
+      }
+
+      &__badge {
+        min-width: 80px;
+        height: 58px;
+        font-size: 34px;
+      }
+
+      &__svg {
+        max-width: 300px;
+      }
+    }
+  }
+}

@@ -1,8 +1,13 @@
 import React from 'react';
 
-const ExperienceFilter = ({ onApply }) => {
+const ExperienceFilter = ({ onApply, value }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedOptions, setSelectedOptions] = React.useState([]);
+
+    React.useEffect(() => {
+        if (!value) return;
+        setSelectedOptions(Array.isArray(value) ? value : []);
+    }, [value]);
     const filterRef = React.useRef(null);  // Добавлен useRef для отслеживания DOM-элемента
 
     const experiences = [
@@ -46,7 +51,7 @@ const ExperienceFilter = ({ onApply }) => {
     };
 
     return (
-        <div className="filter" ref={filterRef}>  {/* Добавлен ref */}
+        <div className={`filter ${isOpen ? 'is-open' : ''}`} ref={filterRef}>
             <div
                 className={`filter-header ${selectedOptions.length > 0 ? 'selected' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
@@ -74,8 +79,7 @@ const ExperienceFilter = ({ onApply }) => {
                     </>
                 )}
             </div>
-            {isOpen && (
-                <div className="filter-options">
+            <div className="filter-options" aria-hidden={!isOpen}>
                     {experiences.map((experience, index) => (
                         <div
                             key={index}
@@ -110,8 +114,7 @@ const ExperienceFilter = ({ onApply }) => {
                             Применить
                         </button>
                     )}
-                </div>
-            )}
+            </div>
         </div>
     );
 };

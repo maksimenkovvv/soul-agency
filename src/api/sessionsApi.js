@@ -3,6 +3,7 @@ import { request } from "./http";
 // --- Fallback storage (пока бэкенд-эндпоинты не подключены) ---
 const LS = {
     schedule: (psyId) => `bs:schedule:${psyId}`,
+    breaks: (psyId) => `bs:breaks:${psyId}`,
     dayoffs: (psyId) => `bs:dayoffs:${psyId}`,
     bookings: (psyId) => `bs:bookings:${psyId}`,
 };
@@ -42,7 +43,9 @@ function toIso(dt) {
 
 const DEFAULT_SCHEDULE = {
     slotMinutes: 50,
-    bufferMinutes: 10,
+    // bufferMinutes — legacy (в текущем бэке его нет). Можно поставить 0,
+    // а паузы делать через WorkBreak.
+    bufferMinutes: 0,
     week: {
         // 1=Mon ... 7=Sun
         1: [{ start: "10:00", end: "18:00" }],
@@ -55,6 +58,67 @@ const DEFAULT_SCHEDULE = {
     },
 };
 
+const DAY_TO_KEY = {
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
+    SUNDAY: 7,
+};
+
+const KEY_TO_DAY = {
+    1: "MONDAY",
+    2: "TUESDAY",
+    3: "WEDNESDAY",
+    4: "THURSDAY",
+    5: "FRIDAY",
+    6: "SATURDAY",
+    7: "SUNDAY",
+};
+
+function hhmm(t) {
+    if (!t) return "00:00";
+    const s = String(t);
+    // LocalTime может прийти как "10:00:00" — обрежем
+    return s.length >= 5 ? s.slice(0, 5) : s;
+}
+
+function scheduleFromWorkingRows(rows) {
+    const week = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+    const slotMinutes = rows?.find((x) => x?.slotDurationMinutes)?.slotDurationMinutes ?? DEFAULT_SCHEDULE.slotMinutes;
+    for (const r of rows || []) {
+        const key = DAY_TO_KEY[String(r?.dayOfWeek || "").toUpperCase()] || null;
+        if (!key) continue;
+        week[key] = [...(week[key] || []), { start: hhmm(r?.startTime), end: hhmm(r?.endTime) }];
+    }
+    // сортировка интервалов по start
+    for (const k of Object.keys(week)) {
+        week[k] = (week[k] || []).slice().sort((a, b) => String(a.start).localeCompare(String(b.start)));
+    }
+    return { slotMinutes, bufferMinutes: 0, week };
+}
+
+function workingRowsFromSchedule(schedule) {
+    const slotMinutes = schedule?.slotMinutes ?? DEFAULT_SCHEDULE.slotMinutes;
+    const week = schedule?.week || {};
+    const out = [];
+    for (const [k, intervals] of Object.entries(week)) {
+        const day = KEY_TO_DAY[Number(k)];
+        if (!day) continue;
+        for (const it of Array.isArray(intervals) ? intervals : []) {
+            out.push({
+                dayOfWeek: day,
+                startTime: hhmm(it.start),
+                endTime: hhmm(it.end),
+                slotDurationMinutes: slotMinutes,
+            });
+        }
+    }
+    return out;
+}
+
 function shouldFallback(err) {
     // пока эндпоинты не готовы — удобно не ломать UI
     return !err || err.status === 404 || err.status === 405 || err.status === 501;
@@ -64,10 +128,22 @@ export const sessionsApi = {
     // --- Schedule (недельный шаблон) ---
     async getSchedule(psychologistId) {
         try {
-            // Предложенный эндпоинт (можешь поменять под свой Spring)
-            // GET /api/psychologists/{id}/schedule
-            return await request(`/api/psychologists/${psychologistId}/schedule`);
+            // Новый бэк: WorkingSchedule (список строк)
+            // GET /api/psychologists/{id}/working-schedule
+            const rows = await request(`/api/psychologists/${psychologistId}/working-schedule`);
+            if (Array.isArray(rows)) return scheduleFromWorkingRows(rows);
+            // если бэк вдруг вернул уже "старый" формат
+            if (rows && rows.week) return rows;
+            return DEFAULT_SCHEDULE;
         } catch (e) {
+            // старый эндпоинт
+            try {
+                const legacy = await request(`/api/psychologists/${psychologistId}/schedule`);
+                if (legacy && legacy.week) return legacy;
+            } catch (e2) {
+                if (!shouldFallback(e2) && !shouldFallback(e)) throw e2;
+            }
+
             if (!shouldFallback(e)) throw e;
             return lsGet(LS.schedule(psychologistId), DEFAULT_SCHEDULE);
         }
@@ -75,15 +151,101 @@ export const sessionsApi = {
 
     async upsertSchedule(psychologistId, schedule) {
         try {
-            // PUT /api/psychologists/{id}/schedule
-            return await request(`/api/psychologists/${psychologistId}/schedule`, {
+            // Новый бэк: заменяем график целиком
+            // PUT /api/psychologists/{id}/working-schedule
+            const payload = workingRowsFromSchedule(schedule);
+            const r = await request(`/api/psychologists/${psychologistId}/working-schedule`, {
                 method: "PUT",
-                json: schedule,
+                json: payload,
             });
+            // сервер может вернуть либо строки, либо уже VM — нормализуем
+            if (Array.isArray(r)) return scheduleFromWorkingRows(r);
+            return r?.week ? r : schedule;
         } catch (e) {
+            // fallback: старый эндпоинт (schedule VM)
+            try {
+                const r = await request(`/api/psychologists/${psychologistId}/schedule`, {
+                    method: "PUT",
+                    json: schedule,
+                });
+                return r?.week ? r : schedule;
+            } catch (e2) {
+                if (!shouldFallback(e2) && !shouldFallback(e)) throw e2;
+            }
+
             if (!shouldFallback(e)) throw e;
             lsSet(LS.schedule(psychologistId), schedule);
             return schedule;
+        }
+    },
+
+    // --- WorkBreaks ---
+    async listWorkBreaks(psychologistId, { from, to } = {}) {
+        try {
+            // GET /api/psychologists/{id}/work-breaks?from=YYYY-MM-DD&to=YYYY-MM-DD
+            const qs = new URLSearchParams();
+            if (from) qs.set("from", from);
+            if (to) qs.set("to", to);
+            const tail = qs.toString() ? `?${qs.toString()}` : "";
+            const r = await request(`/api/psychologists/${psychologistId}/work-breaks${tail}`);
+            return Array.isArray(r) ? r : [];
+        } catch (e) {
+            if (!shouldFallback(e)) throw e;
+            const all = lsGet(LS.breaks(psychologistId), []);
+            // фильтруем только разовые (date) по диапазону; регулярные всегда возвращаем
+            return (all || []).filter((x) => {
+                if (!x?.date) return true;
+                return (!from || x.date >= from) && (!to || x.date <= to);
+            });
+        }
+    },
+
+    async upsertWorkBreak(psychologistId, b) {
+        const payload = {
+            id: b?.id ?? null,
+            date: b?.date ?? null,
+            dayOfWeek: b?.dayOfWeek ?? null,
+            startTime: hhmm(b?.startTime),
+            endTime: hhmm(b?.endTime),
+        };
+
+        try {
+            if (payload.id) {
+                // PUT /api/work-breaks/{id}
+                return await request(`/api/work-breaks/${payload.id}`, {
+                    method: "PUT",
+                    json: payload,
+                });
+            }
+            // POST /api/psychologists/{id}/work-breaks
+            return await request(`/api/psychologists/${psychologistId}/work-breaks`, {
+                method: "POST",
+                json: payload,
+            });
+        } catch (e) {
+            if (!shouldFallback(e)) throw e;
+
+            const all = lsGet(LS.breaks(psychologistId), []);
+            if (payload.id) {
+                const merged = (all || []).map((x) => (x.id === payload.id ? { ...x, ...payload } : x));
+                lsSet(LS.breaks(psychologistId), merged);
+                return payload;
+            }
+            const next = { ...payload, id: uid("break"), psychologistId };
+            lsSet(LS.breaks(psychologistId), [...(all || []), next]);
+            return next;
+        }
+    },
+
+    async deleteWorkBreak(psychologistId, breakId) {
+        try {
+            return await request(`/api/work-breaks/${breakId}`, { method: "DELETE" });
+        } catch (e) {
+            if (!shouldFallback(e)) throw e;
+            const all = lsGet(LS.breaks(psychologistId), []);
+            const merged = (all || []).filter((x) => x.id !== breakId);
+            lsSet(LS.breaks(psychologistId), merged);
+            return { ok: true };
         }
     },
 

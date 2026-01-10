@@ -33,6 +33,34 @@
     }
 }
 
+// Loading state for buttons
+.b-btn.is-loading {
+    opacity: 0.86;
+    pointer-events: none;
+}
+
+.b-btn__spinner {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid rgba($white, 0.35);
+    border-top-color: rgba($white, 0.95);
+    animation: bSpin 0.9s linear infinite;
+    margin-right: 10px;
+    flex: 0 0 auto;
+}
+
+.b-btn--transparent .b-btn__spinner {
+    border-color: rgba($black, 0.25);
+    border-top-color: rgba($black, 0.75);
+}
+
+@keyframes bSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .b-btn--transparent {
 
     &,

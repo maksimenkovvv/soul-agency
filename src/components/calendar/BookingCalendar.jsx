@@ -11,8 +11,10 @@ import { useAuth } from "../../auth/authStore";
 import { useWs } from "../../ws/wsStore";
 import { sessionsApi } from "../../api/sessionsApi";
 import Modal from "../ui/Modal";
+import { useToast } from "../../ui/toast/ToastProvider";
 import {
     addMinutes,
+    buildBreakEvents,
     buildSlotEvents,
     dateToYmd,
     normalizeBookingToEvent,
@@ -29,10 +31,15 @@ export default function BookingCalendar({
                                             schedule: scheduleOverride,
                                             allowDayOff = false,
                                             onBooked,
+                                            reloadToken,
                                         }) {
     const { me, role } = useAuth();
+    const toast = useToast();
     const { connected: wsConnected, subscribe: wsSubscribe } = useWs();
-    const effectiveRole = mode === "PSYCHO" ? "PSYCHOLOGIST" : role;
+    // In PSYCHO mode we treat the viewer as psychologist (unless it's admin).
+    // In CLIENT mode we keep the real role, but management actions are still gated below.
+    const effectiveRole =
+        mode === "PSYCHO" ? (role === "ADMIN" ? "ADMIN" : "PSYCHOLOGIST") : role;
 
     const psyId = psychologist?.id;
 
@@ -43,6 +50,7 @@ export default function BookingCalendar({
     const [schedule, setSchedule] = useState(null);
     const [dayOffs, setDayOffs] = useState([]);
     const [bookings, setBookings] = useState([]);
+    const [breaks, setBreaks] = useState([]);
 
     const [slotModal, setSlotModal] = useState(null); // {start,end}
     const [bookingModal, setBookingModal] = useState(null); // booking
@@ -50,21 +58,25 @@ export default function BookingCalendar({
     const [saving, setSaving] = useState(false);
 
     const canBook = effectiveRole === "CLIENT" || effectiveRole === "ADMIN";
-    const canManage = effectiveRole === "PSYCHOLOGIST" || effectiveRole === "ADMIN";
+    // IMPORTANT: management (day-offs/breaks/schedule) is allowed only in PSYCHO mode.
+    const canManage = mode === "PSYCHO" && (effectiveRole === "PSYCHOLOGIST" || effectiveRole === "ADMIN");
+    const canManageDayOff = allowDayOff && canManage;
 
     // загрузка данных по текущему диапазону
     const load = useCallback(async () => {
         if (!psyId || !range) return;
         setLoading(true);
         try {
-            const [sc, offs, bks] = await Promise.all([
+            const [sc, offs, bks, brs] = await Promise.all([
                 scheduleOverride ? Promise.resolve(scheduleOverride) : sessionsApi.getSchedule(psyId),
                 sessionsApi.listDayOffs(psyId, range),
                 sessionsApi.listBookings(psyId, range),
+                sessionsApi.listWorkBreaks(psyId, range),
             ]);
             if (!scheduleOverride) setSchedule(sc);
             setDayOffs(Array.isArray(offs) ? offs : []);
             setBookings(Array.isArray(bks) ? bks : []);
+            setBreaks(Array.isArray(brs) ? brs : []);
         } finally {
             setLoading(false);
         }
@@ -72,7 +84,7 @@ export default function BookingCalendar({
 
     useEffect(() => {
         load();
-    }, [load]);
+    }, [load, reloadToken]);
 
     // WS: live updates for current psychologist calendar
     // Backend should broadcast any changes (bookings/day-offs/schedule) to:
@@ -97,6 +109,13 @@ export default function BookingCalendar({
 
         const bookingEvents = (bookings || []).map((b) => normalizeBookingToEvent(b, { role: effectiveRole }));
         const dayOffEvents = (dayOffs || []).map((d) => normalizeDayOffToEvent(d));
+        const breakEvents = range
+            ? buildBreakEvents({
+                rangeStart: new Date(`${range.from}T00:00:00`),
+                rangeEnd: new Date(new Date(`${range.to}T00:00:00`).getTime() + 24 * 60 * 60 * 1000),
+                breaks,
+            })
+            : [];
 
         // слоты показываем только в timeGrid (иначе на месяце будет слишком шумно)
         const slotEvents =
@@ -107,11 +126,12 @@ export default function BookingCalendar({
                     schedule: sc,
                     dayOffs,
                     bookings,
+                    breaks,
                 })
                 : [];
 
-        return [...dayOffEvents, ...slotEvents, ...bookingEvents];
-    }, [psyId, schedule, scheduleOverride, dayOffs, bookings, range, viewType, effectiveRole]);
+        return [...dayOffEvents, ...breakEvents, ...slotEvents, ...bookingEvents];
+    }, [psyId, schedule, scheduleOverride, dayOffs, bookings, breaks, range, viewType, effectiveRole]);
 
     const onDatesSet = (arg) => {
         setViewType(arg.view.type);
@@ -131,7 +151,10 @@ export default function BookingCalendar({
             return;
         }
         if (kind === "DAYOFF") {
-            if (!canManage) return;
+            if (!canManageDayOff) {
+                toast.info("Выходные можно менять только в вашем графике.", { title: "Недоступно" });
+                return;
+            }
             const raw = info.event.extendedProps?.raw;
             const date = raw?.date;
             const reason = raw?.reason || "";
@@ -140,12 +163,12 @@ export default function BookingCalendar({
             return;
         }
         if (kind === "BOOKING") {
-            setBookingModal(info.event.extendedProps?.booking || null);
+            setBookingModal(info.event.extendedProps?.raw || null);
         }
     };
 
     const onDateClick = (arg) => {
-        if (!allowDayOff || !canManage) return;
+        if (!canManageDayOff) return;
         // удобнее добавлять day-off в месячном/дневном представлении
         const date = dateToYmd(arg.date);
         const existing = (dayOffs || []).find((x) => x.date === date);
@@ -184,8 +207,11 @@ export default function BookingCalendar({
             } else {
                 await sessionsApi.createDayOff(psyId, { date: dayOffModal.date, reason: dayOffModal.reason });
             }
-            setDayOffModal(null);
             await load();
+            setDayOffModal(null);
+            toast.success("Выходной сохранён");
+        } catch (e) {
+            toast.error(e?.message || "Не удалось сохранить выходной");
         } finally {
             setSaving(false);
         }
@@ -196,8 +222,11 @@ export default function BookingCalendar({
         setSaving(true);
         try {
             await sessionsApi.deleteDayOff(psyId, dayOffModal.existingId);
-            setDayOffModal(null);
             await load();
+            setDayOffModal(null);
+            toast.success("Выходной удалён");
+        } catch (e) {
+            toast.error(e?.message || "Не удалось удалить выходной");
         } finally {
             setSaving(false);
         }
@@ -237,6 +266,7 @@ export default function BookingCalendar({
                 <div className="b-calendar__legend">
                     <span className="b-badge b-badge--slot">Свободно</span>
                     <span className="b-badge b-badge--booking">Занято</span>
+                    <span className="b-badge b-badge--break">Перерыв</span>
                     <span className="b-badge b-badge--dayoff">Выходной</span>
                 </div>
             </div>

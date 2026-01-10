@@ -1,25 +1,93 @@
 .b-search {
-    max-width: 528px;
+  width: 100%;
+  max-width: 528px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &__icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: #8885ff; // цвет иконки
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__input {
     width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(#313235, 0.2);
+    background: #fff;
+    outline: none;
 
-    .search {
-        &-input {
-            height: 100%;
-            width: 100%;
-            border-radius: 10px;
-            padding-left: 10px;
-            border-width: 0;
-            padding-left: 52px;
-            outline: none;
-            color: #D2D7DB;
-            font-size: 18px;
-            line-height: 22px;
-            background: url('../../assets/img/search.png') #fff no-repeat 16px center;
+    padding: 0 14px 0 52px; // место под иконку
+    font-size: 18px;
+    line-height: 22px;
 
-            &::placeholder {
-                color: #D2D7DB;
+    /* ✅ важное: цвет текста ввода НЕ должен быть цветом плейсхолдера */
+    color: #313235;
 
-            }
-        }
+    transition: $transition;
+
+    &::placeholder {
+      color: #d2d7db;
     }
+
+    &:focus {
+      border-color: rgba(#8885ff, 0.55);
+      box-shadow: 0 10px 24px rgba(136, 133, 255, 0.18);
+    }
+  }
+
+  &__apptFilters {
+    margin-left: 10px;
+    flex: 0 0 auto;
+  }
+}
+
+/* ✅ Tablet: чуть компактнее */
+@media (max-width: 1100px) {
+  .b-search {
+    max-width: 100%;
+
+    &__input {
+      height: 46px;
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+}
+
+/* ✅ Mobile: 100% ширина, меньше паддинги */
+@media (max-width: 700px) {
+  .b-search {
+    max-width: 100%;
+
+    &__icon {
+      left: 14px;
+    }
+
+    &__input {
+      height: 44px;
+      border-radius: 12px;
+      padding-left: 46px;
+      font-size: 15px;
+      line-height: 18px;
+    }
+  }
+}
+
+/* ✅ Very small */
+@media (max-width: 420px) {
+  .b-search__input {
+    height: 42px;
+    padding-left: 44px;
+  }
 }

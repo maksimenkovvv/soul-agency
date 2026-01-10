@@ -1,8 +1,13 @@
 import React from 'react';
 
-const PriceFilter = ({ onApply }) => {
+const PriceFilter = ({ onApply, value }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [selectedOptions, setSelectedOptions] = React.useState([]);
+
+    React.useEffect(() => {
+        if (!value) return;
+        setSelectedOptions(Array.isArray(value) ? value : []);
+    }, [value]);
     const filterRef = React.useRef(null);  // Добавлен useRef для отслеживания DOM-элемента
 
     const prices = [
@@ -44,7 +49,7 @@ const PriceFilter = ({ onApply }) => {
     };
 
     return (
-        <div className="filter" ref={filterRef}>  {/* Добавлен ref */}
+        <div className={`filter ${isOpen ? 'is-open' : ''}`} ref={filterRef}>
             <div
                 className={`filter-header ${selectedOptions.length > 0 ? 'selected' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
@@ -72,8 +77,7 @@ const PriceFilter = ({ onApply }) => {
                     </>
                 )}
             </div>
-            {isOpen && (
-                <div className="filter-options">
+            <div className="filter-options" aria-hidden={!isOpen}>
                     {prices.map((price, index) => (
                         <div
                             key={index}
@@ -109,7 +113,6 @@ const PriceFilter = ({ onApply }) => {
                         </button>
                     )}
                 </div>
-            )}
         </div>
     );
 };

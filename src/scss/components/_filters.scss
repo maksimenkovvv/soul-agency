@@ -1,111 +1,323 @@
 .b-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 50px;
+
+  // Desktop: в одну линию
+  flex-wrap: nowrap;
+
+  position: relative;
+  z-index: 5;
+
+  // Search (первый элемент)
+  > :first-child {
+    flex: 1 1 420px;
+    min-width: 260px;
+  }
+
+  // Ряд фильтров (всегда flex, иначе на десктопе будет "колонкой")
+  &__row {
     display: flex;
+    align-items: center;
     gap: 12px;
-    margin-bottom: 50px;
+    flex: 0 0 auto;
+    min-width: 0;
+  }
+
+  .filter {
+    position: relative;
+    flex: 0 0 auto;
+
+    // Когда открыт — поднимаем слой, чтобы не прятался
+    &.is-open {
+      z-index: 20;
+
+      // стрелка вращается, но НЕ крестик очистки
+      .filter-header-marker:not(.filter-header-marker--clear) {
+        transform: rotate(180deg);
+      }
+
+      .filter-options {
+        opacity: 1;
+        transform: translateY(0);
+        visibility: visible;
+        pointer-events: auto;
+        transition-delay: 0s;
+      }
+    }
+
+    // header (лучше button)
+    &-header {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      font-size: 18px;
+      line-height: 22px;
+      padding: 13px 16px 13px 20px;
+
+      border: 1px solid #31323566;
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+
+      background: transparent;
+
+      &.selected {
+        background-color: #fff;
+      }
+
+      .filter-header-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+      }
+
+      &-marker {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        transition: transform $transition;
+        flex: 0 0 auto;
+      }
+    }
+
+    // dropdown
+    &-options {
+      position: absolute;
+      top: calc(100% + 11px);
+      left: 0;
+      z-index: 50;
+
+      padding: 18px 16px;
+      background-color: #ffffffd9;
+      border-radius: 18px;
+      backdrop-filter: blur(32px);
+
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      width: max-content;
+      max-width: min(360px, calc(100vw - 24px));
+
+      // ✅ чтобы не "уезжал вниз" и не требовал скроллить страницу:
+      max-height: min(420px, 60vh);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+
+      // hidden by default (animated)
+      opacity: 0;
+      transform: translateY(-6px);
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity $transition, transform $transition, visibility 0s linear $transition;
+    }
+
+    &-option {
+      width: 100%;
+      text-align: left;
+
+      font-size: 18px;
+      line-height: 22px;
+      padding: 13px 16px;
+
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+
+      border-radius: 12px;
+      transition: background $transition;
+
+      border: 0;
+      background: transparent;
+
+      .filter-option-text {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &.selected {
+        background-color: #fff;
+      }
+
+      &:hover {
+        background-color: #fff;
+      }
+
+      &.is-disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+
+        &:not(.selected):hover {
+          background-color: transparent;
+        }
+      }
+    }
+
+    .filter__state {
+      padding: 12px;
+      opacity: 0.75;
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    .filter__footer {
+      display: flex;
+      gap: 10px;
+      padding-top: 10px;
+    }
+
+    .apply-button {
+      width: 100%;
+    }
+
+    .clear {
+      &-button {
+        background: transparent;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: #8885ff;
+        font-size: 18px;
+        line-height: 22px;
+        padding: 13px 16px;
+        cursor: pointer;
+        border: 0;
+      }
+
+      &-mark {
+        display: flex;
+        width: 24px;
+        height: 24px;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .b-btn {
+      &,
+      a:link,
+      a:visited {
+        font-size: 18px;
+        line-height: 22px;
+      }
+    }
+  }
+}
+
+/* ✅ Tablet: можно переносить строки */
+@media (max-width: 1100px) {
+  .b-filters {
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+
+    &__row {
+      flex-wrap: wrap;
+    }
+
+    .filter-header,
+    .filter-option,
+    .filter .clear-button {
+      font-size: 16px;
+      line-height: 20px;
+      padding: 11px 14px;
+    }
+
+    .filter-header {
+      padding: 11px 14px 11px 16px;
+    }
+
+    .filter-options {
+      padding: 14px 12px;
+      border-radius: 16px;
+    }
+  }
+}
+
+/* ✅ Mobile: поиск сверху, фильтры — скролл-строка */
+@media (max-width: 700px) {
+  .b-filters {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 12px;
+    margin-bottom: 22px;
+
+    > :first-child {
+      width: 100%;
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+
+    &__row {
+      display: flex;
+      gap: 10px;
+
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 6px;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
 
     .filter {
-        position: relative;
-
-        &:has(.filter-options) {
-            .filter {
-                &-header {
-                    &-marker {
-                        transform: rotate(180deg);
-                    }
-                }
-            }
-        }
-
-        &-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 18px;
-            line-height: 22px;
-            padding: 13px 16px 13px 20px;
-            border: 1px solid #31323566;
-            border-radius: 12px;
-            cursor: pointer;
-
-            &.selected {
-                background-color: #FFFFFF;
-            }
-
-            &-marker {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 20px;
-                height: 20px;
-                transition: transform $transition;
-            }
-        }
-
-        &-options {
-            position: absolute;
-            z-index: 10;
-            padding: 18px 16px;
-            background-color: #FFFFFFD9;
-            border-radius: 18px;
-            backdrop-filter: blur(32px);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: max-content;
-            top: calc(100% + 11px);
-        }
-
-        &-option {
-            font-size: 18px;
-            line-height: 22px;
-            padding: 13px 16px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            border-radius: 12px;
-            transition: background $transition;
-
-            &.selected {
-                background-color: #FFFFFF;
-            }
-
-            &:hover {
-                background-color: #FFFFFF;
-            }
-        }
-
-        .clear {
-            &-button {
-                background: transparent;
-                display: flex;
-                gap: 10px;
-                align-items: center;
-                color: #8885FF;
-                font-size: 18px;
-                line-height: 22px;
-                padding: 13px 16px;
-            }
-
-            &-mark {
-                display: flex;
-                width: 24px;
-                height: 24px;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
-        .b-btn {
-
-            &,
-            a:link,
-            a:visited {
-                font-size: 18px;
-                line-height: 22px;
-            }
-        }
+      flex: 0 0 auto;
     }
+
+    .filter-header {
+      font-size: 15px;
+      line-height: 18px;
+      padding: 10px 12px;
+      border-radius: 12px;
+
+      .filter-header-text {
+        max-width: 180px;
+      }
+    }
+
+    .filter-option,
+    .filter .clear-button {
+      font-size: 15px;
+      line-height: 18px;
+      padding: 10px 12px;
+    }
+
+    // dropdown на мобиле — прижимаем к правому краю
+    .filter-options {
+      left: auto;
+      right: 0;
+      max-width: calc(100vw - 24px);
+      max-height: min(420px, 55vh);
+    }
+
+    .filter__footer {
+      flex-direction: column;
+    }
+  }
+}
+
+/* very small */
+@media (max-width: 420px) {
+  .b-filters {
+    gap: 10px;
+
+    .filter-header {
+      padding: 9px 11px;
+    }
+  }
 }

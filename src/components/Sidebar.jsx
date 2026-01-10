@@ -1,12 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+function initials(nameOrEmail) {
+    const s = String(nameOrEmail || "").trim();
+    if (!s) return "?";
+    // email
+    if (s.includes("@")) return s.slice(0, 1).toUpperCase();
+    const parts = s.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0].slice(0, 1) + parts[1].slice(0, 1)).toUpperCase();
+}
+
 function Sidebar({ user, setActiveTab, activeTab }) {
     return (
         <div className="b-sidebar">
             <div className="sidebar__info">
                 <div className="sidebar__info-photo">
-                    <img src={user.avatar} alt="фото" />
+                    {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="фото" />
+                    ) : (
+                        <div className="sidebar__info-photo-fallback" aria-hidden="true">
+                            {initials(user.name || user.email)}
+                        </div>
+                    )}
                 </div>
                 <Link to="settings">
                     <button className="sidebar__info-settings">
@@ -18,35 +34,55 @@ function Sidebar({ user, setActiveTab, activeTab }) {
                 <p className="sidebar__info-name">{user.name}</p>
                 <p className="sidebar__info-email">{user.email}</p>
             </div>
-            <ul className="sidebar__tabs">
-                {user.role === 'client' ? (
+            <ul className="sidebar__tabs" role="tablist" aria-label="Разделы кабинета">
+                {user.role === "CLIENT" ? (
                     <>
-                        <li
-                            className={`sidebar__tabs-item ${activeTab === 'Записи' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('Записи')}
-                        >
-                            Записи
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "Записи" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Записи")}
+                                role="tab"
+                                aria-selected={activeTab === "Записи"}
+                            >
+                                Записи
+                            </button>
                         </li>
-                        <li
-                            className={`sidebar__tabs-item ${activeTab === 'Избранное' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('Избранное')}
-                        >
-                            Избранное
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "Избранное" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Избранное")}
+                                role="tab"
+                                aria-selected={activeTab === "Избранное"}
+                            >
+                                Избранное
+                            </button>
                         </li>
                     </>
                 ) : (
                     <>
-                        <li
-                            className={`sidebar__tabs-item ${activeTab === 'Записи' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('Записи')}
-                        >
-                            Записи
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "Записи" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Записи")}
+                                role="tab"
+                                aria-selected={activeTab === "Записи"}
+                            >
+                                Записи
+                            </button>
                         </li>
-                        <li
-                            className={`sidebar__tabs-item ${activeTab === 'График работы' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('График работы')}
-                        >
-                            График работы
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "График работы" ? "active" : ""}`}
+                                onClick={() => setActiveTab("График работы")}
+                                role="tab"
+                                aria-selected={activeTab === "График работы"}
+                            >
+                                График работы
+                            </button>
                         </li>
                     </>
                 )}

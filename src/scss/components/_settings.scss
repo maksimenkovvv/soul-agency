@@ -1,138 +1,654 @@
 .b-settings {
-    .settings {
-        &__button {
-            display: flex;
-            gap: 17px;
-            align-items: center;
-            max-width: max-content;
-            margin-bottom: 26px;
-            margin-left: 20px;
+  .settings {
+    &__button {
+      display: flex;
+      gap: 17px;
+      align-items: center;
+      max-width: max-content;
+      margin-bottom: 26px;
+      margin-left: 20px;
 
-            span {
-                font-size: 18px;
-                line-height: 22px;
-                font-weight: 700;
-            }
-        }
-
-        &__wrapper {
-            background-color: $whiteBg;
-            padding: 48px;
-            border-radius: 24px;
-        }
-
-        &__content {
-            display: flex;
-            gap: 160px;
-
-            &-photo {
-                max-width: 342px;
-                max-height: 342px;
-                display: flex;
-                position: relative;
-                border-radius: 12px;
-                overflow: hidden;
-
-                &:hover {
-                    .settings__content-photo__blur {
-                        opacity: 1;
-                    }
-                }
-
-                &__blur {
-                    opacity: 0;
-                    position: absolute;
-                    background-color: rgba($whiteBg, 0.40);
-                    width: 100%;
-                    height: 100%;
-                    backdrop-filter: blur(32px);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 48px;
-                    transition: $transition;
-
-
-                    &-btn {
-                        width: 48px;
-                        height: 48px;
-                        background-color: $whiteBg;
-                        border-radius: 12px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: $transition;
-
-                        &:hover {
-                            background-color: rgba($whiteBg, 0.40);
-                        }
-                    }
-                }
-
-                img {
-                    width: 100%;
-                    object-fit: cover;
-                    border-radius: 12px;
-                }
-            }
-
-            &-form {
-                width: 100%;
-                max-width: 665px;
-
-                .login {
-                    &__form {
-                        &-group {
-                            &--reset {
-                                .login {
-                                    &__input {
-                                        &-visible {
-                                            bottom: 49px !important;
-                                        }
-
-                                        &-link {
-                                            width: fit-content;
-                                            font-size: 18px;
-                                            line-height: 22px;
-                                            font-weight: 700;
-                                            color: #6755E0;
-                                        }
-                                    }
-                                }
-                            }
-
-                            .login {
-                                &__input {
-                                    &-wrapper {
-                                        display: flex;
-                                        justify-content: space-between;
-
-                                        .login {
-                                            &__input {
-                                                max-width: 390px;
-                                                width: 100%;
-
-                                                &-button {
-                                                    max-width: 250px;
-                                                    width: 100%;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    &-visible {
-                                        transform: translateX(-50%);
-                                        right: 43%;
-                                        bottom: 17px;
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
+      span {
+        font-size: 18px;
+        line-height: 22px;
+        font-weight: 700;
+      }
     }
+
+    &__wrapper {
+      background-color: $whiteBg;
+      padding: 48px;
+      border-radius: 24px;
+      border: 1px solid rgba($gray, 0.25);
+    }
+
+    &__content {
+      display: flex;
+      gap: 160px;
+
+      /* важно: чтобы JS мог правильно ограничить сдвиг по высоте формы */
+      align-items: flex-start;
+      min-width: 0;
+
+      &-photo {
+        max-width: 342px;
+        max-height: 342px;
+        width: 100%;
+        height: 342px;
+        display: flex;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        flex: 0 0 342px;
+        background: rgba($gray, 0.18);
+        border: 1px solid rgba($gray, 0.25);
+
+        /* ✅ будет "ползти" вниз при скролле — JS меняет --avatarShift */
+        transform: translate3d(0, var(--avatarShift, 0px), 0);
+        will-change: transform;
+
+        &:hover {
+          .settings__content-photo__blur {
+            opacity: 1;
+          }
+        }
+
+        &__blur {
+          opacity: 0;
+          position: absolute;
+          inset: 0;
+          background-color: rgba($whiteBg, 0.40);
+          width: 100%;
+          height: 100%;
+          backdrop-filter: blur(32px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 48px;
+          transition: $transition;
+
+          &-btn {
+            width: 48px;
+            height: 48px;
+            background-color: $whiteBg;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition;
+            border: 1px solid rgba($gray, 0.25);
+            cursor: pointer;
+
+            &:hover {
+              background-color: rgba($whiteBg, 0.40);
+            }
+
+            &:disabled {
+              opacity: 0.65;
+              cursor: not-allowed;
+            }
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 12px;
+          display: block;
+        }
+      }
+
+      &-form {
+        width: 100%;
+        max-width: 665px;
+        min-width: 0;
+
+        .login {
+          &__form {
+            &-group {
+              &--reset {
+                .login {
+                  &__input {
+                    &-visible {
+                      bottom: 49px !important;
+                    }
+
+                    &-link {
+                      width: fit-content;
+                      font-size: 18px;
+                      line-height: 22px;
+                      font-weight: 700;
+                      color: #6755e0;
+                      background: transparent;
+                      cursor: pointer;
+                    }
+                  }
+                }
+              }
+
+              .login {
+                &__input {
+                  &-wrapper {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 14px;
+                    align-items: center;
+                    min-width: 0;
+
+                    .login {
+                      &__input {
+                        max-width: 390px;
+                        width: 100%;
+                        min-width: 0;
+
+                        &-button {
+                          max-width: 250px;
+                          width: 100%;
+                        }
+                      }
+                    }
+                  }
+
+                  &-visible {
+                    transform: translateX(-50%);
+                    right: 43%;
+                    bottom: 17px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* дополнения для расширенных настроек */
+  .settings__hint {
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba($black, 0.7);
+    margin-top: 6px;
+  }
+
+  .settings__section {
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid rgba($gray, 0.35);
+  }
+
+  .settings__section-head {
+    margin-bottom: 18px;
+  }
+
+  .settings__section-title {
+    font-size: 22px;
+    line-height: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: $black;
+  }
+
+  .settings__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: end;
+    min-width: 0;
+  }
+
+  .settings__grid--dict {
+    align-items: start;
+  }
+
+  .settings__dict {
+    position: relative;
+  }
+
+  .settings__dict-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .settings__dict-add {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: rgba($whiteBg, 0.8);
+    border: 1px solid rgba($gray, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition;
+
+    &:hover {
+      background: rgba($whiteBg, 1);
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+  }
+
+  .settings__dict-empty {
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba($black, 0.55);
+    padding: 10px 0 2px;
+  }
+
+  .settings__dict-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 2px 0;
+  }
+
+  .settings__dict-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 12px;
+    background: rgba($whiteBg, 0.85);
+    border: 1px solid rgba($gray, 0.35);
+    max-width: 100%;
+  }
+
+  .settings__dict-chip-title {
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba($black, 0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+
+  .settings__dict-chip-x {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    transition: $transition;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba($gray, 0.15);
+    }
+  }
+
+  .settings__dict-dropdown {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba($whiteBg, 0.85);
+    backdrop-filter: blur(32px);
+    border: 1px solid rgba($gray, 0.25);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    max-width: min(680px, calc(100vw - 24px));
+  }
+
+  .settings__dict-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .settings__dict-search {
+    height: 44px;
+    padding: 10px 12px;
+    font-size: 16px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .settings__dict-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .settings__dict-clear,
+  .settings__dict-done {
+    background: transparent;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 700;
+    padding: 10px 12px;
+    border-radius: 12px;
+    transition: $transition;
+    cursor: pointer;
+  }
+
+  .settings__dict-clear {
+    color: #8885ff;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .settings__dict-done {
+    background: #ffffff;
+    border: 1px solid rgba($gray, 0.25);
+  }
+
+  .settings__dict-msg {
+    padding: 10px 2px;
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba($black, 0.75);
+  }
+
+  .settings__dict-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 280px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .settings__dict-item {
+    font-size: 16px;
+    line-height: 20px;
+    padding: 12px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: background $transition;
+
+    &:hover {
+      background: #ffffff;
+    }
+
+    &.selected {
+      background: #ffffff;
+    }
+
+    &.is-disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+
+      &:hover {
+        background: transparent;
+      }
+    }
+  }
+
+  .settings__dict-item-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .settings__password-actions {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin-top: 12px;
+
+    .b-btn {
+      max-width: 320px;
+      width: 100%;
+    }
+  }
+
+  .login__input--textarea {
+    height: auto;
+    min-height: 140px;
+    resize: vertical;
+    padding-top: 14px;
+  }
+
+  .login__input--select {
+    cursor: pointer;
+  }
+
+  .login__input:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+}
+
+/* ✅ Только desktop: разрешаем скролл-анимацию (на мобиле JS сбросит переменную) */
+@media (min-width: 981px) {
+  .b-settings {
+    .settings__content-photo {
+      /* небольшой “мягкий” эффект, но без лагов */
+      transition: transform 80ms linear;
+    }
+  }
+}
+
+/* <= 1200px: уменьшаем gap и фото */
+@media (max-width: 1200px) {
+  .b-settings {
+    .settings {
+      &__wrapper {
+        padding: 36px;
+      }
+
+      &__content {
+        gap: 60px;
+
+        &-photo {
+          flex: 0 0 300px;
+          max-width: 300px;
+          height: 300px;
+          max-height: 300px;
+        }
+
+        &-form {
+          max-width: 100%;
+        }
+      }
+    }
+
+    .settings__dict-chip-title {
+      max-width: 180px;
+    }
+  }
+}
+
+/* <= 980px: колонка (фото сверху, форма снизу), сетки 2->1 */
+@media (max-width: 980px) {
+  .b-settings {
+    .settings {
+      &__button {
+        margin-left: 0;
+      }
+
+      &__wrapper {
+        padding: 28px;
+      }
+
+      &__content {
+        flex-direction: column;
+        gap: 18px;
+
+        &-photo {
+          flex: 0 0 auto;
+          max-width: none;
+          width: 100%;
+          height: 320px;
+          max-height: none;
+
+          /* на мобиле не хотим “ползти” */
+          transform: none !important;
+
+          .settings__content-photo__blur {
+            opacity: 1;
+            gap: 16px;
+            backdrop-filter: blur(18px);
+          }
+        }
+
+        &-form {
+          max-width: none;
+
+          .login__input-wrapper {
+            flex-direction: column;
+            align-items: stretch;
+
+            .login__input {
+              max-width: none !important;
+            }
+
+            .login__input-button {
+              max-width: none !important;
+              width: 100%;
+            }
+          }
+
+          .login__input-visible {
+            right: 14px !important;
+            bottom: auto !important;
+            top: 40% !important;
+            transform: translateY(-50%) !important;
+          }
+        }
+      }
+    }
+
+    .settings__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .settings__dict-top {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .settings__dict-actions {
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .settings__password-actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      .b-btn {
+        max-width: none;
+      }
+    }
+  }
+}
+
+/* <= 640px: компактнее, кнопки/шрифты меньше */
+@media (max-width: 640px) {
+  .b-settings {
+    .settings {
+      &__wrapper {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      &__button {
+        gap: 12px;
+        margin-bottom: 18px;
+
+        span {
+          font-size: 16px;
+          line-height: 20px;
+        }
+      }
+
+      &__content {
+        &-photo {
+          height: 260px;
+          border-radius: 16px;
+
+          img {
+            border-radius: 16px;
+          }
+
+          .settings__content-photo__blur {
+            gap: 12px;
+
+            &-btn {
+              width: 44px;
+              height: 44px;
+              border-radius: 12px;
+            }
+          }
+        }
+
+        &-form {
+          .login__input-link {
+            font-size: 16px !important;
+            line-height: 20px !important;
+          }
+        }
+      }
+    }
+
+    .settings__section-title {
+      font-size: 18px;
+      line-height: 22px;
+    }
+
+    .settings__section {
+      margin-top: 22px;
+      padding-top: 22px;
+    }
+
+    .settings__hint {
+      font-size: 13px;
+      line-height: 17px;
+    }
+
+    .settings__dict-dropdown {
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .settings__dict-item {
+      font-size: 15px;
+      line-height: 18px;
+      padding: 10px 10px;
+    }
+
+    .settings__dict-chip-title {
+      max-width: 160px;
+    }
+  }
+}
+
+/* <= 420px: ещё компактнее */
+@media (max-width: 420px) {
+  .b-settings {
+    .settings {
+      &__content {
+        &-photo {
+          height: 220px;
+        }
+      }
+    }
+
+    .settings__dict-chip-title {
+      max-width: 130px;
+    }
+  }
 }

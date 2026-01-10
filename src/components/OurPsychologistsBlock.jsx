@@ -4,13 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import OurPsychologistTitle from "./OurPsychologistsBlockTitle";
 import { psychologistsApi } from "../api/psychologistsApi";
 import { useAuth } from "../auth/authStore";
+import { useToast } from "../ui/toast/ToastProvider";
+import { useFavorites } from "../favorites/favoritesStore";
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080";
 
 function resolveUrl(u) {
     if (!u) return "";
-    if (/^https?:\/\//i.test(u)) return u; // абсолютный
-    // относительный -> приклеиваем API_BASE
+    if (/^https?:\/\//i.test(u)) return u;
     return `${API_BASE}${u.startsWith("/") ? u : `/${u}`}`;
 }
 
@@ -73,9 +74,71 @@ function HeartIcon({ active }) {
     );
 }
 
-export default function OurPsychologists({ showTitle = true, psychologistsLenght = null }) {
+function extractIds(arr) {
+    return (arr || [])
+        .map((x) => (typeof x === "number" ? x : x?.id))
+        .filter((v) => v != null)
+        .map((v) => String(v));
+}
+
+function pickFirstArray(...candidates) {
+    for (const c of candidates) {
+        if (Array.isArray(c)) return c;
+    }
+    return null;
+}
+
+function getThemeIds(raw) {
+    const arr = pickFirstArray(raw?.themes, raw?.themeIds, raw?.theme_ids);
+    return arr ? extractIds(arr) : null; // null = неизвестно (не фильтруем на фронте)
+}
+
+function getMethodIds(raw) {
+    const arr = pickFirstArray(raw?.methods, raw?.methodIds, raw?.method_ids);
+    return arr ? extractIds(arr) : null;
+}
+
+function hasIntersection(haveIds, selectedIds) {
+    if (!selectedIds || selectedIds.length === 0) return true;
+    // если бэк не отдаёт эти поля — не ломаем выдачу (и полагаемся на серверный фильтр)
+    if (haveIds == null) return true;
+    if (haveIds.length === 0) return false;
+
+    const set = new Set(haveIds.map(String));
+    // внутри одного фильтра — логика OR (достаточно совпадения с любым выбранным)
+    return selectedIds.some((id) => set.has(String(id)));
+}
+
+// themes/methods: фильтруем на фронте как fallback,
+// но основной сценарий — серверная фильтрация (в request мы передаём themeIds/methodIds).
+function applyClientOnlyFilters(items, query) {
+    if (!query) return items;
+    const selectedThemeIds = extractIds(query.themes);
+    const selectedMethodIds = extractIds(query.methods);
+
+    if (selectedThemeIds.length === 0 && selectedMethodIds.length === 0) return items;
+
+    return (items || []).filter((p) => {
+        const raw = p?.raw || {};
+        const haveThemeIds = getThemeIds(raw);
+        const haveMethodIds = getMethodIds(raw);
+
+        if (!hasIntersection(haveThemeIds, selectedThemeIds)) return false;
+        if (!hasIntersection(haveMethodIds, selectedMethodIds)) return false;
+        return true;
+    });
+}
+
+export default function OurPsychologists({
+                                             showTitle = true,
+                                             psychologistsLenght = null,
+                                             query,
+                                             allowLoadMore = false,
+                                         }) {
     const navigate = useNavigate();
     const auth = useAuth();
+    const toast = useToast();
+    const fav = useFavorites();
 
     const isAuthed =
         typeof auth?.isAuthed === "boolean"
@@ -84,10 +147,36 @@ export default function OurPsychologists({ showTitle = true, psychologistsLenght
 
     const limit = psychologistsLenght ?? null;
 
+    const pageSize = useMemo(() => {
+        if (Number.isFinite(limit)) return Math.min(Number(limit), 50);
+        return allowLoadMore ? 24 : 12;
+    }, [limit, allowLoadMore]);
+
+    // ключ для перезагрузки данных при изменении фильтров (q/price/experience)
+    const serverQueryKey = useMemo(() => {
+        const themes = (query?.themes || [])
+            .map((x) => (typeof x === "number" ? x : x?.id))
+            .filter((v) => v != null);
+        const methods = (query?.methods || [])
+            .map((x) => (typeof x === "number" ? x : x?.id))
+            .filter((v) => v != null);
+
+        return JSON.stringify({
+            q: query?.q || "",
+            price: query?.price || [],
+            experience: query?.experience || [],
+            themes,
+            methods,
+        });
+    }, [query]);
+
     const [items, setItems] = useState([]);
-    const [favIds, setFavIds] = useState(() => new Set());
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState("");
+
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         let alive = true;
@@ -95,32 +184,35 @@ export default function OurPsychologists({ showTitle = true, psychologistsLenght
         async function load() {
             setLoading(true);
             setError("");
+            setItems([]);
+            setPage(0);
+            setTotalPages(1);
 
             try {
-                const resp = await psychologistsApi.list({ limit });
+                const resp = await psychologistsApi.list({
+                    page: 0,
+                    size: pageSize,
+                    q: query?.q,
+                    themes: query?.themes,
+                    methods: query?.methods,
+                    price: query?.price,
+                    experience: query?.experience,
+                });
 
-                const arr = Array.isArray(resp) ? resp : (resp?.items || resp?.content || []);
+                const arr = Array.isArray(resp) ? resp : resp?.items || resp?.content || [];
                 const normalized = (arr || []).map(normalizePsychologist).filter((x) => x?.id != null);
 
                 if (!alive) return;
 
                 setItems(normalized);
 
-                // если бэк уже отдаёт isFavourite — можно сразу
-                setFavIds(new Set(normalized.filter((x) => x.isFavourite).map((x) => x.id)));
+                const tp = Number(resp?.totalPages);
+                if (Number.isFinite(tp) && tp > 0) setTotalPages(tp);
 
-                // если есть отдельный эндпоинт избранного — подтянем точнее
-                if (isAuthed) {
-                    try {
-                        const fav = await psychologistsApi.favourites();
-                        const ids = Array.isArray(fav)
-                            ? fav.map((x) => (typeof x === "number" ? x : x?.id)).filter((v) => v != null)
-                            : [];
-                        if (alive) setFavIds(new Set(ids));
-                    } catch {
-                        // не критично
-                    }
-                }
+                const pn = Number(resp?.number);
+                if (Number.isFinite(pn) && pn >= 0) setPage(pn);
+
+                // избранное хранится в глобальном FavoritesStore
             } catch (e) {
                 if (!alive) return;
                 setError(e?.message || "Не удалось загрузить психологов");
@@ -133,34 +225,77 @@ export default function OurPsychologists({ showTitle = true, psychologistsLenght
         return () => {
             alive = false;
         };
-    }, [limit, isAuthed]);
+        // 👇 важно: при смене serverQueryKey делаем полный reload
+    }, [pageSize, isAuthed, serverQueryKey]);
+
+    // только client-only filters (themes/methods)
+    const clientFiltered = useMemo(
+        () => applyClientOnlyFilters(items, query),
+        [items, query]
+    );
 
     const displayed = useMemo(() => {
-        if (!limit) return items;
-        return items.slice(0, limit);
-    }, [items, limit]);
+        if (!limit) return clientFiltered;
+        return clientFiltered.slice(0, limit);
+    }, [clientFiltered, limit]);
+
+    const canLoadMore = allowLoadMore && !limit && page + 1 < totalPages;
+
+    const loadMore = async () => {
+        if (!canLoadMore || loadingMore) return;
+        setLoadingMore(true);
+        setError("");
+
+        try {
+            const nextPage = page + 1;
+            const resp = await psychologistsApi.list({
+                page: nextPage,
+                size: pageSize,
+                q: query?.q,
+                themes: query?.themes,
+                methods: query?.methods,
+                price: query?.price,
+                experience: query?.experience,
+            });
+
+            const arr = Array.isArray(resp) ? resp : resp?.items || resp?.content || [];
+            const normalized = (arr || []).map(normalizePsychologist).filter((x) => x?.id != null);
+
+            setItems((prev) => {
+                const map = new Map((prev || []).map((x) => [x.id, x]));
+                for (const x of normalized) map.set(x.id, x);
+                return Array.from(map.values());
+            });
+
+            const tp = Number(resp?.totalPages);
+            if (Number.isFinite(tp) && tp > 0) setTotalPages(tp);
+
+            setPage(nextPage);
+        } catch (e) {
+            setError(e?.message || "Не удалось загрузить ещё психологов");
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     const toggleFavourite = async (id) => {
-        if (!isAuthed) {
+        const res = await fav.toggle(id);
+
+        if (res?.unauth) {
+            toast.info("Войдите, чтобы добавлять в избранное");
             navigate("/login");
             return;
         }
 
-        const currentlyFav = favIds.has(id);
-
-        // optimistic UI
-        const next = new Set(favIds);
-        if (currentlyFav) next.delete(id);
-        else next.add(id);
-        setFavIds(next);
-
-        try {
-            if (currentlyFav) await psychologistsApi.removeFavourite(id);
-            else await psychologistsApi.addFavourite(id);
-        } catch (e) {
-            setFavIds(new Set(favIds)); // rollback
-            setError(e?.message || "Не удалось обновить избранное");
+        if (res?.ok) {
+            if (res.removed) toast.info("Удалено из избранного", { title: "Избранное" });
+            if (res.added) toast.success("Добавлено в избранное", { title: "Избранное" });
+            return;
         }
+
+        const msg = res?.error?.message || "Не удалось обновить избранное";
+        setError(msg);
+        toast.error(msg, { title: "Избранное" });
     };
 
     return (
@@ -191,7 +326,7 @@ export default function OurPsychologists({ showTitle = true, psychologistsLenght
                     ))
                 ) : (
                     displayed.map((p) => {
-                        const isFav = favIds.has(p.id);
+                        const isFav = fav.isFavourite(p.id);
                         const imgSrc = p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER;
 
                         return (
@@ -240,6 +375,29 @@ export default function OurPsychologists({ showTitle = true, psychologistsLenght
                     })
                 )}
             </div>
+
+            {!loading && displayed.length === 0 ? (
+                <div
+                    style={{
+                        marginTop: 16,
+                        padding: "14px 16px",
+                        borderRadius: 16,
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        background: "rgba(136,133,255,0.10)",
+                        opacity: 0.95,
+                    }}
+                >
+                    Ничего не найдено. Попробуйте изменить фильтры.
+                </div>
+            ) : null}
+
+            {canLoadMore ? (
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+                    <button type="button" className="b-btn" onClick={loadMore} disabled={loadingMore}>
+                        {loadingMore ? "Загрузка…" : "Показать ещё"}
+                    </button>
+                </div>
+            ) : null}
         </div>
     );
 }

@@ -37,6 +37,22 @@ export function overlaps(aStart, aEnd, bStart, bEnd) {
     return aS < bE && bS < aE;
 }
 
+const DOW_TO_KEY = {
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
+    SUNDAY: 7,
+};
+
+function hhmm(t) {
+    if (!t) return "00:00";
+    const s = String(t);
+    return s.length >= 5 ? s.slice(0, 5) : s;
+}
+
 export function normalizeBookingToEvent(booking, { role } = {}) {
     const start = booking.startDateTime || booking.start || booking.start_datetime;
     const end = booking.endDateTime || booking.end || booking.end_datetime;
@@ -78,9 +94,51 @@ export function normalizeDayOffToEvent(dayOff) {
     };
 }
 
-export function buildSlotEvents({ rangeStart, rangeEnd, schedule, dayOffs = [], bookings = [], now = new Date() }) {
+export function normalizeBreakToEvent(br, baseDateYmd) {
+    // фон на интервал внутри дня
+    const base = new Date(`${baseDateYmd}T00:00:00`);
+    const start = timeToDate(base, hhmm(br.startTime));
+    const end = timeToDate(base, hhmm(br.endTime));
+    return {
+        id: `break_${br.id || "new"}_${baseDateYmd}`,
+        title: "Перерыв",
+        start: start.toISOString(),
+        end: end.toISOString(),
+        display: "background",
+        classNames: ["fc-break"],
+        extendedProps: { kind: "BREAK", raw: br },
+    };
+}
+
+export function buildBreakEvents({ rangeStart, rangeEnd, breaks = [] }) {
+    const events = [];
+    const cur = new Date(rangeStart);
+    cur.setHours(0, 0, 0, 0);
+    const endDay = new Date(rangeEnd);
+    endDay.setHours(0, 0, 0, 0);
+
+    while (cur < endDay) {
+        const ymd = dateToYmd(cur);
+        const dayKey = dayKeyFromDate(cur);
+        const daily = (breaks || []).filter((b) => {
+            if (b?.date) return b.date === ymd;
+            if (b?.dayOfWeek) return DOW_TO_KEY[String(b.dayOfWeek).toUpperCase()] === dayKey;
+            return false;
+        });
+
+        for (const br of daily) {
+            events.push(normalizeBreakToEvent(br, ymd));
+        }
+
+        cur.setDate(cur.getDate() + 1);
+    }
+
+    return events;
+}
+
+export function buildSlotEvents({ rangeStart, rangeEnd, schedule, dayOffs = [], bookings = [], breaks = [], now = new Date() }) {
     const slotMinutes = schedule?.slotMinutes ?? 50;
-    const bufferMinutes = schedule?.bufferMinutes ?? 10;
+    const bufferMinutes = schedule?.bufferMinutes ?? 0;
     const week = schedule?.week || {};
 
     const dayOffSet = new Set(dayOffs.map((d) => d.date));
@@ -106,6 +164,17 @@ export function buildSlotEvents({ rangeStart, rangeEnd, schedule, dayOffs = [], 
         }
 
         const dayKey = dayKeyFromDate(cur);
+        const breakRanges = (breaks || [])
+            .filter((b) => {
+                if (b?.date) return b.date === ymd;
+                if (b?.dayOfWeek) return DOW_TO_KEY[String(b.dayOfWeek).toUpperCase()] === dayKey;
+                return false;
+            })
+            .map((b) => {
+                const s = timeToDate(cur, hhmm(b.startTime));
+                const e = timeToDate(cur, hhmm(b.endTime));
+                return { start: s, end: e, raw: b };
+            });
         const intervals = Array.isArray(week[dayKey]) ? week[dayKey] : [];
 
         for (const it of intervals) {
@@ -124,7 +193,9 @@ export function buildSlotEvents({ rangeStart, rangeEnd, schedule, dayOffs = [], 
                 }
 
                 // не показываем слоты, которые пересекаются с бронями
-                const collides = bookingRanges.some((br) => overlaps(slotStart, slotEnd, br.start, br.end));
+                const collidesBooking = bookingRanges.some((br) => overlaps(slotStart, slotEnd, br.start, br.end));
+                const collidesBreak = breakRanges.some((br) => overlaps(slotStart, slotEnd, br.start, br.end));
+                const collides = collidesBooking || collidesBreak;
                 if (!collides) {
                     const id = `slot_${ymd}_${slotStart.getHours()}_${slotStart.getMinutes()}`;
                     events.push({

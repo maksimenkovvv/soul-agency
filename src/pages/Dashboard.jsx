@@ -1,28 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 
-import Sidebar from '../components/Sidebar';
-import ContentArea from '../components/ContentArea';
+import { useAuth } from "../auth/authStore";
+import Sidebar from "../components/Sidebar";
+import ContentArea from "../components/ContentArea";
 
-import photo from '../assets/img/psychologist-1.webp'
+function roleTabs(role) {
+    if (role === "CLIENT") {
+        return ["Записи", "Избранное"];
+    }
+    // PSYCHOLOGIST / ADMIN
+    return ["Записи", "График работы"];
+}
 
-function Dashboard() {
-    const [activeTab, setActiveTab] = useState('Записи');
-    const [user, setUser] = useState({
-        name: 'Мария Иванова',
-        email: 'example@google.com',
-        role: 'client', // или 'psychologist' / client - обычный пользователь, psychologist - психолог
-        avatar: photo,
-        appointments: [],
-        favorites: [],
-        schedule: [],
-    });
+export default function Dashboard() {
+    const { booting, me, role } = useAuth();
+
+    const user = useMemo(() => {
+        return {
+            id: me?.id,
+            name: me?.name || me?.fullName || me?.email || "Профиль",
+            email: me?.email || "",
+            role: role || null, // CLIENT | PSYCHOLOGIST | ADMIN
+            avatarUrl: me?.avatarUrl || me?.avatar || null,
+        };
+    }, [me, role]);
+
+    const tabs = useMemo(() => roleTabs(user.role), [user.role]);
+    const [activeTab, setActiveTab] = useState(() => tabs[0] || "Записи");
+
+    // если роль/вкладки поменялись — не даём активной вкладке быть несуществующей
+    useEffect(() => {
+        if (!tabs.includes(activeTab)) {
+            setActiveTab(tabs[0] || "Записи");
+        }
+    }, [tabs, activeTab]);
+
+    if (booting) {
+        return null;
+    }
 
     return (
         <div className="dashboard">
             <Sidebar user={user} setActiveTab={setActiveTab} activeTab={activeTab} />
-            <ContentArea activeTab={activeTab} user={user} />
+
+            <main className="dashboard__content">
+                <ContentArea activeTab={activeTab} user={user} />
+            </main>
         </div>
     );
 }
-
-export default Dashboard;

@@ -1,0 +1,107 @@
+.b-toast {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, calc(100vw - 36px));
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.b-toast__item {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 34px 1fr 30px;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 12px;
+  border-radius: 16px;
+  background: $whiteBg;
+  border: 1px solid rgba($gray, 0.55);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
+  color: $black;
+  animation: toastIn 0.28s ease both;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: rgba($blackBg, 0.25);
+  }
+
+  &.is-success::before { background: $mintBg; }
+  &.is-error::before { background: $redBg; }
+  &.is-info::before { background: $lightbllue; }
+}
+
+.b-toast__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba($gray, 0.55);
+  background: rgba($blackBg, 0.03);
+
+  .is-success & { background: rgba($mintBg, 0.45); border-color: rgba($gray, 0.45); }
+  .is-error & { background: rgba($redBg, 0.16); border-color: rgba($gray, 0.45); }
+  .is-info & { background: rgba($lightbllue, 0.75); border-color: rgba($gray, 0.45); }
+}
+
+.b-toast__title {
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+.b-toast__text {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.35;
+  opacity: 0.85;
+}
+
+.b-toast__close {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba($gray, 0.55);
+  background: rgba($blackBg, 0.02);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition;
+
+  &:hover {
+    background: rgba($blackBg, 0.06);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate3d(12px, -6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 520px) {
+  .b-toast {
+    left: 18px;
+    right: 18px;
+    width: auto;
+  }
+}

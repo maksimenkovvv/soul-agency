@@ -1,107 +1,215 @@
 .b-appointments-cards {
-    height: 100%;
-    display: grid;
+  height: 100%;
+  display: grid;
+  min-width: 0; /* важно, чтобы гриды не раздували контейнер */
 
-    .appointments-cards {
-        &__items {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 24px 21px;
-        }
-
-        &__item {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            padding: 24px;
-            border-radius: 18px;
-            background-color: $whiteBg;
-
-            &-top {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-
-                &__info {
-                    font-size: 18px;
-                    line-height: 22px;
-                    font-weight: 700;
-
-                    &-time {
-                        margin-left: 12px;
-                    }
-                }
-
-                &__status {
-                    font-size: 14px;
-                    line-height: 16px;
-                    padding: 4px 14px;
-                    border-radius: 6px;
-
-                    &.upcoming {
-                        color: $black;
-                        background-color: $mintBg;
-                    }
-
-                    &.today {
-                        color: $white;
-                        background-color: $blackBg;
-                    }
-
-                    &.past {
-                        color: rgba($black, 0.40);
-                        background-color: rgba($gray, 0.40);
-                    }
-
-                }
-            }
-
-            &-middle {
-                font-size: 14px;
-                line-height: 16px;
-                color: $black;
-
-                &__photo {
-                    width: 56px;
-                    height: 56px;
-                    border-radius: 12px;
-                    object-fit: cover;
-                    margin-bottom: 12px;
-                }
-
-                &__name {
-                    margin-bottom: 4px;
-                }
-
-                &__price {
-                    font-weight: 700;
-                }
-            }
-
-            &-bottom {
-                font-size: 18px;
-                line-height: 22px;
-            }
-        }
-
-        &__notfound {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: auto;
-
-            &-title {
-                margin-bottom: 32px;
-                font-size: 20px;
-            }
-
-            &-btn {
-                max-width: max-content;
-
-                .b-btn {
-                    font-size: 18px;
-                }
-            }
-        }
+  .appointments-cards {
+    &__items {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px 21px;
+      min-width: 0;
     }
+
+    &__item {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+      border-radius: 18px;
+      background-color: $whiteBg;
+      min-width: 0; /* чтобы текст/внутренности не ломали сетку */
+
+      &-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+
+        &__info {
+          font-size: 18px;
+          line-height: 22px;
+          font-weight: 700;
+          min-width: 0;
+
+          /* если влезает плохо — не раздуваем карточку */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+
+          &-time {
+            margin-left: 12px;
+          }
+        }
+
+        &__status {
+          font-size: 14px;
+          line-height: 16px;
+          padding: 4px 14px;
+          border-radius: 6px;
+          flex: 0 0 auto;
+          white-space: nowrap;
+
+          &.upcoming {
+            color: $black;
+            background-color: $mintBg;
+          }
+
+          &.today {
+            color: $white;
+            background-color: $blackBg;
+          }
+
+          &.past {
+            color: rgba($black, 0.40);
+            background-color: rgba($gray, 0.40);
+          }
+        }
+      }
+
+      &-middle {
+        font-size: 14px;
+        line-height: 16px;
+        color: $black;
+        min-width: 0;
+
+        &__photo {
+          width: 56px;
+          height: 56px;
+          border-radius: 12px;
+          object-fit: cover;
+          margin-bottom: 12px;
+        }
+
+        &__name {
+          margin-bottom: 4px;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        &__price {
+          font-weight: 700;
+          white-space: nowrap;
+        }
+      }
+
+      &-bottom {
+        font-size: 18px;
+        line-height: 22px;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+    }
+
+    &__notfound {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: auto;
+
+      &-title {
+        margin-bottom: 32px;
+        font-size: 20px;
+      }
+
+      &-btn {
+        max-width: max-content;
+
+        .b-btn {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+/* ✅ 2 колонки (ноут/планшет) */
+@media (max-width: 1200px) {
+  .b-appointments-cards {
+    .appointments-cards {
+      &__items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      &__item {
+        padding: 20px;
+        gap: 18px;
+
+        &-top {
+          &__info {
+            font-size: 16px;
+            line-height: 20px;
+          }
+        }
+
+        &-bottom {
+          font-size: 16px;
+          line-height: 20px;
+        }
+      }
+    }
+  }
+}
+
+/* ✅ 1 колонка (мобилка) */
+@media (max-width: 700px) {
+  .b-appointments-cards {
+    .appointments-cards {
+      &__items {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      &__item {
+        padding: 18px;
+        gap: 16px;
+
+        &-top {
+          align-items: flex-start;
+
+          &__info {
+            font-size: 15px;
+            line-height: 18px;
+          }
+
+          &__status {
+            font-size: 13px;
+            line-height: 16px;
+            padding: 4px 10px;
+          }
+        }
+
+        &-middle {
+          &__photo {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+          }
+        }
+
+        &-bottom {
+          font-size: 15px;
+          line-height: 18px;
+        }
+      }
+    }
+  }
+}
+
+/* ✅ очень маленькие экраны */
+@media (max-width: 420px) {
+  .b-appointments-cards {
+    .appointments-cards {
+      &__item {
+        padding: 16px;
+        border-radius: 16px;
+      }
+    }
+  }
 }

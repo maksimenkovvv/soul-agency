@@ -1,0 +1,6 @@
+.b-breadcrumbs { margin: 12px 0 8px; }
+.b-breadcrumbs__list { display:flex; flex-wrap:wrap; gap:6px; list-style:none; padding:0; margin:0; }
+.b-breadcrumbs__link { opacity:.85; text-decoration:none; }
+.b-breadcrumbs__link:hover { opacity:1; text-decoration:underline; }
+.b-breadcrumbs__current { font-weight:600; }
+.b-breadcrumbs__sep { opacity:.4; margin:0 2px; }

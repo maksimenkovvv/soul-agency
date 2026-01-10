@@ -151,6 +151,27 @@
     }
 }
 
+.b-psy-search {
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 12px;
+        max-height: 56vh;
+        overflow: auto;
+        padding-right: 4px;
+    }
+}
+
+.b-psy-card--skeleton {
+    height: 82px;
+    border-radius: 14px;
+    border: 1px solid rgba($gray, 0.55);
+    background: linear-gradient(90deg, rgba($gray, 0.22), rgba($gray, 0.12), rgba($gray, 0.22));
+    background-size: 200% 100%;
+    animation: skeleton 1.1s ease-in-out infinite;
+}
+
 // --- Calendar wrapper + FullCalendar theme ---
 .b-calendar {
     background-color: $whiteBg;
@@ -275,6 +296,10 @@
     .fc-dayoff {
         background-color: rgba($redBg, 0.18) !important;
     }
+
+    .fc-break {
+        background-color: rgba($lightbllue, 0.55) !important;
+    }
 }
 
 .b-badge {
@@ -297,6 +322,10 @@
 
     &--dayoff {
         background-color: rgba($redBg, 0.18);
+    }
+
+    &--break {
+        background-color: rgba($lightbllue, 0.55);
     }
 }
 
@@ -328,6 +357,12 @@
         margin-bottom: 16px;
     }
 
+    @media (max-width: 900px) {
+        &__row {
+            grid-template-columns: 1fr;
+        }
+    }
+
     &__days {
         display: flex;
         flex-direction: column;
@@ -340,15 +375,39 @@
     &__day {
         border: 1px solid rgba($gray, 0.55);
         border-radius: 14px;
-        padding: 12px;
+        padding: 0;
+        overflow: hidden;
+        background-color: rgba($white, 0.65);
+
+        &.is-enabled {
+            background-color: rgba($white, 0.92);
+        }
+
+        &.has-errors {
+            border-color: rgba(#ff3b30, 0.55);
+        }
     }
 
     &__day-head {
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 12px;
-        margin-bottom: 10px;
+        padding: 12px;
+        background: transparent;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba($gray, 0.08);
+        }
+    }
+
+    &__day-left {
+        min-width: 0;
+        flex: 1 1 auto;
     }
 
     &__day-name {
@@ -358,10 +417,126 @@
         font-weight: 700;
     }
 
+    &__warn {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background-color: rgba(#ff3b30, 0.85);
+        box-shadow: 0 0 0 3px rgba(#ff3b30, 0.12);
+        flex: 0 0 auto;
+        margin-left: 2px;
+    }
+
+    &__summary {
+        font-size: 16px;
+        line-height: 20px;
+        opacity: 0.75;
+        margin-top: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__day-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    &__mini-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        border: 1px solid rgba($gray, 0.35);
+        background-color: rgba($gray, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        line-height: 1;
+        color: rgba($black, 0.85);
+        transition: transform $transition, background $transition, border-color $transition, opacity $transition;
+
+        &:hover {
+            background-color: rgba($gray, 0.18);
+            border-color: rgba($gray, 0.55);
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        &.is-disabled,
+        &:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            transform: none;
+        }
+
+        &.is-ok {
+            border-color: rgba($lightbllue, 0.85);
+            background-color: rgba($lightbllue, 0.18);
+        }
+    }
+
+    &__caret {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.65;
+        transition: transform $transition, opacity $transition;
+    }
+
+    &__day.is-open &__caret {
+        transform: rotate(180deg);
+        opacity: 0.9;
+    }
+
+    &__day-body {
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        transition: grid-template-rows $transition, opacity $transition;
+        padding: 0 12px;
+    }
+
+    &__day.is-open &__day-body {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        padding-bottom: 12px;
+    }
+
+    &__day-body-inner {
+        overflow: hidden;
+    }
+
+    &__issues {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(#ff3b30, 0.28);
+        background-color: rgba(#ff3b30, 0.08);
+        margin-bottom: 10px;
+    }
+
+    &__issue {
+        font-size: 14px;
+        line-height: 18px;
+        color: rgba(#ff3b30, 0.95);
+        &:not(:last-child) {
+            margin-bottom: 6px;
+        }
+    }
+
     &__intervals {
         display: flex;
         flex-direction: column;
         gap: 10px;
+        padding-top: 6px;
     }
 
     &__interval {
@@ -423,6 +598,11 @@
     padding: 10px 12px;
     font-size: 18px;
     line-height: 22px;
+
+    &.is-error {
+        border-color: rgba(#ff3b30, 0.55);
+        background-color: rgba(#ff3b30, 0.06);
+    }
 }
 
 .b-icon-btn {

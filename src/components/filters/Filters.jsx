@@ -5,13 +5,20 @@ import ExperienceFilter from './ExperienceFilter';
 import PriceFilter from './PriceFilter';
 import Search from './Search';
 
-const Filters = ({ onFilterChange }) => {
+const Filters = ({ onFilterChange, value }) => {
     const [filters, setFilters] = React.useState({
+        q: "",
         themes: [],
         methods: [],
         experience: [],
         price: [],
     });
+
+    // allow controlled usage (e.g. parent keeps state)
+    React.useEffect(() => {
+        if (!value) return;
+        setFilters((prev) => ({ ...prev, ...value }));
+    }, [value]);
 
     const handleThemeChange = (selectedThemes) => {
         const updatedFilters = { ...filters, themes: selectedThemes };
@@ -37,15 +44,29 @@ const Filters = ({ onFilterChange }) => {
         onFilterChange(updatedFilters);
     };
 
+    const handleSearch = (q) => {
+        const updatedFilters = { ...filters, q: q ?? "" };
+        setFilters(updatedFilters);
+        onFilterChange(updatedFilters);
+    };
+
     return (
         <div className="b-filters">
-            <Search showAppointmentFilters={false} />
-            <ThemeFilter onApply={handleThemeChange} />
-            <MethodFilter onApply={handleMethodChange} />
-            <ExperienceFilter onApply={handleExperienceChange} />
-            <PriceFilter onApply={handlePriceChange} />
+            <Search
+                showAppointmentFilters={false}
+                value={filters.q}
+                onSearch={handleSearch}
+            />
+
+            <div className="b-filters__row">
+                <ThemeFilter value={filters.themes} onApply={handleThemeChange} />
+                <MethodFilter value={filters.methods} onApply={handleMethodChange} />
+                <ExperienceFilter value={filters.experience} onApply={handleExperienceChange} />
+                <PriceFilter value={filters.price} onApply={handlePriceChange} />
+            </div>
         </div>
     );
+
 };
 
 export default Filters;

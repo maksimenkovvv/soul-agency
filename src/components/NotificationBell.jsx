@@ -6,7 +6,6 @@ function formatTime(iso) {
     if (!iso) return "";
     try {
         const d = new Date(iso);
-        // compact: dd.mm hh:mm
         const dd = String(d.getDate()).padStart(2, "0");
         const mm = String(d.getMonth() + 1).padStart(2, "0");
         const hh = String(d.getHours()).padStart(2, "0");
@@ -18,14 +17,17 @@ function formatTime(iso) {
 }
 
 function typeLabel(type) {
-    if (type === "SESSION") return "Сессия";
-    if (type === "MESSAGE") return "Сообщение";
+    const t = String(type || "").toUpperCase();
+    if (t.includes("CHAT") || t.includes("MESSAGE")) return "Сообщение";
+    if (t.includes("SESSION") || t.includes("APPOINT") || t.includes("BOOK")) return "Сессия";
+    if (t.includes("FAV")) return "Избранное";
     return "Системное";
 }
 
 function iconFor(type) {
-    // Minimal inline icons to keep project dependency-free
-    if (type === "SESSION") {
+    const t = String(type || "").toUpperCase();
+
+    if (t.includes("SESSION") || t.includes("APPOINT") || t.includes("BOOK")) {
         return (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7 3V5" stroke="#313235" strokeWidth="2" strokeLinecap="round" />
@@ -41,7 +43,8 @@ function iconFor(type) {
             </svg>
         );
     }
-    if (type === "MESSAGE") {
+
+    if (t.includes("CHAT") || t.includes("MESSAGE")) {
         return (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -55,12 +58,23 @@ function iconFor(type) {
             </svg>
         );
     }
+
+    if (t.includes("FAV")) {
+        return (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 21s-7-4.534-9.5-8.5C.5 9 2.5 6 6 6c2 0 3.5 1.2 4.5 2.4C11.5 7.2 13 6 15 6c3.5 0 5.5 3 3.5 6.5C19 16.466 12 21 12 21Z"
+                    stroke="#313235"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                />
+            </svg>
+        );
+    }
+
     return (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                d="M12 22C13.1046 22 14 21.1046 14 20H10C10 21.1046 10.8954 22 12 22Z"
-                fill="#313235"
-            />
+            <path d="M12 22C13.1046 22 14 21.1046 14 20H10C10 21.1046 10.8954 22 12 22Z" fill="#313235" />
             <path
                 d="M18 16V11C18 7.68629 15.3137 5 12 5C8.68629 5 6 7.68629 6 11V16L4 18V19H20V18L18 16Z"
                 stroke="#313235"
@@ -72,15 +86,15 @@ function iconFor(type) {
 }
 
 export default function NotificationBell() {
-    const {
-        notifications,
-        unreadNotificationsCount,
-        messageUnreadTotal,
-        nextSession,
-        markRead,
-        markAllRead,
-    } = useNotifications();
+    const { notifications, unreadNotificationsCount, messageUnreadTotal, nextSession, markRead, markAllRead } =
+        useNotifications();
+
     const [open, setOpen] = useState(false);
+
+    // ✅ ring state
+    const [ring, setRing] = useState(false);
+    const prevBadgeRef = useRef(0);
+
     const wrapRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
@@ -91,9 +105,60 @@ export default function NotificationBell() {
 
     const latest = useMemo(() => notifications.slice(0, 6), [notifications]);
 
+    const fireRing = () => {
+        setRing(true);
+        window.setTimeout(() => setRing(false), 900);
+    };
+
+    // ✅ 1) Ring once on badge change
+    useEffect(() => {
+        const prev = prevBadgeRef.current;
+        prevBadgeRef.current = totalBadge;
+
+        if (totalBadge > 0 && totalBadge !== prev) {
+            fireRing();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [totalBadge]);
+
+    // ✅ 2) Ring periodically while there are unread (and dropdown is closed)
+    useEffect(() => {
+        if (totalBadge <= 0) return;
+        if (open) return;
+
+        let cancelled = false;
+        let timerId = null;
+
+        const scheduleNext = () => {
+            // период: 8..15 секунд (можешь поменять)
+            const ms = 8000 + Math.random() * 7000;
+
+            timerId = window.setTimeout(() => {
+                if (cancelled) return;
+
+                // если за время ожидания уведомления исчезли/открыли дропдаун — просто перескедулимся
+                if (open || totalBadge <= 0) {
+                    scheduleNext();
+                    return;
+                }
+
+                fireRing();
+                scheduleNext();
+            }, ms);
+        };
+
+        scheduleNext();
+
+        return () => {
+            cancelled = true;
+            if (timerId) window.clearTimeout(timerId);
+        };
+    }, [totalBadge, open]);
+
     // Close on outside click
     useEffect(() => {
         if (!open) return;
+
         const onDown = (e) => {
             if (!wrapRef.current) return;
             if (!wrapRef.current.contains(e.target)) setOpen(false);
@@ -101,8 +166,10 @@ export default function NotificationBell() {
         const onKey = (e) => {
             if (e.key === "Escape") setOpen(false);
         };
+
         window.addEventListener("pointerdown", onDown);
         window.addEventListener("keydown", onKey);
+
         return () => {
             window.removeEventListener("pointerdown", onDown);
             window.removeEventListener("keydown", onKey);
@@ -112,17 +179,21 @@ export default function NotificationBell() {
     const openNotif = (n) => {
         markRead(n.id);
         setOpen(false);
-        const href = n?.meta?.href;
+
+        const href = n?.linkUrl || n?.meta?.href;
         if (href) navigate(href);
-        else if (n?.type === "MESSAGE") navigate("/chat");
-        else if (n?.type === "SESSION") navigate("/sessions");
+        else {
+            const t = String(n?.type || "").toUpperCase();
+            if (t.includes("CHAT") || t.includes("MESSAGE")) navigate("/chat");
+            else if (t.includes("SESSION") || t.includes("APPOINT") || t.includes("BOOK")) navigate("/sessions");
+        }
     };
 
     return (
         <div className="notify" ref={wrapRef}>
             <button
                 type="button"
-                className="notify__bell"
+                className={`notify__bell ${totalBadge > 0 ? "has-unread" : ""} ${ring ? "ring" : ""}`}
                 onClick={() => setOpen((v) => !v)}
                 aria-label="Уведомления"
                 title="Уведомления"
@@ -149,7 +220,7 @@ export default function NotificationBell() {
                                 type="button"
                                 className="notify__link"
                                 onClick={() => {
-                                    markAllRead();
+                                    markAllRead().catch(() => {});
                                 }}
                             >
                                 Прочитать всё
@@ -160,7 +231,6 @@ export default function NotificationBell() {
                         </div>
                     </div>
 
-                    {/* Session info */}
                     {nextSession && (
                         <button
                             type="button"
@@ -181,7 +251,6 @@ export default function NotificationBell() {
                         </button>
                     )}
 
-                    {/* Unread messages summary (only when user is not on /chat) */}
                     {!isChat && messageUnreadTotal > 0 && (
                         <button
                             type="button"
@@ -219,7 +288,7 @@ export default function NotificationBell() {
                                             <span className="notify__item-time">{formatTime(n.createdAt)}</span>
                                         </div>
                                         <div className="notify__item-title">{n.title}</div>
-                                        {n.text ? <div className="notify__item-text">{n.text}</div> : null}
+                                        {n.message || n.text ? <div className="notify__item-text">{n.message || n.text}</div> : null}
                                     </div>
                                     {!n.readAt && <span className="notify__dot" />}
                                 </button>

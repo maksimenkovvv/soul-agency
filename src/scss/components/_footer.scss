@@ -1,20 +1,192 @@
-.footer {
+$accentColor: #8885ff;
+
+.app-footer {
+  position: relative;
+  width: 100%;
+  margin-top: auto;
+  padding: 26px 0 34px;
+  overflow: visible;
+
+  /* Светлое свечение */
+  &__glow {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    transform: translateX(-50%);
+    width: min(980px, 92vw);
+    height: 140px;
+    background: radial-gradient(60% 120% at 50% 100%, rgba($accentColor, 0.22) 0%, transparent 70%);
+    filter: blur(34px);
+    pointer-events: none;
+    z-index: 0;
+    animation: footerGlow 10s ease-in-out infinite;
+  }
+
+  /* Контейнер-панель (как на сайте: белый glass) */
+  &__inner {
     position: relative;
+    z-index: 1;
 
-    &__header {
-        display: flex;
-        margin-bottom: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 14px 16px;
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(49, 50, 53, 0.10);
+
+    box-shadow:
+            0 10px 30px rgba(17, 24, 39, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: rgba($accentColor, 0.22);
+      box-shadow:
+              0 14px 40px rgba(17, 24, 39, 0.10),
+              inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+  }
+
+  &__left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__copy {
+    color: rgba(49, 50, 53, 0.78);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.15px;
+    white-space: nowrap;
+  }
+
+  &__heart {
+    display: inline-block;
+    filter: drop-shadow(0 8px 18px rgba($accentColor, 0.22));
+    animation: heartBeat 1.6s ease-in-out infinite;
+  }
+
+  /* Бейдж AI-VAI — светлый чип */
+  &__brand {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 8px 12px 8px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+
+    background: linear-gradient(135deg, rgba(136, 133, 255, 0.10), rgba(255, 255, 255, 0.65));
+    border: 1px solid rgba(136, 133, 255, 0.22);
+    color: rgba(49, 50, 53, 0.90);
+
+    overflow: hidden;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: rgba(136, 133, 255, 0.35);
+      box-shadow: 0 10px 24px rgba(136, 133, 255, 0.18);
+      background: linear-gradient(135deg, rgba(136, 133, 255, 0.14), rgba(255, 255, 255, 0.75));
+
+      .app-footer__shine {
+        transform: translateX(140%) skewX(-18deg);
+      }
+
+      .app-footer__brandMark {
+        box-shadow: 0 10px 22px rgba($accentColor, 0.25);
+      }
+
+      .app-footer__brandText {
+        color: rgba(49, 50, 53, 1);
+      }
     }
 
-    &__button {
-        padding: 25px;
-        background-color: $purpleBg;
-        border-radius: 18px;
-        max-width: 390px;
-        width: 100%;
-        position: absolute;
-        top: 12px;
-        right: 30%;
-        transform: rotateZ(-3.7deg);
+    &:active {
+      transform: translateY(0);
     }
+  }
+
+  &__brandMark {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+
+    background: linear-gradient(135deg, $accentColor, darken($accentColor, 14%));
+    box-shadow: 0 8px 18px rgba($accentColor, 0.20);
+    flex: 0 0 auto;
+  }
+
+  &__brandText {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.45px;
+    text-transform: uppercase;
+    opacity: 0.95;
+    white-space: nowrap;
+  }
+
+  &__shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: translateX(-120%) skewX(-18deg);
+    transition: transform 0.55s ease;
+    pointer-events: none;
+  }
+}
+
+@keyframes footerGlow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.12); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.12); }
+  70% { transform: scale(1); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .app-footer {
+    padding: 18px 0 26px;
+
+    &__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 18px;
+    }
+
+    &__left {
+      justify-content: center;
+    }
+
+    &__brand {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 }

@@ -1,35 +1,49 @@
 import React from 'react';
-
-import boss from '../assets/img/boss.webp'
+import boss from '../assets/img/boss.webp';
 
 function About() {
     return (
-        <div className="b-about">
-            <h1 className="about__title">Меня зовут Лера,<br />я основатель БюроДуши</h1>
-            <div className="about__content">
-                <div className="about__content-left">
-                    <img src={boss} alt="" />
-                    <div className="about__content-left__text">
-                        Всё, что мы делаем, защищает вашу конфиденциальность и ценит вашу уникальность.
-                    </div>
-                </div>
-                <div className="about__content-right">
-                    <div className="about__content-right__wrapper">
-                        <p className="about__content-right__title">Миссия</p>
-                        <div className="about__content-right__subtitle-wrapper">
-                            <p className="about__content-right__subtitle">Мы распространяем психологическую культуру в города России, делая поддержку доступной каждому.</p>
+        <section className="b-about">
+            <div className="container">
+
+                <header className="about__header">
+                    <h1 className="about__title">
+                        Меня зовут <span className="text-accent">Лера</span>, <br />
+                        я основатель БюроДуши
+                    </h1>
+                </header>
+
+                <div className="about__grid">
+                    <div className="about__visual">
+                        <div className="about__image-wrapper">
+                            <img src={boss} alt="Лера, основатель БюроДуши" />
+                        </div>
+                        <div className="about__quote-card">
+                            <p>Всё, что мы делаем, защищает вашу конфиденциальность и ценит вашу уникальность.</p>
                         </div>
                     </div>
-                    <div className="about__content-right__wrapper">
-                        <p className="about__content-right__title">Ценность</p>
-                        <div className="about__content-right__subtitle-wrapper">
-                            <p className="about__content-right__subtitle">Наша платформа объединяет людей и специалистов, создавая пространство, где можно безопасно открываться, понимать себя и находить поддержку.</p>
-                            <p className="about__content-right__subtitle">Мы создаём безопасное и поддерживающее сообщество, где каждый может глубже понять себя и расти с помощью психологии.Искренность, уважение и вовлечённость помогают нам быть рядом с вами, а индивидуальный подход и прозрачность делают ваш опыт комфортным и доверительным.</p>
+
+                    {/* Правая колонка с текстом */}
+                    <div className="about__info">
+                        <div className="about__section">
+                            <h3 className="about__subtitle">Миссия</h3>
+                            <div className="about__text">
+                                <p>Мы распространяем психологическую культуру в города России, делая поддержку доступной каждому.</p>
+                            </div>
+                        </div>
+
+                        <div className="about__section">
+                            <h3 className="about__subtitle">Ценность</h3>
+                            <div className="about__text">
+                                <p>Наша платформа объединяет людей и специалистов, создавая пространство, где можно безопасно открываться, понимать себя и находить поддержку.</p>
+                                <p>Мы создаём сообщество, где каждый может глубже понять себя. Искренность, уважение и вовлечённость помогают нам быть рядом с вами.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
-        </div >
+        </section>
     );
 };
 

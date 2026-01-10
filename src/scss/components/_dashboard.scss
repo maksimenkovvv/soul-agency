@@ -1,4 +1,33 @@
 .dashboard {
-    display: flex;
-    gap: 160px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 390px minmax(0, 1fr);
+  gap: 60px;
+  align-items: start;
+
+  > * {
+    min-width: 0;
+  }
+
+  &__content {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 1280px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .b-sidebar {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 820px) {
+  .dashboard {
+    gap: 16px;
+  }
 }
