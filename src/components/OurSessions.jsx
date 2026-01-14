@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import image from "../assets/img/psychologist-1.webp";
+import fade1 from "../assets/img/fade1.webp";
+import fade2 from "../assets/img/fade2.webp";
+import fade3 from "../assets/img/fade3.webp";
 
 import PsychologistModal from "./ui/PsychologistModal";
 import OurPsychologistTitle from "./OurPsychologistsBlockTitle";
@@ -132,7 +134,7 @@ function applyClientOnlyFilters(items, query) {
     });
 }
 
-export default function OurPsychologists({
+export default function OurSessions({
     showTitle = true,
     psychologistsLenght = null,
     query,
@@ -143,10 +145,10 @@ export default function OurPsychologists({
     const [selectedPsychologist, setSelectedPsychologist] = useState(null);
 
     // В функции открытия модалки
-    const openPsychologistModal = (psychologist) => {
+    const openPsychologistModal = (session) => {
         setSelectedPsychologist({
-            ...psychologist,
-            type: "psychologist"  // Добавляем тип
+            ...session,
+            type: "session"  // Добавляем тип
         });
         setModalOpen(true);
         document.body.style.overflow = 'hidden';
@@ -322,97 +324,43 @@ export default function OurPsychologists({
         toast.error(msg, { title: "Избранное" });
     };
 
-    const psychologists = [
+    const sessions = [
         {
             id: 1,
+            title: 'Тема сессии с длинным названиемв 2 строки',
             name: "Анна Смирнова",
-            experience: 8,
             pricePerSession: 3500,
             sessionDuration: 60,
-            image: image,
-            age: 35,
+            image: fade1,
             method: 'Гештальт-терапия',
             themes: 'Самооценка',
-            education: "Самое кайфовое",
             description: "Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
+            date: "19 сентября, 9:00",
         },
         {
             id: 2,
+            title: 'Тема сессии с длинным названиемв 2 строки',
             name: "Дмитрий Иванов",
-            experience: 12,
             pricePerSession: 5000,
             sessionDuration: 50,
-            image: image,
-            age: 42,
+            image: fade2,
             method: 'Отношения',
             themes: 'КПТ',
-            education: "Самое кайфовое",
             description: "Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
+            date: "19 сентября, 9:00",
         },
         {
             id: 3,
+            title: 'Тема сессии с длинным названиемв 2 строки',
             name: "Мария Петрова",
-            experience: 5,
             pricePerSession: 2800,
             sessionDuration: 60,
-            image: image,
-            age: 29,
+            image: fade3,
             method: 'Гештальт-терапия',
             themes: 'Самооценка',
-            education: "Самое кайфовое",
             description: "Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
+            date: "19 сентября, 9:00",
         },
-        {
-            id: 4,
-            name: "Алексей Козлов",
-            experience: 15,
-            pricePerSession: 6500,
-            sessionDuration: 90,
-            image: image,
-            age: 48,
-            method: 'Отношения',
-            themes: 'МТД',
-            education: "Самое кайфовое",
-            description: "Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        },
-        {
-            id: 5,
-            name: "Елена Соколова",
-            experience: 10,
-            pricePerSession: 4200,
-            sessionDuration: 60,
-            image: image,
-            age: 38,
-            method: 'Гештальт-терапия',
-            themes: 'Самооценка',
-            education: "Самое кайфовое",
-            description: "Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        }
     ];
 
     // return (
@@ -539,19 +487,17 @@ export default function OurPsychologists({
             ) : null}
 
             <div className="psychologists__item-wrapper">
-                {psychologists.map((psychologist) =>
-                    <div id={psychologist.id} className="psychologists__item">
+                {sessions.map((session) =>
+                    <div id={session.id} className="psychologists__item">
                         <div className="psychologists__item-image">
                             <img
-                                src={psychologist.image}
-                                alt={psychologist.name}
+                                src={session.image}
+                                alt={session.title}
                             />
                         </div>
 
                         <div className="psychologists__item-info">
-                            <div className="psychologists__item-info__item"><span>Образование:</span> более {psychologist.experience} лет</div>
-                            <div className="psychologists__item-info__item"><span>Метод:</span> {psychologist.method}</div>
-                            <div className="psychologists__item-info__item"><span>Темы:</span> {psychologist.themes}</div>
+                            <div className="psychologists__item-info__item"><span>Описание:</span>{session.description}</div>
                         </div>
 
                         <div className="psychologists__item-content">
@@ -566,8 +512,8 @@ export default function OurPsychologists({
                             <button
                                 type='button'
                                 className="psychologists__item-content__arrow"
-                                onClick={() => openPsychologistModal(psychologist)}
-                                aria-label={`Подробнее о психологе ${psychologist.name}`}
+                                onClick={() => openPsychologistModal(session)}
+                                aria-label={`Подробнее о психологе ${session.name}`}
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -579,12 +525,17 @@ export default function OurPsychologists({
                                     />
                                 </svg >
                             </button >
-
-                            <p className="psychologists__item-content__name">{psychologist.name}</p>
+                            <p className="psychologists__item-content__name">{session.title}</p>
                             <p className="psychologists__item-content__experience">
-                                <span>Опыт:</span> {psychologist.experience} лет
+                                <span>Психолог:</span> {session.name}
                             </p >
-                            <p className="psychologists__item-content__price">{psychologist.sessionDuration}мин {psychologist.pricePerSession}₽</p>
+                            <p className="psychologists__item-content__experience">
+                                <span>Время:</span> {session.date}
+                            </p >
+                            <p className="psychologists__item-content__experience">
+                                <span>Человек в группе:</span> 2/5
+                            </p >
+                            <p className="psychologists__item-content__price">{session.sessionDuration} мин {session.pricePerSession}₽</p>
                         </div >
                     </div >
                 )}
@@ -593,7 +544,7 @@ export default function OurPsychologists({
                 isOpen={modalOpen}
                 psychologist={selectedPsychologist}
                 onClose={closePsychologistModal}
-                type={selectedPsychologist?.type || "psychologist"} // Передаем тип
+                type={selectedPsychologist?.type || "session"} // Передаем тип
             />
         </div >
     );

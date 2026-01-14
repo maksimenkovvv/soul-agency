@@ -1,0 +1,208 @@
+.psychologist {
+    &-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        pointer-events: none;
+
+        &__expand-button {
+            font-size: 18px;
+            line-height: 22px;
+            color: #8885FF;
+            transition: $transition;
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+
+        &.is-open {
+            pointer-events: auto;
+
+            .psychologist-modal__overlay {
+                opacity: 1;
+            }
+
+            .psychologist-modal__content {
+                transform: translateY(0);
+            }
+        }
+
+        &__overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba($blackFull, 0.5);
+            opacity: 0;
+            transition: $transition;
+        }
+
+        &__content {
+            background-color: $whiteBg;
+            width: 100%;
+            height: calc(100vh - 100px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 48px;
+            position: relative;
+            transform: translateY(100%);
+            transition: $transition;
+            overflow-y: auto;
+            pointer-events: auto;
+            margin-top: 100px;
+            display: flex;
+            gap: 162px;
+        }
+
+        &__close {
+            position: absolute;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 48px;
+            right: 48px;
+
+            &:hover {
+                color: #333;
+            }
+        }
+
+        &__avatar {
+            width: 253px;
+            height: 320px;
+            border-radius: 18px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        &__header {
+            max-width: 805px;
+
+            &-name {
+                font-size: 32px;
+                line-height: 36px;
+                margin-bottom: 12px;
+            }
+
+            &-price {
+                font-size: 18px;
+                line-height: 22px;
+                margin-bottom: 48px;
+                font-weight: 700;
+            }
+
+            &-info {
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+
+                &__dates {
+                    &-items {
+                        display: flex;
+                        gap: 9px;
+                        flex-wrap: wrap;
+                    }
+
+                    &-item {
+                        padding: 13px 20px;
+                        background-color: #D2D7DB66;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        display: flex;
+                        transition: $transition;
+
+                        &:hover {
+                            background-color: #ACAAFE;
+                            color: #FFFFFF;
+                        }
+
+                        &.is-selected {
+                            background-color: #ACAAFE;
+                            color: #FFFFFF;
+                        }
+                    }
+                }
+
+                &__row {
+                    font-size: 18px;
+                    line-height: 22px;
+                    color: #313235;
+                    display: flex;
+
+                    &-data {
+                        width: fit-content;
+
+                        &:first-child {
+                            max-width: 180px;
+                            width: 100%;
+                            font-weight: 700;
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        &:last-child {
+                            p {
+                                line-clamp: 3;
+                                display: -webkit-box;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                            }
+                        }
+
+                        &--expand {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 12px;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        &__bottom {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            position: absolute;
+            right: 48px;
+            bottom: 20px;
+
+            &-price,
+            &-date {
+                font-size: 22px;
+                line-height: 120%;
+            }
+
+            &-price {
+                color: #313235;
+                font-weight: 700;
+            }
+
+            &-date {
+                color: #31323566;
+            }
+        }
+
+    }
+}

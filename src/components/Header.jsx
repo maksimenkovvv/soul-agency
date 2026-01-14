@@ -112,6 +112,11 @@ function Header() {
                     </NavLink>
                 </li>
                 <li className="header__menu-item">
+                    <NavLink to="/sessions2" className={navLinkClass}>
+                        Сессии2
+                    </NavLink>
+                </li>
+                <li className="header__menu-item">
                     <NavLink to="/blog" className={navLinkClass}>
                         Блог
                     </NavLink>
@@ -167,9 +172,9 @@ function Header() {
                             className={`header__profileBtn ${isCabinetActive ? "is-active" : ""}`}
                             title={me?.name || me?.email || "Профиль"}
                         >
-              <span className="header__avatar" aria-hidden="true">
-                {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="header__avatarText">{getInitials(me)}</span>}
-              </span>
+                            <span className="header__avatar" aria-hidden="true">
+                                {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="header__avatarText">{getInitials(me)}</span>}
+                            </span>
                             <span className="header__profileText">Профиль</span>
                         </button>
 
@@ -201,9 +206,9 @@ function Header() {
                                     goCabinet();
                                 }}
                             >
-                <span className="header__drawerAvatar" aria-hidden="true">
-                  {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="header__avatarText">{getInitials(me)}</span>}
-                </span>
+                                <span className="header__drawerAvatar" aria-hidden="true">
+                                    {avatarUrl ? <img src={avatarUrl} alt="" /> : <span className="header__avatarText">{getInitials(me)}</span>}
+                                </span>
                                 <span className="header__drawerProfileText">{me?.name || me?.email || "Профиль"}</span>
                             </button>
                         ) : null}

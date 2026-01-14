@@ -23,12 +23,10 @@
       border: 1px solid rgba($gray, 0.25);
 
       .psychologists__item-image {
-        background: linear-gradient(
-                        90deg,
-                        rgba($white, 0.6) 0%,
-                        rgba($white, 0.92) 50%,
-                        rgba($white, 0.6) 100%
-        );
+        background: linear-gradient(90deg,
+            rgba($white, 0.6) 0%,
+            rgba($white, 0.92) 50%,
+            rgba($white, 0.6) 100%);
         background-size: 200% 100%;
         animation: psychologistsShimmer 1.2s ease-in-out infinite;
       }
@@ -39,6 +37,14 @@
         min-height: 120px;
         background: rgba($blackBg, 0.03);
         border: 1px solid rgba($gray, 0.25);
+      }
+    }
+
+    &:hover {
+      .psychologists {
+        &__item-info {
+          opacity: 1;
+        }
       }
     }
   }
@@ -55,6 +61,30 @@
       height: 100%;
       display: block;
       object-fit: cover;
+    }
+  }
+
+  &__item-info {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background-color: #FFFFFFD9;
+    backdrop-filter: blur(32px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    transition: $transition;
+
+    &__item {
+      font-size: 20px;
+      line-height: 100%;
+
+      span {
+        font-weight: 700;
+      }
     }
   }
 
@@ -107,11 +137,11 @@
     }
 
     &__name {
-      margin-bottom: 16px;
+      margin-bottom: 22px;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 26px;
       line-height: 1.2;
-      padding-right: 54px; // чтобы не залезало под стрелку
+      padding-right: 54px;
     }
 
     &__experience {
@@ -131,8 +161,13 @@
 
 /* shimmer skeleton */
 @keyframes psychologistsShimmer {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
 /* ✅ Tablet: 2 columns */
