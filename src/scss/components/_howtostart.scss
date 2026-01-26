@@ -1,104 +1,115 @@
 .how-to-start {
+  position: relative;
+  margin-bottom: 160px;
+
+  &__header {
+    display: flex;
+  }
+
+  &__list {
     position: relative;
-    margin-bottom: 160px;
+    min-height: 840px;
 
-    &__header {
-        display: flex;
-    }
+    &-item {
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding: 48px 48px 56px;
+      width: 100%;
+      position: sticky;
+      top: 50px;
+      right: 0;
+      left: 0;
+      height: 80vh;
+      border-radius: 20px;
 
-    &__list {
-        position: relative;
-        min-height: 840px;
+      &:last-child {
+        height: max-content;
+      }
 
-        &-item {
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 48px 48px 56px;
-            width: 100%;
+      &:nth-child(2) {
+        top: 190px;
+      }
+      &:nth-child(3) {
+        top: 330px;
+      }
 
-            &:last-child {
-                border-radius: 20px;
-            }
+      &--white {
+        background-color: $whiteBg;
+      }
 
-            &--white {
-                background-color: $whiteBg;
-            }
+      &--mint {
+        background-color: $mintBg;
+      }
 
-            &--mint {
-                background-color: $mintBg;
-            }
+      &--purple {
+        background-color: $purpleBg;
+      }
 
-            &--purple {
-                background-color: $purpleBg;
-            }
+      &--black {
+        background-color: $blackBg;
 
-            &--black {
-                background-color: $blackBg;
-
-                .how-to-start {
-                    &__list {
-                        &-item {
-                            &__header {
-                                &-step {
-                                    color: $gray;
-                                }
-
-                                &-title {
-                                    color: $gray;
-                                }
-
-                            }
-
-                            &__content {
-
-                                &-title {
-                                    color: $gray;
-                                }
-
-                                &-description {
-                                    color: $gray;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            &__header {
-                padding-bottom: 56px;
-                display: flex;
-
+        .how-to-start {
+          &__list {
+            &-item {
+              &__header {
                 &-step {
-                    font-weight: 700;
-                    margin-right: 24px;
-                    max-width: 252px;
-                    width: 100%;
-                    font-size: 32px;
-                    line-height: 1.2;
-                    color: $black;
+                  color: $gray;
                 }
 
                 &-title {
-                    margin: 0;
+                  color: $gray;
                 }
-            }
+              }
 
-            &__content {
-                &-wrapper {
-                    display: flex;
-                    gap: 24px;
-                }
-
+              &__content {
                 &-title {
-                    font-weight: 700;
-                    margin-bottom: 20px;
+                  color: $gray;
                 }
 
                 &-description {
-                    font-size: 18px;
-                    line-height: 22px;
+                  color: $gray;
                 }
+              }
             }
+          }
         }
+      }
+
+      &__header {
+        padding-bottom: 56px;
+        display: flex;
+
+        &-step {
+          font-weight: 700;
+          margin-right: 24px;
+          max-width: 252px;
+          width: 100%;
+          font-size: 32px;
+          line-height: 1.2;
+          color: $black;
+        }
+
+        &-title {
+          margin: 0;
+        }
+      }
+
+      &__content {
+        &-wrapper {
+          display: flex;
+          gap: 24px;
+        }
+
+        &-title {
+          font-weight: 700;
+          margin-bottom: 20px;
+        }
+
+        &-description {
+          font-size: 18px;
+          line-height: 22px;
+        }
+      }
     }
+  }
 }
