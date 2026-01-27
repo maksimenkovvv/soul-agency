@@ -4,11 +4,13 @@
 
   &__header {
     display: flex;
+    position: sticky;
+    top: 60px;
+    z-index: 1;
   }
 
   &__list {
     position: relative;
-    min-height: 840px;
 
     &-item {
       border-top-left-radius: 20px;
@@ -16,21 +18,24 @@
       padding: 48px 48px 56px;
       width: 100%;
       position: sticky;
-      top: 50px;
-      right: 0;
-      left: 0;
-      height: 80vh;
+      height: 70vh;
       border-radius: 20px;
 
-      &:last-child {
-        height: max-content;
+      &:nth-child(1) {
+        z-index: 10;
+        top: 160px;
       }
-
       &:nth-child(2) {
-        top: 190px;
+        z-index: 20;
+        top: 280px;
       }
       &:nth-child(3) {
-        top: 330px;
+        z-index: 30;
+        top: 400px;
+      }
+      &:nth-child(4) {
+        z-index: 40;
+        top: 520px;
       }
 
       &--white {
