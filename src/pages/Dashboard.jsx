@@ -6,10 +6,10 @@ import ContentArea from "../components/ContentArea";
 
 function roleTabs(role) {
     if (role === "CLIENT") {
-        return ["Записи", "Избранное"];
+        return ["Записи", "Избранное", "Платежи"];
     }
     // PSYCHOLOGIST / ADMIN
-    return ["Записи", "График работы"];
+    return ["Записи", "График работы", "Групповые сессии"];
 }
 
 export default function Dashboard() {

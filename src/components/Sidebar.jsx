@@ -59,6 +59,18 @@ function Sidebar({ user, setActiveTab, activeTab }) {
                                 Избранное
                             </button>
                         </li>
+
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "Платежи" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Платежи")}
+                                role="tab"
+                                aria-selected={activeTab === "Платежи"}
+                            >
+                                Платежи
+                            </button>
+                        </li>
                     </>
                 ) : (
                     <>
@@ -82,6 +94,17 @@ function Sidebar({ user, setActiveTab, activeTab }) {
                                 aria-selected={activeTab === "График работы"}
                             >
                                 График работы
+                            </button>
+                        </li>
+                        <li className="sidebar__tabs-item">
+                            <button
+                                type="button"
+                                className={`sidebar__tabBtn ${activeTab === "Групповые сессии" ? "active" : ""}`}
+                                onClick={() => setActiveTab("Групповые сессии")}
+                                role="tab"
+                                aria-selected={activeTab === "Групповые сессии"}
+                            >
+                                Групповые сессии
                             </button>
                         </li>
                     </>

@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { authApi } from "../api/authApi";
 
 const STORAGE_KEY = "bs:auth";
 
+/** shape: { token: string|null, me: {id,email,role,name,...}|null } */
 function readStored() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+        return parsed;
     } catch {
         return null;
     }
@@ -21,68 +25,93 @@ function writeStored(v) {
 
 function normalizeRole(role) {
     if (!role) return null;
-    return role.startsWith("ROLE_") ? role.slice(5) : role; // ROLE_CLIENT -> CLIENT
+    const s = String(role);
+    return s.startsWith("ROLE_") ? s.slice(5) : s; // ROLE_CLIENT -> CLIENT
 }
 
 const Ctx = createContext(null);
 
 export function AuthProvider({ children }) {
-    const [auth, setAuth] = useState(() => readStored());
-    // auth = { token, me: {id,email,role,name} }
+    const [auth, setAuth] = useState(() => readStored()); // {token, me}
     const [booting, setBooting] = useState(true);
 
-    const isAuthenticated = !!auth?.me?.role;
+    // защита от двойного boot/login в StrictMode / быстрых кликов
+    const bootSeq = useRef(0);
 
-    const setAuthSafe = (next) => {
+    const setAuthSafe = useCallback((next) => {
         setAuth(next);
         writeStored(next);
-    };
-
-    const boot = async () => {
-        setBooting(true);
-        try {
-            // 1) refresh -> token
-            const r = await authApi.refresh();
-            const token = r?.token || r?.accessToken || null;
-
-            // сохраняем token, чтобы http.js стал отправлять Authorization
-            setAuthSafe({ token, me: null });
-
-            // 2) me -> user info
-            const me = await authApi.me(); // {id,email,role,name} где role=ROLE_CLIENT
-            const normalized = { ...me, role: normalizeRole(me.role) };
-
-            setAuthSafe({ token, me: normalized });
-        } catch {
-            setAuthSafe(null);
-        } finally {
-            setBooting(false);
-        }
-    };
-
-    useEffect(() => {
-        boot();
     }, []);
 
-    const login = async (email, password) => {
-        const r = await authApi.login(email, password);
-        const token = r?.token || r?.accessToken || null;
+    const applyMe = useCallback(
+        (token, meRaw) => {
+            if (!meRaw) return setAuthSafe({ token: token ?? null, me: null });
+            const normalized = { ...meRaw, role: normalizeRole(meRaw.role) };
+            setAuthSafe({ token: token ?? null, me: normalized });
+            return normalized;
+        },
+        [setAuthSafe]
+    );
 
-        setAuthSafe({ token, me: null });
-
-        const me = await authApi.me();
-        const normalized = { ...me, role: normalizeRole(me.role) };
-        setAuthSafe({ token, me: normalized });
-
-        return normalized;
-    };
-
-    const logout = async () => {
+    const boot = useCallback(async () => {
+        const seq = ++bootSeq.current;
+        setBooting(true);
         try {
-            await authApi.logout();
-        } catch {}
-        setAuthSafe(null);
-    };
+            // refresh возвращает accessToken/token ИЛИ может вернуть вообще пусто, но выставить cookie
+            const r = await authApi.refresh();
+            const token = r?.token ?? r?.accessToken ?? r?.jwt ?? null;
+
+            // если refresh не дал токен, всё равно пробуем me (cookie-based)
+            const me = await authApi.me();
+            if (seq !== bootSeq.current) return; // устаревший вызов
+            applyMe(token, me);
+        } catch {
+            if (seq !== bootSeq.current) return;
+            setAuthSafe(null);
+        } finally {
+            if (seq === bootSeq.current) setBooting(false);
+        }
+    }, [applyMe, setAuthSafe]);
+
+    useEffect(() => {
+        // один boot на монтировании
+        boot();
+    }, [boot]);
+
+    const login = useCallback(
+        async (email, password, captchaToken) => {
+            const seq = ++bootSeq.current;
+            setBooting(true);
+            try {
+                const r = await authApi.login(String(email || "").trim(), password, captchaToken);
+                const token = r?.token ?? r?.accessToken ?? r?.jwt ?? null;
+
+                // token мог прийти хедером/кукой, me — отдельным запросом
+                const me = await authApi.me();
+                if (seq !== bootSeq.current) return null;
+                return applyMe(token, me);
+            } finally {
+                if (seq === bootSeq.current) setBooting(false);
+            }
+        },
+        [applyMe]
+    );
+
+    const logout = useCallback(async () => {
+        const seq = ++bootSeq.current;
+        setBooting(true);
+        try {
+            try {
+                await authApi.logout();
+            } catch {}
+            if (seq !== bootSeq.current) return;
+            setAuthSafe(null);
+        } finally {
+            if (seq === bootSeq.current) setBooting(false);
+        }
+    }, [setAuthSafe]);
+
+    const isAuthenticated = !!auth?.me?.role;
 
     const value = useMemo(
         () => ({
@@ -90,13 +119,13 @@ export function AuthProvider({ children }) {
             auth,
             me: auth?.me || null,
             token: auth?.token || null,
-            role: auth?.me?.role || null, // уже CLIENT/PSYCHOLOGIST/ADMIN
+            role: auth?.me?.role || null, // CLIENT/PSYCHOLOGIST/ADMIN
             isAuthenticated,
             boot,
             login,
             logout,
         }),
-        [booting, auth, isAuthenticated]
+        [booting, auth, isAuthenticated, boot, login, logout]
     );
 
     return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -110,5 +139,5 @@ export function useAuth() {
 
 export function hasRole(userRole, allowed = []) {
     if (!userRole) return false;
-    return allowed.includes(userRole);
+    return Array.isArray(allowed) && allowed.includes(userRole);
 }

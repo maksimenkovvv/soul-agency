@@ -284,7 +284,7 @@ function buildSchemas({
 }
 
 export default function BlogPost() {
-    const { slug: slugParam } = useParams();
+    const { slug: slugParam } = useParams(); // это параметр из URL, будет "2-some-slug"
     const location = useLocation();
 
     const route = useMemo(() => parseIdSlugParam(slugParam), [slugParam]);
@@ -301,30 +301,38 @@ export default function BlogPost() {
 
     const contentRef = useRef(null);
 
+    // ✅ Загрузка поста: в запрос уходит id-slug как есть
     useEffect(() => {
         let mounted = true;
+
         setLoading(true);
         setNotFound(false);
         setPost(null);
 
+        const rawKey = String(slugParam || "").trim(); // ✅ id-slug
+        const parsed = parseIdSlugParam(rawKey);       // для fallback
+
         (async () => {
             try {
-                // если есть getById — используем его для /blog/{id}-{slug}
-                if (route?.id && typeof blogApi?.getById === "function") {
-                    const res = await blogApi.getById(route.id);
-                    if (!mounted) return;
-                    setPost(res);
-                    setNotFound(!res);
-                    return;
-                }
-
-                // иначе всегда грузим по "чистому" slug (без id-)
-                const res = await blogApi.getBySlug(route?.slug || "");
+                // ✅ основной запрос — отправляем id-slug (или slug) как есть
+                const res = await blogApi.getBySlug(rawKey);
                 if (!mounted) return;
                 setPost(res);
                 setNotFound(!res);
             } catch {
-                if (mounted) setNotFound(true);
+                // ✅ fallback: если URL был id-slug, попробуем чистый slug (на всякий)
+                if (parsed?.slug && parsed.slug !== rawKey) {
+                    try {
+                        const res2 = await blogApi.getBySlug(parsed.slug);
+                        if (!mounted) return;
+                        setPost(res2);
+                        setNotFound(!res2);
+                    } catch {
+                        if (mounted) setNotFound(true);
+                    }
+                } else {
+                    if (mounted) setNotFound(true);
+                }
             } finally {
                 if (mounted) setLoading(false);
             }
@@ -333,9 +341,9 @@ export default function BlogPost() {
         return () => {
             mounted = false;
         };
-    }, [route?.id, route?.slug]);
+    }, [slugParam]);
 
-    // canonical лучше вести на нормализованный id-slug (если есть post)
+    // canonical ведём на нормализованный id-slug (если есть post)
     const canonicalUrl = useMemo(() => {
         try {
             const path = post?.id && post?.slug ? blogPostPath(post) : (location.pathname || "");
@@ -427,7 +435,6 @@ export default function BlogPost() {
     useEffect(() => {
         let mounted = true;
 
-        // если поста ещё нет — сбросим related и загрузку
         if (!post?.id) {
             setRelatedPosts([]);
             setRelatedLoading(false);
@@ -671,11 +678,19 @@ export default function BlogPost() {
                             Telegram
                         </button>
 
-                        <button type="button" className="b-share__btn" onClick={() => openShare(`https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}`)}>
+                        <button
+                            type="button"
+                            className="b-share__btn"
+                            onClick={() => openShare(`https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}`)}
+                        >
                             VK
                         </button>
 
-                        <button type="button" className="b-share__btn" onClick={() => openShare(`https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${shareUrl}`)}`)}>
+                        <button
+                            type="button"
+                            className="b-share__btn"
+                            onClick={() => openShare(`https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${shareUrl}`)}`)}
+                        >
                             WhatsApp
                         </button>
 
@@ -777,11 +792,7 @@ export default function BlogPost() {
                         ) : relatedPosts?.length ? (
                             <div className="b-related__list">
                                 {relatedPosts.map((p) => (
-                                    <Link
-                                        key={p.id || p.slug}
-                                        to={blogPostPath(p)} // ✅ id-slug
-                                        className="b-related__item"
-                                    >
+                                    <Link key={p.id || p.slug} to={blogPostPath(p)} className="b-related__item">
                                         <div className="b-related__item-title">{p.title}</div>
                                         <div className="b-related__item-meta">
                                             {p.createdWhen ? formatDate(p.createdWhen) : ""}

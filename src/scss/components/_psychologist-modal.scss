@@ -1,208 +1,574 @@
 .psychologist {
-    &-modal {
-        position: fixed;
+  &-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    pointer-events: none;
+
+    // ===== animation =====
+    $dur: 320ms;
+    $ease: cubic-bezier(0.18, 0.92, 0.24, 1);
+
+    // ===== overlay =====
+    &__overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+
+      background: rgba($blackFull, 0.55);
+      transition: opacity $dur $ease;
+      will-change: opacity;
+
+      @supports (backdrop-filter: blur(14px)) {
+        background: rgba($blackFull, 0.35);
+        backdrop-filter: blur(12px);
+      }
+    }
+
+    // ===== content (sheet) =====
+    &__content {
+      position: relative;
+      pointer-events: auto;
+
+      // ✅ sheet не доходит до верха
+      height: calc(100vh - 96px);
+      margin-top: 96px;
+
+      width: min(1260px, 100%);
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+
+      // ✅ фон с нежным акцентом
+      background: linear-gradient(
+                      180deg,
+                      rgba(136, 133, 255, 0.08) 0%,
+                      rgba(255, 255, 255, 1) 42%,
+                      rgba(255, 255, 255, 1) 100%
+      );
+
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 -22px 48px rgba(0, 0, 0, 0.16);
+
+      padding: 30px 30px 18px;
+
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      column-gap: 28px;
+      row-gap: 18px;
+      align-items: start;
+
+      // ✅ закрыта: снизу
+      transform: translate3d(0, 120%, 0);
+      opacity: 0.98;
+
+      transition:
+              transform $dur $ease,
+              opacity $dur $ease;
+      will-change: transform, opacity;
+
+      // ✅ handle сверху
+      &::before {
+        content: "";
+        grid-column: 1 / -1;
+        width: 58px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(49, 50, 53, 0.16);
+        margin: 4px auto 6px;
+      }
+    }
+
+    // ===== open state =====
+    &.is-open {
+      pointer-events: auto;
+
+      .psychologist-modal__overlay {
+        opacity: 1;
+      }
+
+      .psychologist-modal__content {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+      }
+    }
+
+    // ===== close button =====
+    &__close {
+      grid-column: 1 / -1;
+      justify-self: end;
+
+      width: 44px;
+      height: 44px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.65);
+
+      cursor: pointer;
+      color: rgba(49, 50, 53, 0.78);
+
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+
+      @supports (backdrop-filter: blur(12px)) {
+        backdrop-filter: blur(10px);
+      }
+
+      &:hover {
+        transform: scale(1.04);
+        background: rgba(255, 255, 255, 0.85);
+      }
+
+      &:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+      }
+    }
+
+    // ===== avatar =====
+    &__avatar {
+      grid-column: 1;
+      width: 100%;
+      height: 380px;
+      border-radius: 22px;
+      overflow: hidden;
+
+      background: rgba(210, 215, 219, 0.18);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+
+      position: sticky;
+      top: 70px;
+
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.12);
+
+      // ✅ аккуратное “кольцо” (как premium-card)
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 22px;
+        padding: 1px;
+        pointer-events: none;
+
+        background: linear-gradient(
+                        135deg,
+                        rgba(136, 133, 255, 0.55),
+                        rgba(136, 133, 255, 0.10),
+                        rgba(0, 0, 0, 0.06)
+        );
+
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.01);
+      }
+    }
+
+    // ===== header =====
+    &__header {
+      grid-column: 2;
+      min-width: 0;
+
+      &-name {
+        font-size: 28px;
+        line-height: 1.15;
+        letter-spacing: -0.25px;
+        margin-bottom: 10px;
+      }
+
+      // ✅ price как “badge”
+      &-price {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 10px 14px;
+        border-radius: 999px;
+
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 800;
+
+        color: rgba(49, 50, 53, 0.92);
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(136, 133, 255, 0.18);
+
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+
+        margin-bottom: 18px;
+
+        @supports (backdrop-filter: blur(10px)) {
+          backdrop-filter: blur(10px);
+        }
+      }
+
+      // ===== info blocks =====
+      &-info {
+        display: grid;
+        gap: 12px;
+
+        &__row {
+          display: grid;
+          grid-template-columns: 165px minmax(0, 1fr);
+          gap: 14px;
+
+          padding: 14px 16px;
+          border-radius: 18px;
+
+          background: rgba(255, 255, 255, 0.80);
+          border: 1px solid rgba(0, 0, 0, 0.06);
+          box-shadow: 0 12px 26px rgba(0, 0, 0, 0.06);
+
+          transition: transform 150ms ease, box-shadow 150ms ease;
+
+          @supports (backdrop-filter: blur(10px)) {
+            backdrop-filter: blur(10px);
+          }
+
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.08);
+          }
+
+          // ✅ тонкий акцент слева
+          &::before {
+            content: "";
+            width: 4px;
+            border-radius: 999px;
+            background: rgba(136, 133, 255, 0.35);
+            grid-row: 1;
+            grid-column: 1 / -1;
+            position: absolute;
+            left: 10px;
+            top: 14px;
+            bottom: 14px;
+            opacity: 0.35;
+          }
+
+          &-data {
+            position: relative;
+            z-index: 1;
+
+            &:first-child {
+              font-size: 13px;
+              line-height: 16px;
+              font-weight: 800;
+              color: rgba(49, 50, 53, 0.62);
+              padding-top: 2px;
+            }
+
+            &:last-child {
+              font-size: 15px;
+              line-height: 20px;
+              color: rgba(49, 50, 53, 0.92);
+              min-width: 0;
+              word-break: break-word;
+            }
+
+            &--expand {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 10px;
+              min-width: 0;
+            }
+          }
+        }
+      }
+    }
+
+    // ===== expand button (pill) =====
+    &__expand-button {
+      font-size: 13px;
+      line-height: 16px;
+      font-weight: 800;
+
+      border-radius: 999px;
+      padding: 9px 12px;
+
+      color: rgba(136, 133, 255, 1);
+      background: rgba(136, 133, 255, 0.10);
+      border: 1px solid rgba(136, 133, 255, 0.18);
+
+      cursor: pointer;
+      transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        background: rgba(136, 133, 255, 0.14);
+      }
+
+      &:active {
+        transform: translateY(0);
+        opacity: 0.85;
+      }
+    }
+
+    // ===== calendar block =====
+    &__calendar {
+      width: 100%;
+      margin-top: 10px;
+
+      padding: 14px;
+      border-radius: 20px;
+
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+
+      overflow: hidden;
+
+      @supports (backdrop-filter: blur(10px)) {
+        backdrop-filter: blur(10px);
+      }
+
+      .fc {
+        max-width: 100%;
+      }
+    }
+
+    // ===== bottom bar (floating sticky) =====
+    &__bottom {
+      grid-column: 1 / -1;
+      position: sticky;
+      bottom: 0;
+      z-index: 3;
+
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      margin-top: 14px;
+
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+      border-radius: 22px;
+
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.12);
+
+      @supports (backdrop-filter: blur(14px)) {
+        backdrop-filter: blur(12px);
+      }
+
+      &-price {
+        font-size: 18px;
+        line-height: 1.2;
+        font-weight: 900;
+        white-space: nowrap;
+        color: rgba(49, 50, 53, 0.95);
+      }
+
+      &-date {
+        font-size: 13px;
+        line-height: 16px;
+        color: rgba(49, 50, 53, 0.55);
+        min-width: 0;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &-button {
+        margin-left: auto;
+        white-space: nowrap;
+
+        border-radius: 16px;
+        padding: 14px 18px;
+        font-weight: 900;
+      }
+    }
+
+    // ===== responsive =====
+    @media (max-width: 1100px) {
+      &__content {
+        width: 100%;
+        grid-template-columns: 300px minmax(0, 1fr);
+        padding: 26px 20px 16px;
+      }
+
+      &__avatar {
+        height: 340px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      &__content {
+        margin-top: 72px;
+        height: calc(100vh - 72px);
+
+        grid-template-columns: 1fr;
+        row-gap: 14px;
+
+        padding: 22px 14px 14px;
+        border-top-left-radius: 24px;
+        border-top-right-radius: 24px;
+      }
+
+      &__avatar {
+        position: relative;
+        top: 0;
+        height: 260px;
+        grid-column: 1;
+      }
+
+      &__header {
+        grid-column: 1;
+
+        &-name {
+          font-size: 24px;
+        }
+
+        &-price {
+          width: 100%;
+          justify-content: center;
+        }
+
+        &-info {
+          &__row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+        }
+      }
+
+      &__bottom {
+        flex-direction: column;
+        align-items: stretch;
+
+        &-price,
+        &-date {
+          text-align: center;
+        }
+
+        &-button {
+          width: 100%;
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &__overlay,
+      &__content {
+        transition: none !important;
+      }
+    }
+  }
+}
+.psychologist {
+  &-modal {
+
+    // =========================
+    // ✅ CONTENT: красивый скролл
+    // =========================
+    &__content {
+      // чтобы не было "резинового" прокрута по боди на iOS
+      overscroll-behavior: contain;
+
+      // чтобы скролл не прыгал при появлении/исчезновении
+      scrollbar-gutter: stable both-edges;
+
+      // Firefox
+      scrollbar-width: thin;
+      scrollbar-color: rgba(136, 133, 255, 0.55) rgba(0, 0, 0, 0.06);
+
+      // WebKit (Chrome/Safari/Edge)
+      &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 999px;
+        margin: 10px 0; // отступы сверху/снизу
+      }
+
+      &::-webkit-scrollbar-thumb {
+        border-radius: 999px;
+        background: rgba(136, 133, 255, 0.55);
+
+        // чтобы thumb был "капсулой", а не жирной заливкой
+        border: 2px solid rgba(255, 255, 255, 0.75);
+
+        transition: background 160ms ease, transform 160ms ease;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: rgba(136, 133, 255, 0.75);
+      }
+
+      &::-webkit-scrollbar-thumb:active {
+        background: rgba(136, 133, 255, 0.9);
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+    }
+    &__content {
+      position: relative;
+
+      &::after {
+        content: "";
+        pointer-events: none;
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 22px;
+        background: linear-gradient(
+                        to top,
+                        rgba(255, 255, 255, 1),
+                        rgba(255, 255, 255, 0)
+        );
+      }
+
+      &::before {
+        content: "";
+        pointer-events: none;
+        position: sticky;
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        z-index: 1000;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        pointer-events: none;
-
-        &__expand-button {
-            font-size: 18px;
-            line-height: 22px;
-            color: #8885FF;
-            transition: $transition;
-
-            &:hover {
-                opacity: 0.8;
-            }
-        }
-
-        &.is-open {
-            pointer-events: auto;
-
-            .psychologist-modal__overlay {
-                opacity: 1;
-            }
-
-            .psychologist-modal__content {
-                transform: translateY(0);
-            }
-        }
-
-        &__overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba($blackFull, 0.5);
-            opacity: 0;
-            transition: $transition;
-        }
-
-        &__content {
-            background-color: $whiteBg;
-            width: 100%;
-            height: calc(100vh - 100px);
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            padding: 48px;
-            position: relative;
-            transform: translateY(100%);
-            transition: $transition;
-            overflow-y: auto;
-            pointer-events: auto;
-            margin-top: 100px;
-            display: flex;
-            gap: 162px;
-        }
-
-        &__close {
-            position: absolute;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            top: 48px;
-            right: 48px;
-
-            &:hover {
-                color: #333;
-            }
-        }
-
-        &__avatar {
-            width: 253px;
-            height: 320px;
-            border-radius: 18px;
-            overflow: hidden;
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-        }
-
-        &__header {
-            max-width: 805px;
-
-            &-name {
-                font-size: 32px;
-                line-height: 36px;
-                margin-bottom: 12px;
-            }
-
-            &-price {
-                font-size: 18px;
-                line-height: 22px;
-                margin-bottom: 48px;
-                font-weight: 700;
-            }
-
-            &-info {
-                display: flex;
-                flex-direction: column;
-                gap: 32px;
-
-                &__dates {
-                    &-items {
-                        display: flex;
-                        gap: 9px;
-                        flex-wrap: wrap;
-                    }
-
-                    &-item {
-                        padding: 13px 20px;
-                        background-color: #D2D7DB66;
-                        border-radius: 12px;
-                        cursor: pointer;
-                        display: flex;
-                        transition: $transition;
-
-                        &:hover {
-                            background-color: #ACAAFE;
-                            color: #FFFFFF;
-                        }
-
-                        &.is-selected {
-                            background-color: #ACAAFE;
-                            color: #FFFFFF;
-                        }
-                    }
-                }
-
-                &__row {
-                    font-size: 18px;
-                    line-height: 22px;
-                    color: #313235;
-                    display: flex;
-
-                    &-data {
-                        width: fit-content;
-
-                        &:first-child {
-                            max-width: 180px;
-                            width: 100%;
-                            font-weight: 700;
-                            display: flex;
-                            align-items: center;
-                        }
-
-                        &:last-child {
-                            p {
-                                line-clamp: 3;
-                                display: -webkit-box;
-                                -webkit-box-orient: vertical;
-                                overflow: hidden;
-                            }
-                        }
-
-                        &--expand {
-                            display: flex;
-                            flex-direction: column;
-                            align-items: flex-start;
-                            gap: 12px;
-                        }
-                    }
-
-                }
-            }
-        }
-
-        &__bottom {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            position: absolute;
-            right: 48px;
-            bottom: 20px;
-
-            &-price,
-            &-date {
-                font-size: 22px;
-                line-height: 120%;
-            }
-
-            &-price {
-                color: #313235;
-                font-weight: 700;
-            }
-
-            &-date {
-                color: #31323566;
-            }
-        }
-
+        height: 18px;
+        background: linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 1),
+                        rgba(255, 255, 255, 0)
+        );
+        z-index: 2;
+      }
     }
+    @media (max-width: 860px) {
+      &__content {
+        &::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+  }
 }

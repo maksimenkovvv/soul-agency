@@ -1,59 +1,122 @@
 import React from "react";
 import { IconArrowDown, IconDots, IconPlay } from "./chatIcons";
 import MediaViewer from "./MediaViewer";
+import MessageSenderMeta from "./MessageSenderMeta";
 
-/* -------------------- helpers (универсальные под DTO/нормализованный фронт) -------------------- */
+/* -------------------- helpers -------------------- */
 
 const getId = (m) => m?.id ?? m?.messageId ?? null;
 const getClientId = (m) => m?.clientId ?? null;
+
 const getFromUserId = (m) => m?.fromUserId ?? m?.senderId ?? null;
 
-const getCreatedAt = (m) => m?.createdAt ?? m?.createdWhen ?? null;
-const getText = (m) => (m?.text ?? m?.content ?? "");
+const getCreatedAt = (m) => m?.createdAt ?? m?.createdWhen ?? m?.created_at ?? m?.created_when ?? null;
+const getText = (m) => m?.text ?? m?.content ?? m?.message ?? "";
 
 const getDeleted = (m) =>
+    Boolean(m?.deleted) ||
+    Boolean(m?.isDeleted) ||
     Boolean(m?.deletedAt) ||
     Boolean(m?.deletedWhen) ||
-    Boolean(m?.deleted) ||
-    Boolean(m?.isDeleted);
+    Boolean(m?.deleted_at) ||
+    Boolean(m?.deleted_when);
 
-const getDeletedAt = (m) => m?.deletedAt ?? m?.deletedWhen ?? null;
+const getLastModified = (m) =>
+    m?.lastModified ??
+    m?.last_modified ??
+    m?.updatedAt ??
+    m?.updated_at ??
+    m?.editedAt ??
+    m?.edited_at ??
+    null;
 
-const getLastModified = (m) => m?.lastModified ?? m?.updatedAt ?? null;
+const getEditedAt = (m) => m?.editedAt ?? m?.edited_at ?? m?.editedWhen ?? m?.edited_when ?? getLastModified(m);
+
+const getEditedFlag = (m) =>
+    Boolean(m?.isEdited) || Boolean(m?.edited) || Boolean(m?.wasEdited) || Boolean(m?.is_edited);
+
+// ✅ новые флаги из твоего API
+const getMineFlag = (m) => (typeof m?.mine === "boolean" ? m.mine : null);
+const getReadByMeFlag = (m) => (typeof m?.readByMe === "boolean" ? m.readByMe : null);
+const getReadAt = (m) =>
+    m?.readAt ??
+    m?.read_at ??
+    m?.readWhen ??
+    m?.read_when ??
+    m?.lastReadAt ??
+    m?.last_read_at ??
+    m?.seenAt ??
+    m?.seen_at ??
+    null;
+
+const getReadByOtherFlag = (m) => {
+    // 1) прямой флаг
+    if (typeof m?.readByOther === "boolean") return m.readByOther;
+
+    // 2) числовые счётчики (часто так в GROUP)
+    const cnt =
+        m?.readByCount ??
+        m?.read_count ??
+        m?.readCount ??
+        m?.readersCount ??
+        m?.readers_count ??
+        m?.seenCount ??
+        m?.seen_count ??
+        null;
+
+    if (typeof cnt === "number" && Number.isFinite(cnt)) return cnt > 0;
+
+    // 3) массивы (часто так в GROUP)
+    const arr =
+        m?.readByUsers ??
+        m?.read_by_users ??
+        m?.readers ??
+        m?.read_by ??
+        m?.seenBy ??
+        m?.seen_by ??
+        null;
+
+    if (Array.isArray(arr)) return arr.length > 0;
+
+    // 4) nested (на всякий)
+    const nestedCnt = m?.readBy?.count ?? m?.readers?.count ?? null;
+    if (typeof nestedCnt === "number" && Number.isFinite(nestedCnt)) return nestedCnt > 0;
+
+    // 5) если есть readAt/seenAt — считаем прочитанным
+    if (getReadAt(m)) return true;
+
+    return null;
+};
+
+
+function toDate(v) {
+    if (!v) return null;
+    const d = v instanceof Date ? v : new Date(v);
+    return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function createdTs(m) {
+    const d = toDate(getCreatedAt(m));
+    return d ? d.getTime() : 0;
+}
 
 function isEdited(m) {
-    const created = getCreatedAt(m);
-    const edited = getLastModified(m);
-    if (!created || !edited) return false;
-    const c = new Date(created).getTime();
-    const e = new Date(edited).getTime();
-    if (Number.isNaN(c) || Number.isNaN(e)) return false;
+    if (!m || getDeleted(m)) return false;
 
-    // createdWhen == lastModified на insert — не считаем это редактированием
-    return e > c + 1500;
-}
+    if (getEditedFlag(m)) return true;
 
-function isTmpId(v) {
-    if (v == null) return false;
-    const s = String(v);
-    return s.startsWith("tmp_") || s.startsWith("c:") || s.startsWith("client:");
-}
+    const created = toDate(getCreatedAt(m));
+    const editedAt = toDate(getEditedAt(m));
 
-function messageKeyOf(m) {
-    // ключ для jump/highlight
-    // IMPORTANT: используем createdAt/createdWhen, иначе будет "undefined" и jump сломается
-    const created = getCreatedAt(m) || "";
-    return getId(m) || getClientId(m) || `${m?.dialogId || m?.chatId || "d"}:${String(created)}`;
-}
+    if (created && editedAt) {
+        const c = created.getTime();
+        const e = editedAt.getTime();
+        return e > c + 1500;
+    }
 
-function isNonEmpty(v) {
-    return v != null && String(v).trim() !== "";
-}
-
-async function safeCopy(text) {
-    try {
-        await navigator.clipboard?.writeText?.(text);
-    } catch {}
+    const lm = toDate(getLastModified(m));
+    if (!created || !lm) return false;
+    return lm.getTime() > created.getTime() + 1500;
 }
 
 const fmtTime = (d) => {
@@ -85,9 +148,52 @@ function isSameDay(a, b) {
     return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
 }
 
+async function safeCopy(text) {
+    try {
+        await navigator.clipboard?.writeText?.(text);
+    } catch {}
+}
+
+function isNonEmpty(v) {
+    return v != null && String(v).trim() !== "";
+}
+
+function isTmpId(v) {
+    if (v == null) return false;
+    const s = String(v);
+    return s.startsWith("tmp_") || s.startsWith("c:") || s.startsWith("client:");
+}
+
+function safeIdPart(v) {
+    return String(v ?? "")
+        .trim()
+        .replace(/\s+/g, "_");
+}
+
+function normalizeDialogId(x) {
+    if (x == null) return null;
+    if (typeof x === "object") return x.id ?? x.dialogId ?? x.chatId ?? x.threadId ?? null;
+    return x;
+}
+
+/**
+ * ✅ ВАЖНО:
+ * messageKeyOf ДОЛЖЕН быть безопасным для id="" (без пробелов),
+ * иначе ломаются jump/restore/querySelector.
+ */
+function messageKeyOf(m) {
+    const id = getId(m);
+    const cid = getClientId(m);
+    if (id != null) return safeIdPart(id);
+    if (cid != null) return safeIdPart(cid);
+
+    const didRaw = normalizeDialogId(m?.dialogId ?? m?.chatId ?? m?.threadId ?? m?.chatId ?? "d");
+    const did = didRaw != null ? safeIdPart(didRaw) : "d";
+    const ts = createdTs(m);
+    return `${did}:${String(ts || 0)}`;
+}
+
 function normalizeReactions(raw) {
-    // 1) [{emoji:"👍", count:2, me:true}, ...]
-    // 2) { "👍": {count:2, me:true}, "🔥": 1 }
     if (!raw) return [];
     if (Array.isArray(raw)) {
         return raw
@@ -142,12 +248,30 @@ function TypingBubble({ text = "Печатает…" }) {
     );
 }
 
-/* -------------------- component -------------------- */
+function cssEscapeSafe(v) {
+    const s = String(v ?? "");
+    if (typeof window !== "undefined" && window.CSS && typeof window.CSS.escape === "function") return window.CSS.escape(s);
+    return s.replace(/["\\]/g, "\\$&");
+}
 
+function guessDialogId(messages) {
+    if (!Array.isArray(messages) || messages.length === 0) return null;
+    const m = messages[0] || messages[messages.length - 1];
+    const did = normalizeDialogId(m?.dialogId ?? m?.chatId ?? m?.threadId ?? m?.chatId ?? null);
+    return did != null ? String(did) : null;
+}
+
+/**
+ * ✅ NEW:
+ * onMessagesSeen(ids:number[]) — батч, когда сообщения реально попали в viewport
+ * ✅ onBottomVisible() — когда виден низ списка (sentinel)
+ * ✅ ref API: jumpToMessage + getScrollState + restoreScrollState
+ */
 const MessageList = React.forwardRef(function MessageList(
     {
         messages = [],
         meId,
+        myRole,
         loading,
         onRequestMore,
         onEdit,
@@ -156,38 +280,85 @@ const MessageList = React.forwardRef(function MessageList(
         typing = false,
         typingText = "Печатает…",
 
-        onReply, // (message) => void
-        onReact, // (message, emoji) => void
+        onReply,
+        onReact,
 
         onOpenMedia,
         mediaItems: mediaItemsExternal,
         mediaIndexByKey: mediaIndexByKeyExternal,
-        messageMap, // Map(messageKey -> message)
+        messageMap,
+
+        onMessagesSeen,
+        onBottomVisible,
+        onOpenReadInfo,
+        dialogId,
+        members = [],
+        chatType,
+        showSenderMetaForMineInGroup = false,
     },
     ref
 ) {
     const listRef = React.useRef(null);
 
     const [hasNewHiddenMessages, setHasNewHiddenMessages] = React.useState(false);
-
-    // fallback viewer (если не поднят в ChatUI)
     const [viewer, setViewer] = React.useState({ open: false, index: 0 });
-
-    // ctx menu
     const [menu, setMenu] = React.useState(null);
-
-    // quick reacts popover (по "+")
     const [reactPop, setReactPop] = React.useState(null);
     const reactPopWrapRef = React.useRef(null);
 
-    // Sticky day
     const [stickyDay, setStickyDay] = React.useState(null);
     const rafRef = React.useRef(0);
 
-    // Jump highlight
     const [highlightKey, setHighlightKey] = React.useState(null);
     const highlightTimerRef = React.useRef(null);
 
+    // ✅ определяем GROUP без доп. запросов
+    const isGroup = React.useMemo(() => {
+        const t = String(chatType || "").toUpperCase();
+        if (t) return t === "GROUP";
+        // fallback: если участников > 2 — почти наверняка GROUP
+        return Array.isArray(members) && members.length > 2;
+    }, [chatType, members]);
+
+    // ✅ map участников: userId -> sender object для MessageSenderMeta
+    const membersById = React.useMemo(() => {
+        const map = new Map();
+        (members || []).forEach((u) => {
+            const id = u?.userId ?? u?.id ?? null;
+            if (id == null) return;
+
+            const name = u?.name ?? u?.fullName ?? u?.email ?? "Пользователь";
+            map.set(String(id), {
+                id,
+                userId: id,
+                fullName: name,
+                name,
+                email: u?.email ?? null,
+                avatarUrl: u?.avatarUrl ?? u?.avatar ?? null,
+                avatar: u?.avatar ?? null,
+                isOnline: u?.isOnline,
+                lastSeenAt: u?.lastSeenAt,
+            });
+        });
+        return map;
+    }, [members]);
+
+    const resolveSender = React.useCallback(
+        (m) => {
+            const uid = getFromUserId(m);
+            if (uid == null) return null;
+
+            const found = membersById.get(String(uid));
+            if (found) return found;
+
+            // fallback из сообщения
+            const nm = m?.fromUserName || m?.fromName || "Пользователь";
+            return { id: uid, userId: uid, fullName: nm, name: nm, avatarUrl: null };
+        },
+        [membersById]
+    );
+
+    // -------- media helpers --------
     const isMedia = React.useCallback((a) => {
         const mime = String(a?.mime || "");
         const kind = String(a?.kind || "");
@@ -202,10 +373,10 @@ const MessageList = React.forwardRef(function MessageList(
         return `${mid}::${aid}`;
     }, []);
 
-    // Collect ALL media (fallback)
     const mediaItemsInternal = React.useMemo(() => {
         const out = [];
         for (const m of messages || []) {
+            if (getDeleted(m)) continue;
             const atts = Array.isArray(m?.attachments) ? m.attachments : [];
             for (const a of atts) {
                 const k = isMedia(a);
@@ -235,23 +406,41 @@ const MessageList = React.forwardRef(function MessageList(
 
     const mediaIndexByKey = mediaIndexByKeyExternal || mediaIndexByKeyInternal;
 
+    // -------- rows --------
     const rows = React.useMemo(() => {
         const out = [];
         let prevDay = null;
 
-        for (const m of messages) {
-            const day = getCreatedAt(m);
-            if (!prevDay || !isSameDay(prevDay, day)) {
-                const k = dayKey(day);
-                out.push({ kind: "day", key: `day:${k}`, day, dayKey: k });
-                prevDay = day;
+        // ✅ для GROUP: чтобы не рисовать sender meta на каждом сообщении подряд
+        // сохраняем предыдущего автора в рамках дня
+        let prevFromInDay = null;
+
+        for (const m of messages || []) {
+            const day = toDate(getCreatedAt(m));
+            if (day) {
+                if (!prevDay || !isSameDay(prevDay, day)) {
+                    const k = dayKey(day);
+                    out.push({ kind: "day", key: `day:${k}`, day, dayKey: k });
+                    prevDay = day;
+                    prevFromInDay = null; // новая дата — заново показываем sender meta
+                }
             }
+
             const mk = messageKeyOf(m);
-            out.push({ kind: "msg", key: `m:${mk}`, msg: m, messageKey: mk });
+            out.push({
+                kind: "msg",
+                key: `m:${mk}`,
+                msg: m,
+                messageKey: mk,
+                prevFromUserId: prevFromInDay,
+            });
+
+            prevFromInDay = getFromUserId(m);
         }
         return out;
     }, [messages]);
 
+    // -------- scroll helpers --------
     const isAtBottomNow = React.useCallback(() => {
         const el = listRef.current;
         if (!el) return true;
@@ -275,55 +464,79 @@ const MessageList = React.forwardRef(function MessageList(
 
     const jumpToMessage = React.useCallback((key) => {
         const el = listRef.current;
-        if (!el || !key) return;
+        if (!el || !key) return false;
 
-        const node = el.querySelector(`#msg-${CSS.escape(String(key))}`);
+        const node = el.querySelector(`#msg-${cssEscapeSafe(String(key))}`);
         if (node && typeof node.scrollIntoView === "function") {
             node.scrollIntoView({ block: "center", behavior: "smooth" });
             setHighlightKey(String(key));
 
             if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
             highlightTimerRef.current = setTimeout(() => setHighlightKey(null), 1400);
+            return true;
+        }
+        return false;
+    }, []);
+
+    const getScrollState = React.useCallback(() => {
+        const el = listRef.current;
+        if (!el) return null;
+
+        const scrollTop = el.scrollTop;
+
+        const nodes = el.querySelectorAll('[id^="msg-"]');
+        let anchorKey = null;
+        let anchorOffset = 0;
+
+        for (const node of nodes) {
+            const top = node.offsetTop;
+            if (top >= scrollTop + 8) {
+                anchorKey = String(node.id).replace(/^msg-/, "");
+                anchorOffset = top - scrollTop;
+                break;
+            }
+        }
+
+        if (!anchorKey && nodes.length) {
+            const node = nodes[0];
+            anchorKey = String(node.id).replace(/^msg-/, "");
+            anchorOffset = node.offsetTop - scrollTop;
+        }
+
+        return { scrollTop, anchorKey, anchorOffset };
+    }, []);
+
+    const restoreScrollState = React.useCallback((state) => {
+        const el = listRef.current;
+        if (!el || !state) return;
+
+        if (state.anchorKey) {
+            const node = el.querySelector(`#msg-${cssEscapeSafe(String(state.anchorKey))}`);
+            if (node) {
+                const nextTop = Math.max(0, node.offsetTop - (Number(state.anchorOffset) || 0));
+                el.scrollTo({ top: nextTop, behavior: "auto" });
+                return;
+            }
+        }
+
+        if (typeof state.scrollTop === "number") {
+            el.scrollTo({ top: Math.max(0, state.scrollTop), behavior: "auto" });
         }
     }, []);
 
-    React.useImperativeHandle(ref, () => ({ jumpToMessage }));
+    React.useImperativeHandle(ref, () => ({
+        jumpToMessage,
+        getScrollState,
+        restoreScrollState,
+    }));
 
-    // Smart scroll on new messages
-    const prevLenRef = React.useRef(0);
-    React.useEffect(() => {
-        const prevLen = prevLenRef.current;
-        prevLenRef.current = messages.length;
-
-        if (messages.length === 0) return;
-        if (messages.length <= prevLen) return;
-
-        const last = messages[messages.length - 1];
-        const fromId = getFromUserId(last);
-        const fromMe = meId != null && fromId != null && String(fromId) === String(meId);
-        scrollToBottom(fromMe);
-    }, [messages.length, meId, scrollToBottom, messages]);
-
-    // Если typing появился и мы внизу — держим низ
-    const prevTypingRef = React.useRef(false);
-    React.useEffect(() => {
-        const was = prevTypingRef.current;
-        prevTypingRef.current = Boolean(typing);
-        if (!typing || was === typing) return;
-        if (isAtBottomNow()) {
-            const el = listRef.current;
-            if (el) el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
-        }
-    }, [typing, isAtBottomNow]);
-
-    // Close ctx menu / quick reacts on outside click / ESC
+    // -------- context menu closing --------
     React.useEffect(() => {
         if (!menu && !reactPop) return;
 
         const onDown = (e) => {
             const wrap = reactPopWrapRef.current;
             if (wrap && wrap.contains(e.target)) return;
-
             setMenu(null);
             setReactPop(null);
         };
@@ -335,18 +548,21 @@ const MessageList = React.forwardRef(function MessageList(
             }
         };
 
-        window.addEventListener("mousedown", onDown, true);
+        window.addEventListener("mousedown", onDown);
         window.addEventListener("keydown", onKey, true);
         return () => {
-            window.removeEventListener("mousedown", onDown, true);
+            window.removeEventListener("mousedown", onDown);
             window.removeEventListener("keydown", onKey, true);
         };
     }, [menu, reactPop]);
 
-    // throttle for onRequestMore
-    const moreLockRef = React.useRef(false);
-    const lastMoreAtRef = React.useRef(0);
+    React.useEffect(() => {
+        if (menu?.message && getDeleted(menu.message)) setMenu(null);
+        if (reactPop?.message && getDeleted(reactPop.message)) setReactPop(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages]);
 
+    // -------- sticky day --------
     const updateStickyDay = React.useCallback(() => {
         const el = listRef.current;
         if (!el) return;
@@ -369,6 +585,22 @@ const MessageList = React.forwardRef(function MessageList(
         setStickyDay(current);
     }, []);
 
+    React.useEffect(() => {
+        updateStickyDay();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rows.length]);
+
+    React.useEffect(() => {
+        return () => {
+            if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
+    }, []);
+
+    // -------- load more on top (keep position) --------
+    const moreLockRef = React.useRef(false);
+    const lastMoreAtRef = React.useRef(0);
+
     const onScroll = (e) => {
         const el = e.currentTarget;
 
@@ -378,9 +610,20 @@ const MessageList = React.forwardRef(function MessageList(
             if (!moreLockRef.current && now - lastMoreAtRef.current > 700) {
                 moreLockRef.current = true;
                 lastMoreAtRef.current = now;
-                Promise.resolve(onRequestMore()).finally(() => {
-                    moreLockRef.current = false;
-                });
+
+                const beforeHeight = el.scrollHeight;
+                const beforeTop = el.scrollTop;
+
+                Promise.resolve(onRequestMore())
+                    .catch(() => {})
+                    .finally(() => {
+                        moreLockRef.current = false;
+                        requestAnimationFrame(() => {
+                            const afterHeight = el.scrollHeight;
+                            const delta = afterHeight - beforeHeight;
+                            if (delta > 0) el.scrollTop = beforeTop + delta;
+                        });
+                    });
             }
         }
 
@@ -395,18 +638,207 @@ const MessageList = React.forwardRef(function MessageList(
         }
     };
 
+    // -------- autoscroll on new messages --------
+    const prevLenRef = React.useRef(0);
     React.useEffect(() => {
-        updateStickyDay();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rows.length]);
+        const prevLen = prevLenRef.current;
+        prevLenRef.current = messages.length;
+
+        if (messages.length === 0) return;
+
+        if (prevLen === 0) {
+            scrollToBottom(false);
+            return;
+        }
+
+        if (messages.length <= prevLen) return;
+
+        const last = messages[messages.length - 1];
+
+        // ✅ mine: сначала берём флаг mine из API, если нет — fallback по meId
+        const mineByApi = getMineFlag(last);
+        const mine =
+            typeof mineByApi === "boolean"
+                ? mineByApi
+                : meId != null && getFromUserId(last) != null && String(getFromUserId(last)) === String(meId);
+
+        scrollToBottom(mine);
+    }, [messages.length, meId, scrollToBottom, messages]);
+
+    const prevTypingRef = React.useRef(false);
+    React.useEffect(() => {
+        const was = prevTypingRef.current;
+        prevTypingRef.current = Boolean(typing);
+        if (!typing || was === typing) return;
+        if (isAtBottomNow()) {
+            const el = listRef.current;
+            if (el) el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
+        }
+    }, [typing, isAtBottomNow]);
+
+    // -------- ✅ per-message observer (read when visible) --------
+    const roleStr = String(myRole || "").toLowerCase();
+    const isPsychLike = roleStr.includes("psy") || roleStr.includes("admin");
+
+    const ioRef = React.useRef(null);
+    const nodesRef = React.useRef(new Map()); // mid:number -> element
+    const seenLocalRef = React.useRef(new Set()); // mid:number already queued/sent
+    const seenQueueRef = React.useRef(new Set());
+    const flushTimerRef = React.useRef(0);
+
+    const flushSeen = React.useCallback(() => {
+        flushTimerRef.current = 0;
+        if (typeof onMessagesSeen !== "function") {
+            seenQueueRef.current.clear();
+            return;
+        }
+        const ids = Array.from(seenQueueRef.current);
+        if (!ids.length) return;
+
+        seenQueueRef.current.clear();
+        onMessagesSeen(ids);
+    }, [onMessagesSeen]);
+
+    const scheduleFlush = React.useCallback(() => {
+        if (flushTimerRef.current) return;
+        flushTimerRef.current = window.setTimeout(flushSeen, 500);
+    }, [flushSeen]);
+
+    const dialogIdActual = React.useMemo(() => {
+        const d = normalizeDialogId(dialogId);
+        if (d != null) return String(d);
+        return String(guessDialogId(messages) ?? "");
+    }, [dialogId, messages]);
+
+    const lastDialogRef = React.useRef("");
 
     React.useEffect(() => {
+        if (lastDialogRef.current === dialogIdActual) return;
+        lastDialogRef.current = dialogIdActual;
+
+        seenLocalRef.current.clear();
+        seenQueueRef.current.clear();
+
+        if (ioRef.current) {
+            try {
+                ioRef.current.disconnect();
+            } catch {}
+        }
+        nodesRef.current.clear();
+    }, [dialogIdActual]);
+
+    React.useEffect(() => {
+        const root = listRef.current;
+        if (!root || typeof onMessagesSeen !== "function") return;
+
+        if (ioRef.current) ioRef.current.disconnect();
+
+        ioRef.current = new IntersectionObserver(
+            (entries) => {
+                if (typeof document !== "undefined" && document.visibilityState && document.visibilityState !== "visible") return;
+
+                for (const e of entries) {
+                    if (!e.isIntersecting) continue;
+                    if (e.intersectionRatio < 0.65) continue;
+
+                    const el = e.target;
+                    const mid = el?.getAttribute?.("data-mid");
+                    if (!mid) continue;
+
+                    const n = Number(mid);
+                    if (!Number.isFinite(n) || n <= 0) continue;
+
+                    if (seenLocalRef.current.has(n)) continue;
+                    seenLocalRef.current.add(n);
+                    seenQueueRef.current.add(n);
+                }
+
+                if (seenQueueRef.current.size) scheduleFlush();
+            },
+            { root, threshold: [0.65] }
+        );
+
+        for (const el of nodesRef.current.values()) {
+            ioRef.current.observe(el);
+        }
+
         return () => {
-            if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+            if (ioRef.current) ioRef.current.disconnect();
+            ioRef.current = null;
+            if (flushTimerRef.current) {
+                clearTimeout(flushTimerRef.current);
+                flushTimerRef.current = 0;
+            }
         };
+    }, [onMessagesSeen, scheduleFlush]);
+
+    const attachReadableNode = React.useCallback((messageId, el) => {
+        const mid = Number(messageId);
+        if (!Number.isFinite(mid) || mid <= 0) return;
+
+        const prev = nodesRef.current.get(mid);
+
+        if (!el) {
+            if (prev && ioRef.current) {
+                try {
+                    ioRef.current.unobserve(prev);
+                } catch {}
+            }
+            nodesRef.current.delete(mid);
+            return;
+        }
+
+        if (prev && ioRef.current) {
+            try {
+                ioRef.current.unobserve(prev);
+            } catch {}
+        }
+        nodesRef.current.set(mid, el);
+        if (ioRef.current) {
+            try {
+                ioRef.current.observe(el);
+            } catch {}
+        }
     }, []);
 
+    // -------- ✅ bottom sentinel observer --------
+    const bottomRef = React.useRef(null);
+    const bottomIoRef = React.useRef(null);
+    const bottomLockRef = React.useRef(0);
+
+    React.useEffect(() => {
+        const root = listRef.current;
+        const sentinel = bottomRef.current;
+        if (!root || !sentinel || typeof onBottomVisible !== "function") return;
+
+        if (bottomIoRef.current) bottomIoRef.current.disconnect();
+
+        bottomIoRef.current = new IntersectionObserver(
+            (entries) => {
+                if (typeof document !== "undefined" && document.visibilityState && document.visibilityState !== "visible") return;
+
+                for (const e of entries) {
+                    if (!e.isIntersecting) continue;
+
+                    const now = Date.now();
+                    if (now - bottomLockRef.current < 600) return;
+                    bottomLockRef.current = now;
+
+                    if (isAtBottomNow()) onBottomVisible();
+                }
+            },
+            { root, threshold: [0.1] }
+        );
+
+        bottomIoRef.current.observe(sentinel);
+
+        return () => {
+            if (bottomIoRef.current) bottomIoRef.current.disconnect();
+            bottomIoRef.current = null;
+        };
+    }, [onBottomVisible, isAtBottomNow]);
+
+    // -------- UI --------
     const quickReacts = ["👍", "❤️", "😂", "🔥", "😮", "😢"];
 
     const openMediaAtIndex = (idx) => {
@@ -417,7 +849,6 @@ const MessageList = React.forwardRef(function MessageList(
     return (
         <div className="chat__messages" ref={listRef} onScroll={onScroll}>
             {stickyDay ? <div className="chat__stickyDay">{stickyDay}</div> : null}
-
             {loading ? <div style={{ padding: 12, opacity: 0.65 }}>Загрузка…</div> : null}
 
             {rows.map((r) => {
@@ -433,26 +864,57 @@ const MessageList = React.forwardRef(function MessageList(
                 const m = r.msg;
                 const mk = r.messageKey;
 
-                const fromId = getFromUserId(m);
-                const mine = meId != null && fromId != null && String(fromId) === String(meId);
+                // ✅ mine: сначала из API, потом fallback
+                const mineByApi = getMineFlag(m);
+                const mine =
+                    typeof mineByApi === "boolean"
+                        ? mineByApi
+                        : meId != null && getFromUserId(m) != null && String(getFromUserId(m)) === String(meId);
 
                 const deleted = getDeleted(m);
 
                 const rawId = getId(m);
-                const serverId = rawId != null && !isTmpId(rawId) ? String(rawId) : null;
-                const hasServerId = Boolean(serverId);
+                const serverId = rawId != null && !isTmpId(rawId) ? Number(rawId) : null;
+                const hasServerId = Number.isFinite(serverId) && serverId > 0;
 
                 const canEdit = mine && !deleted;
                 const canDelete = mine && !deleted;
+                const canInteract = !deleted && hasServerId;
 
                 const isPending = m?.status === "pending" || !hasServerId;
                 const isFailed = m?.status === "failed";
-                const isRead = Boolean(m?.readAt) || String(m?.status || "").toLowerCase() === "read";
 
-                // reply: твой DTO уже может отдавать replyTo объект
-                const replyObj = m?.replyTo || null;
+                // legacy flags (если вернутся)
+                const byClientLegacy = Boolean(m?.isReadByClient ?? m?.is_read_by_client);
+                const byPsyLegacy = Boolean(m?.isReadByPsychologist ?? m?.is_read_by_psychologist);
 
-                // fallback ids (если будешь хранить отдельно)
+                // ✅ NEW: readByMe/readByOther из API (приоритет)
+                const readByMeApi = getReadByMeFlag(m);
+                const readByOtherApi = getReadByOtherFlag(m);
+
+                // ✅ "прочитано мной" для входящих
+                const readByMe =
+                    typeof readByMeApi === "boolean" ? readByMeApi : isPsychLike ? byPsyLegacy : byClientLegacy;
+
+                // ✅ "прочитано собеседником" для моих
+                const legacyOther = isPsychLike ? byClientLegacy : byPsyLegacy;
+
+                const readByOther =
+                    typeof readByOtherApi === "boolean"
+                        ? readByOtherApi
+                        : isGroup
+                            ? Boolean(byClientLegacy || byPsyLegacy)
+                            : legacyOther;
+
+
+                // ✅ CHECKS: только для моих
+                // readAt тоже считаем как "прочитано" (если вдруг бэк отдаёт timestamp)
+                const isReadForChecks = mine ? Boolean(readByOther || getReadAt(m)) : false;
+
+                // ✅ observe only: incoming + serverId + not deleted + not readByMe
+                const shouldObserveRead = !mine && !deleted && hasServerId && !readByMe;
+
+                const replyObj = m?.replyTo ?? null;
                 const replyToMessageId = m?.replyToMessageId ?? m?.replyToId ?? replyObj?.id ?? null;
                 const replyToClientId = m?.replyToClientId ?? null;
                 const replyToKey = m?.replyToKey ?? replyToMessageId ?? replyToClientId ?? null;
@@ -460,29 +922,49 @@ const MessageList = React.forwardRef(function MessageList(
                 const replyMsg =
                     replyToKey && messageMap && typeof messageMap.get === "function" ? messageMap.get(String(replyToKey)) : null;
 
-                const reactions = normalizeReactions(m?.reactions || m?._reactions);
+                const reactions = deleted ? [] : normalizeReactions(m?.reactions || m?._reactions);
+
+                // ✅ NEW: sender meta for GROUP (без доп. запросов)
+                const fromUserId = getFromUserId(m);
+                const senderMetaAllowed = isGroup && !deleted && fromUserId != null && (showSenderMetaForMineInGroup || !mine);
+
+                // показываем только если автор сменился (или это первое сообщение дня)
+                const shouldShowSenderMeta =
+                    senderMetaAllowed && String(fromUserId) !== String(r.prevFromUserId ?? "");
+
+                const senderMeta = shouldShowSenderMeta ? resolveSender(m) : null;
 
                 const renderReplyPreview = () => {
+                    if (deleted) return null;
                     if (!replyToKey && !replyObj) return null;
 
-                    // приоритет: нашли в messageMap
                     if (replyMsg) {
+                        const replyDeleted = getDeleted(replyMsg);
+
                         const who =
                             replyMsg?.fromUserName ||
                             replyMsg?.fromName ||
-                            (getFromUserId(replyMsg) != null && meId != null && String(getFromUserId(replyMsg)) === String(meId) ? "Вы" : "Собеседник");
+                            (getMineFlag(replyMsg) === true ||
+                            (getFromUserId(replyMsg) != null && meId != null && String(getFromUserId(replyMsg)) === String(meId))
+                                ? "Вы"
+                                : "Собеседник");
 
-                        const text = String(getText(replyMsg) || "").trim();
-                        const snippet = text
-                            ? text.slice(0, 90)
-                            : Array.isArray(replyMsg?.attachments) && replyMsg.attachments.length
-                                ? "Вложение"
-                                : "Сообщение";
+                        let snippet = "Сообщение";
+                        if (replyDeleted) {
+                            snippet = "Сообщение удалено";
+                        } else {
+                            const text = String(getText(replyMsg) || "").trim();
+                            snippet = text
+                                ? text.slice(0, 90)
+                                : Array.isArray(replyMsg?.attachments) && replyMsg.attachments.length
+                                    ? "Вложение"
+                                    : "Сообщение";
+                        }
 
                         return (
                             <button
                                 type="button"
-                                className="chat__reply"
+                                className={`chat__reply ${replyDeleted ? "is-deleted" : ""}`}
                                 onClick={() => jumpToMessage(messageKeyOf(replyMsg) || replyToKey || replyObj?.id)}
                                 title="Перейти к сообщению"
                             >
@@ -495,7 +977,6 @@ const MessageList = React.forwardRef(function MessageList(
                         );
                     }
 
-                    // если есть replyTo объект прямо в сообщении (как у тебя)
                     if (replyObj) {
                         const who = replyObj?.fromName || "Сообщение";
                         const text = String(replyObj?.text || "").trim();
@@ -518,12 +999,7 @@ const MessageList = React.forwardRef(function MessageList(
                     }
 
                     return (
-                        <button
-                            type="button"
-                            className="chat__reply"
-                            onClick={() => jumpToMessage(String(replyToKey))}
-                            title="Перейти к сообщению"
-                        >
+                        <button type="button" className="chat__reply" onClick={() => jumpToMessage(String(replyToKey))} title="Перейти к сообщению">
                             <div className="bar" />
                             <div className="body">
                                 <div className="who">Ответ</div>
@@ -544,11 +1020,26 @@ const MessageList = React.forwardRef(function MessageList(
                 const thumbs = mediaAtts.slice(0, maxThumbs);
                 const hiddenCount = mediaAtts.length - thumbs.length;
 
+                if (m?.system) {
+                    return (
+                        <div key={m.clientId || m.id} className="chat__sysmsg">
+                            <div className="chat__sysmsg-pill">{m.text || m.content || ""}</div>
+                        </div>
+                    );
+                }
                 return (
                     <div
                         key={r.key}
                         id={`msg-${mk}`}
                         className={`chat__bubble-row ${mine ? "me" : ""} ${highlightKey === String(mk) ? "is-highlight" : ""}`}
+                        data-mid={shouldObserveRead ? String(serverId) : undefined}
+                        ref={
+                            shouldObserveRead
+                                ? (el) => {
+                                    if (serverId != null) attachReadableNode(serverId, el);
+                                }
+                                : null
+                        }
                     >
                         <div
                             className={`chat__bubble ${mine ? "me" : ""} ${deleted ? "is-deleted" : ""}`}
@@ -568,38 +1059,55 @@ const MessageList = React.forwardRef(function MessageList(
                                 });
                             }}
                         >
-                            <div className="chat__bubble-actions">
-                                <button
-                                    type="button"
-                                    className="chat__bubble-menu"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (deleted) return;
-                                        setReactPop(null);
-                                        const rect = e.currentTarget.getBoundingClientRect();
-                                        setMenu({
-                                            x: rect.right - 8,
-                                            y: rect.bottom + 8,
-                                            message: m,
-                                            messageKey: mk,
-                                            mine,
-                                            canEdit,
-                                            canDelete,
-                                            hasServerId,
-                                        });
-                                    }}
-                                    aria-label="Действия"
-                                >
-                                    <IconDots style={{ width: 18, height: 18, stroke: "currentColor" }} />
-                                </button>
-                            </div>
+                            {!deleted ? (
+                                <div className="chat__bubble-actions">
+                                    <button
+                                        type="button"
+                                        className="chat__bubble-menu"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (deleted) return;
+                                            setReactPop(null);
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setMenu({
+                                                x: rect.right - 8,
+                                                y: rect.bottom + 8,
+                                                message: m,
+                                                messageKey: mk,
+                                                mine,
+                                                canEdit,
+                                                canDelete,
+                                                hasServerId,
+                                            });
+                                        }}
+                                        aria-label="Действия"
+                                    >
+                                        <IconDots style={{ width: 18, height: 18, stroke: "currentColor" }} />
+                                    </button>
+                                </div>
+                            ) : null}
 
                             {deleted ? (
-                                <p style={{ opacity: 0.6, fontStyle: "italic" }}>
-                                    Сообщение удалено
-                                </p>
+                                <>
+                                    <p style={{ opacity: 0.6, fontStyle: "italic", margin: 0 }}>Сообщение удалено</p>
+                                    <div className="chat__bubble-meta">
+                                        <span className="time">{fmtTime(getCreatedAt(m))}</span>
+                                        {mine ? (
+                                            <>
+                                                {isPending ? <span className="chat__status">…</span> : null}
+                                                {isFailed ? <span className="chat__status is-failed">!</span> : null}
+                                                {!isPending && !isFailed ? <Checks read={isReadForChecks} /> : null}
+                                            </>
+                                        ) : null}
+                                    </div>
+                                </>
                             ) : (
                                 <>
+                                    {/* ✅ NEW: sender meta в GROUP (по fromUserId + members) */}
+                                    {shouldShowSenderMeta && senderMeta ? (
+                                        <MessageSenderMeta sender={senderMeta} showName compact />
+                                    ) : null}
+
                                     {renderReplyPreview()}
 
                                     {mediaAtts.length > 0 ? (
@@ -640,64 +1148,64 @@ const MessageList = React.forwardRef(function MessageList(
 
                                     {fileAtts.length > 0 ? (
                                         <div className="chat__files">
-                                            {fileAtts.map((a) => (
-                                                <a
-                                                    key={a.id || a.url}
-                                                    className="chat__file"
-                                                    href={a.url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                >
-                                                    <div className="ic" aria-hidden="true">
-                                                        <svg viewBox="0 0 24 24" fill="none">
-                                                            <path
-                                                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"
-                                                                strokeWidth="2"
-                                                                strokeLinejoin="round"
-                                                            />
-                                                            <path d="M14 2v6h6" strokeWidth="2" strokeLinejoin="round" />
-                                                        </svg>
-                                                    </div>
-                                                    <div className="meta">
-                                                        <div className="name">{a.name || "file"}</div>
-                                                        {a.sizeBytes ? <div className="size">{Math.round(a.sizeBytes / 1024)} KB</div> : null}
-                                                        {a.size ? <div className="size">{Math.round(a.size / 1024)} KB</div> : null}
-                                                    </div>
-                                                </a>
-                                            ))}
+                                            {fileAtts.map((a) => {
+                                                const bytes = Number(a.size ?? a.sizeBytes ?? a.bytes ?? 0) || 0;
+                                                const kb = bytes ? Math.max(1, Math.round(bytes / 1024)) : 0;
+
+                                                return (
+                                                    <a key={a.id || a.url} className="chat__file" href={a.url} target="_blank" rel="noreferrer">
+                                                        <div className="ic" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none">
+                                                                <path
+                                                                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"
+                                                                    strokeWidth="2"
+                                                                    strokeLinejoin="round"
+                                                                />
+                                                                <path d="M14 2v6h6" strokeWidth="2" strokeLinejoin="round" />
+                                                            </svg>
+                                                        </div>
+                                                        <div className="meta">
+                                                            <div className="name">{a.name || "file"}</div>
+                                                            {kb ? <div className="size">{kb} KB</div> : null}
+                                                        </div>
+                                                    </a>
+                                                );
+                                            })}
                                         </div>
                                     ) : null}
 
-                                    {/* Reactions */}
                                     {typeof onReact === "function" ? (
                                         <div className="chat__reactions">
-                                            {reactions.map((r) => (
+                                            {reactions.map((rct) => (
                                                 <button
-                                                    key={r.emoji}
+                                                    key={rct.emoji}
                                                     type="button"
-                                                    className={`chat__reaction chat__reactionChip ${r.me ? "me" : ""}`}
-                                                    onClick={() => onReact?.(m, r.emoji)}
+                                                    className={`chat__reaction chat__reactionChip ${rct.me ? "me" : ""}`}
+                                                    onClick={() => {
+                                                        if (!canInteract) return;
+                                                        onReact?.(m, rct.emoji);
+                                                    }}
                                                     title="Реакция"
-                                                    disabled={!hasServerId}
+                                                    disabled={!canInteract}
                                                 >
-                                                    <span className="e">{r.emoji}</span>
-                                                    <span className="c">{r.count}</span>
+                                                    <span className="e">{rct.emoji}</span>
+                                                    <span className="c">{rct.count}</span>
                                                 </button>
                                             ))}
 
                                             <button
                                                 type="button"
                                                 className="chat__reactionPlus"
-                                                title={hasServerId ? "Добавить реакцию" : "Реакции доступны после отправки"}
+                                                title={canInteract ? "Добавить реакцию" : "Реакции доступны после отправки"}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    if (!hasServerId) return;
+                                                    if (!canInteract) return;
                                                     setMenu(null);
                                                     setReactPop((prev) =>
                                                         prev?.messageKey === String(mk) ? null : { messageKey: String(mk), message: m, mine }
                                                     );
                                                 }}
-                                                disabled={!hasServerId}
+                                                disabled={!canInteract}
                                             >
                                                 +
                                             </button>
@@ -710,6 +1218,7 @@ const MessageList = React.forwardRef(function MessageList(
                                                             type="button"
                                                             className="chat__reactbtn"
                                                             onClick={() => {
+                                                                if (!canInteract) return;
                                                                 onReact?.(m, emo);
                                                                 setReactPop(null);
                                                             }}
@@ -722,29 +1231,45 @@ const MessageList = React.forwardRef(function MessageList(
                                             ) : null}
                                         </div>
                                     ) : null}
+
+                                    <div className="chat__bubble-meta">
+                                        <span className="time">{fmtTime(getCreatedAt(m))}</span>
+                                        {isEdited(m) ? <span className="chat__edited">ред.</span> : null}
+
+                                        {mine ? (
+                                            <>
+                                                {isPending ? <span className="chat__status">…</span> : null}
+                                                {isFailed ? <span className="chat__status is-failed">!</span> : null}
+
+                                                {!isPending && !isFailed ? (
+                                                    <button
+                                                        type="button"
+                                                        className="chat__checks-btn"
+                                                        onClick={(e) => {
+                                                            if (typeof onOpenReadInfo !== "function" || !hasServerId) return;
+                                                            onOpenReadInfo({ messageId: serverId, anchorEl: e.currentTarget });
+                                                        }}
+                                                        title="Кто прочитал"
+                                                        style={{ background: "transparent", border: 0, padding: 0, cursor: "pointer" }}
+                                                    >
+                                                        <Checks read={isReadForChecks} />
+                                                    </button>
+                                                ) : null}
+                                            </>
+                                        ) : null}
+                                    </div>
                                 </>
                             )}
-
-                            <div className="chat__bubble-meta">
-                                <span className="time">{fmtTime(getCreatedAt(m))}</span>
-
-                                {/* .ред. как в TG */}
-                                {!deleted && isEdited(m) ? <span className="chat__edited">ред.</span> : null}
-
-                                {mine && !deleted ? (
-                                    <>
-                                        {isPending ? <span className="chat__status">…</span> : null}
-                                        {isFailed ? <span className="chat__status is-failed">!</span> : null}
-                                        {!isPending && !isFailed ? <Checks read={isRead} /> : null}
-                                    </>
-                                ) : null}
-                            </div>
                         </div>
                     </div>
                 );
             })}
 
             {typing ? <TypingBubble text={typingText} /> : null}
+
+            {/* ✅ sentinel для onBottomVisible */}
+            <div ref={bottomRef} style={{ height: 1 }} />
+
 
             {hasNewHiddenMessages ? (
                 <button className="chat__newmsg" type="button" onClick={() => scrollToBottom(true)}>
@@ -753,7 +1278,6 @@ const MessageList = React.forwardRef(function MessageList(
                 </button>
             ) : null}
 
-            {/* ctx menu (не показываем спорные действия для удалённых) */}
             {menu ? (
                 <div className="chat__ctxmenu" style={{ left: menu.x, top: menu.y }} onMouseDown={(e) => e.stopPropagation()}>
                     {getDeleted(menu.message) ? (
@@ -840,14 +1364,8 @@ const MessageList = React.forwardRef(function MessageList(
                 </div>
             ) : null}
 
-            {/* Fallback MediaViewer */}
             {typeof onOpenMedia !== "function" ? (
-                <MediaViewer
-                    open={viewer.open}
-                    items={mediaItems}
-                    startIndex={viewer.index}
-                    onClose={() => setViewer({ open: false, index: 0 })}
-                />
+                <MediaViewer open={viewer.open} items={mediaItems} startIndex={viewer.index} onClose={() => setViewer({ open: false, index: 0 })} />
             ) : null}
         </div>
     );

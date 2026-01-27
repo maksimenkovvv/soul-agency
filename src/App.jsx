@@ -9,7 +9,6 @@ import Main from "./pages/Main";
 import About from "./pages/About";
 import Psychologist from "./pages/Psychologists";
 import Sessions from "./pages/Sessions";
-import Sessions2 from "./pages/Sessions2";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Forbidden from "./pages/Forbidden";
@@ -193,7 +192,6 @@ function App() {
                     <Route path="/about" element={<About />} />
                     <Route path="/psychologist" element={<Psychologist />} />
                     <Route path="/sessions" element={<Sessions />} />
-                    <Route path="/sessions2" element={<Sessions2 />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/403" element={<Forbidden />} />
 

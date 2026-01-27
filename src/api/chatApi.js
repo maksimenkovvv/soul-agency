@@ -1,11 +1,5 @@
+// chatApi.js
 import { request } from "./http";
-
-// Chat REST API
-// - GET  /api/chat/dialogs
-// - GET  /api/chat/dialogs/{id}/messages?limit=30&cursor=...
-// - POST /api/chat/dialogs/{id}/messages  (JSON or multipart)
-// - POST /api/chat/dialogs/{id}/read
-// - POST /api/chat/messages/{messageId}/reactions
 
 function pickArray(res) {
     if (Array.isArray(res)) return res;
@@ -23,20 +17,14 @@ export const chatApi = {
         qs.set("limit", String(limit));
         if (cursor) qs.set("cursor", String(cursor));
 
-        const res = await request(`/api/chat/dialogs/${dialogId}/messages?${qs.toString()}`);
-
-        // if backend returns {items,nextCursor}
+        const res = await request(`/api/chat/dialogs/${String(dialogId)}/messages?${qs.toString()}`);
         if (res && typeof res === "object" && !Array.isArray(res) && Array.isArray(res.items)) return res;
-
-        // fallback for arrays
         return { items: pickArray(res), nextCursor: null };
     },
 
-    sendMessage: async (
-        dialogId,
-        { text, content, clientId, files, replyToKey, replyToMessageId } = {}
-    ) => {
+    sendMessage: async (dialogId, { text, content, clientId, files, replyToKey, replyToMessageId, replyToClientId } = {}) => {
         const bodyText = content != null ? content : text;
+        const did = String(dialogId);
 
         const hasFiles = Array.isArray(files) && files.length > 0;
         if (hasFiles) {
@@ -44,50 +32,91 @@ export const chatApi = {
             if (bodyText != null) fd.append("content", bodyText);
             if (clientId) fd.append("clientId", clientId);
 
-            // reply
             if (replyToMessageId != null) fd.append("replyToMessageId", String(replyToMessageId));
+            if (replyToClientId != null) fd.append("replyToClientId", String(replyToClientId));
             else if (replyToKey != null) fd.append("replyToKey", String(replyToKey));
 
             for (const f of files) fd.append("files", f);
 
-            return request(`/api/chat/dialogs/${dialogId}/messages`, {
-                method: "POST",
-                body: fd,
-                headers: {}, // важно: не ставим Content-Type вручную
-            });
+            return request(`/api/chat/dialogs/${did}/messages`, { method: "POST", body: fd, headers: {} });
         }
 
-        return request(`/api/chat/dialogs/${dialogId}/messages`, {
+        return request(`/api/chat/dialogs/${did}/messages`, {
             method: "POST",
             json: {
                 content: bodyText || "",
                 clientId,
                 ...(replyToMessageId != null
                     ? { replyToMessageId }
-                    : replyToKey != null
-                        ? { replyToKey: String(replyToKey) }
-                        : {}),
+                    : replyToClientId != null
+                        ? { replyToClientId: String(replyToClientId) }
+                        : replyToKey != null
+                            ? { replyToKey: String(replyToKey) }
+                            : {}),
             },
         });
     },
 
-    markDialogRead: async (dialogId) => {
-        return request(`/api/chat/dialogs/${dialogId}/read`, { method: "POST" });
+    markMessagesRead: async (dialogId, messageIds = []) => {
+        const did = String(dialogId);
+        const ids = Array.isArray(messageIds) ? messageIds.map((x) => Number(x)).filter((x) => Number.isFinite(x) && x > 0) : [];
+        if (!ids.length) return { updated: 0 };
+
+        return request(`/api/chat/dialogs/${did}/messages/read`, { method: "POST", json: { messageIds: ids } });
     },
 
-    /**
-     * Reactions
-     * POST /api/chat/messages/{messageId}/reactions
-     * body: { emoji: "👍", add?: true|false }   // если add не передать — бэк может трактовать как toggle
-     * returns: { messageId, reactions:[{emoji,count,me}] }
-     */
+    getMessageReaders: async (messageId) => {
+        return request(`/api/chat/messages/${String(messageId)}/readers`);
+    },
+
     reactToMessage: async (messageId, { emoji, add } = {}) => {
-        return request(`/api/chat/messages/${messageId}/reactions`, {
+        return request(`/api/chat/messages/${String(messageId)}/reactions`, {
             method: "POST",
-            json: {
-                emoji: emoji != null ? String(emoji) : "",
-                ...(add === undefined ? {} : { add: Boolean(add) }),
-            },
+            json: { emoji: emoji != null ? String(emoji) : "", ...(add === undefined ? {} : { add: Boolean(add) }) },
         });
+    },
+
+    getDialog: async (dialogId) => {
+        const did = String(dialogId);
+        return request(`/api/chat/dialogs/${did}`);
+    },
+
+    listMembers: async (dialogId) => {
+        const did = String(dialogId);
+        const res = await request(`/api/chat/dialogs/${did}/members`);
+        if (Array.isArray(res)) return res;
+        return res?.items || res?.content || res?.data || [];
+    },
+
+    // ✅ поиск пользователей (подстрой endpoint под свой бэк)
+    searchUsers: async (q) => {
+        const qs = new URLSearchParams();
+        qs.set("q", String(q || ""));
+        const res = await request(`/api/users/search?${qs.toString()}`);
+        return pickArray(res);
+    },
+
+    // ✅ add member (GROUP)
+    addMember: async (chatId, userId) => {
+        return request(`/api/chat/dialogs/${String(chatId)}/members`, {
+            method: "POST",
+            body: JSON.stringify({ userId }),
+            headers: { "Content-Type": "application/json" },
+        });
+    },
+
+    // ✅ remove member (GROUP)
+    removeMember: async (chatId, userId) => {
+        return request(`/api/chat/dialogs/${String(chatId)}/members/${String(userId)}`, {
+            method: "DELETE",
+        });
+    },
+
+    getDialogInfo: async (chatId, { includeMembers = true } = {}) => {
+        const qs = new URLSearchParams();
+        qs.set("includeMembers", includeMembers ? "true" : "false");
+        const res = await request(`/api/chat/dialogs/${String(chatId)}/info?${qs.toString()}`);
+        return res;
     },
 };
+

@@ -17,9 +17,6 @@
   }
 
   &__logo {
-    display: flex;
-    max-width: 100px;
-
     &,
     &:link,
     &:visited {
@@ -27,8 +24,10 @@
       text-decoration: none;
     }
 
-    img {
-      max-width: 100%;
+    p {
+      font-size: 20px;
+      line-height: 100%;
+      font-weight: 700;
     }
   }
 
@@ -41,14 +40,10 @@
     margin: 0;
 
     &-item {
-      display: flex;
-      align-items: center;
-
       a {
         &,
         &:link,
         &:visited {
-          font-size: 20px;
           color: $grayLight;
           text-decoration: none;
         }
@@ -81,7 +76,7 @@
     }
 
     &.is-active::after {
-      content: '';
+      content: "";
       position: absolute;
       left: 0;
       right: 0;
@@ -191,7 +186,6 @@
     &,
     &:link,
     &:visited {
-      font-size: 20px;
       font-weight: 700;
       text-decoration: none;
       color: $black;
@@ -213,9 +207,7 @@
 
     color: $blackBg;
 
-    &:hover {
-      border-color: rgba($gray, 0.8);
-    }
+    &:hover { border-color: rgba($gray, 0.8); }
 
     span {
       display: block;
@@ -229,20 +221,12 @@
       pointer-events: none;
     }
 
-    span + span {
-      margin-top: 6px;
-    }
+    span + span { margin-top: 6px; }
 
     &.is-open {
-      span:nth-child(1) {
-        transform: translateY(8px) rotate(45deg);
-      }
-      span:nth-child(2) {
-        opacity: 0;
-      }
-      span:nth-child(3) {
-        transform: translateY(-8px) rotate(-45deg);
-      }
+      span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
     }
   }
 

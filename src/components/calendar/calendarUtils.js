@@ -12,6 +12,21 @@ export function addMinutes(date, minutes) {
     return d;
 }
 
+const STATUS_META = {
+    PENDING_PAYMENT: { label: "Ожидает оплату", cls: "pending_payment" },
+    PAID:            { label: "Оплачено",       cls: "paid" },
+    CONFIRMED:       { label: "Подтверждено",   cls: "confirmed" }, // на будущее
+    CANCELLED:       { label: "Отменено",       cls: "cancelled" },
+    COMPLETED:       { label: "Завершено",      cls: "completed" },
+    NO_SHOW:         { label: "Неявка",         cls: "no_show" },
+};
+
+function statusMeta(statusRaw) {
+    const key = String(statusRaw || "PENDING_PAYMENT").toUpperCase();
+    return STATUS_META[key] || { label: key, cls: "unknown" };
+}
+
+
 export function dateToYmd(date) {
     const d = new Date(date);
     const y = d.getFullYear();
@@ -54,15 +69,24 @@ function hhmm(t) {
 }
 
 export function normalizeBookingToEvent(booking, { role } = {}) {
-    const start = booking.startDateTime || booking.start || booking.start_datetime;
-    const end = booking.endDateTime || booking.end || booking.end_datetime;
-    const status = booking.status || 'PENDING_PAYMENT';
+    const start = booking.startDateTime || booking.start;
+    const end = booking.endDateTime || booking.end;
+    const st = statusMeta(booking.status);
 
-    let title = 'Сессия';
-    if (role === 'PSYCHOLOGIST' || role === 'ADMIN') {
-        title = booking.clientName || booking.client?.name || 'Клиент';
+    let title = "Сессия";
+
+    if (role === "PSYCHOLOGIST" || role === "ADMIN") {
+        if (booking.type === "GROUP") {
+            const paid = booking.paidCount ?? null;
+            const total = booking.clientsCount ?? null;
+            const suffix = (paid != null && total != null) ? ` · ${paid}/${total} оплачено` : "";
+            title = (booking.title || "Групповая сессия") + suffix;
+        } else {
+            title = booking.clientName || "Клиент";
+        }
     } else {
-        title = status === 'CONFIRMED' ? 'Сессия' : 'Занято';
+        // клиенту не надо показывать внутреннюю кухню психолога
+        title = st.label === "Отменено" ? "Отменено" : "Занято";
     }
 
     return {
@@ -70,29 +94,40 @@ export function normalizeBookingToEvent(booking, { role } = {}) {
         title,
         start,
         end,
-        classNames: ['fc-booking', `fc-booking--${status.toLowerCase()}`],
+        classNames: ["fc-booking", `fc-booking--${st.cls}`],
         extendedProps: {
-            kind: 'BOOKING',
-            status,
-            raw: booking,
+            kind: "BOOKING",
+            bookingId: booking.id,
+            status: booking.status,
         },
     };
 }
 
+function addDaysYmd(ymd, days = 1) {
+    const d = new Date(`${ymd}T00:00:00`);
+    d.setDate(d.getDate() + days);
+    return dateToYmd(d);
+}
+
 export function normalizeDayOffToEvent(dayOff) {
-    // фон на весь день
-    const start = new Date(`${dayOff.date}T00:00:00`);
-    const end = addMinutes(start, 24 * 60);
+    const start = String(dayOff.date);          // "YYYY-MM-DD"
+    const end = addDaysYmd(start, 1);           // endExclusive для allDay
+
     return {
-        id: `dayoff_${dayOff.id}`,
-        title: dayOff.reason ? `Выходной: ${dayOff.reason}` : 'Выходной',
-        start: start.toISOString(),
-        end: end.toISOString(),
-        display: 'background',
-        classNames: ['fc-dayoff'],
-        extendedProps: { kind: 'DAYOFF', raw: dayOff },
+        // ✅ важно: если dayOff.id нет/undefined — используем дату, иначе будут коллизии
+        id: `dayoff_${dayOff.id ?? start}`,
+        title: dayOff.reason ? `Выходной: ${dayOff.reason}` : "Выходной",
+
+        start,
+        end,
+        allDay: true,
+        display: "background",
+        classNames: ["fc-dayoff"],
+
+        extendedProps: { kind: "DAYOFF", raw: dayOff },
     };
 }
+
 
 export function normalizeBreakToEvent(br, baseDateYmd) {
     // фон на интервал внутри дня

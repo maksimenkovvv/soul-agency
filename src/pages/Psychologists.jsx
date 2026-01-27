@@ -1,7 +1,9 @@
-import React from 'react';
-import PsychologistTitle from '../components/PsychologistsTitle';
-import OurPsychologists from '../components/OurPsychologistsBlock';
-import Filters from '../components/filters/Filters';
+import React from "react";
+import { useSearchParams } from "react-router-dom";
+
+import PsychologistTitle from "../components/PsychologistsTitle";
+import OurPsychologists from "../components/OurPsychologistsBlock";
+import Filters from "../components/filters/Filters";
 
 function Psychologist() {
     const [filters, setFilters] = React.useState({
@@ -12,15 +14,22 @@ function Psychologist() {
         price: [],
     });
 
-    const handleFilterChange = (next) => {
-        setFilters(next);
-    };
+    const [searchParams] = useSearchParams();
+    const bookingId = searchParams.get("bookingId");
+    const paymentReturn = searchParams.get("payment") === "return";
 
     return (
         <div className="psychologists">
             <PsychologistTitle />
-            <Filters value={filters} onFilterChange={handleFilterChange} />
-            <OurPsychologists showTitle={false} query={filters} allowLoadMore />
+            <Filters value={filters} onFilterChange={setFilters} />
+
+            <OurPsychologists
+                showTitle={false}
+                query={filters}
+                allowLoadMore
+                autoOpenBookingId={bookingId}
+                autoOpenAfterPayment={paymentReturn}
+            />
         </div>
     );
 }

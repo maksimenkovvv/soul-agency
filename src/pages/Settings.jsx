@@ -439,7 +439,7 @@ function Settings() {
                                 </div>
 
                                 <div className="login__form-group">
-                                    <label className="login__label">Заголовок</label>
+                                    <label className="login__label">Образование</label>
                                     <input
                                         type="text"
                                         className="login__input"

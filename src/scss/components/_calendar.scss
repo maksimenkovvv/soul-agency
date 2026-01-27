@@ -754,3 +754,308 @@
         opacity: 0.75;
     }
 }
+.fc-v-event .fc-event-main {
+  color: rgb(49, 50, 53);
+  height: 100%;
+}
+
+.fc-timegrid-event-harness {
+  cursor: pointer;
+}
+
+// =====================================================
+// ✅ RESPONSIVE: Sessions page + Calendar (FullCalendar)
+// =====================================================
+
+@media (max-width: 1280px) {
+  .b-sessions-layout {
+    grid-template-columns: 380px 1fr;
+
+    &--psycho {
+      grid-template-columns: 440px 1fr;
+    }
+  }
+
+  .b-calendar {
+    padding: 16px;
+
+    .fc-toolbar-title {
+      font-size: 22px;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .b-sessions-layout {
+    grid-template-columns: 340px 1fr;
+
+    &--psycho {
+      grid-template-columns: 380px 1fr;
+    }
+  }
+
+  .b-psy-search__list {
+    max-height: 48vh;
+  }
+
+  .b-calendar {
+    &__head {
+      align-items: flex-start;
+    }
+
+    &__legend {
+      justify-content: flex-start;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 980px) {
+  // ✅ одна колонка
+  .b-sessions-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    &--psycho {
+      grid-template-columns: 1fr;
+    }
+
+    &__side {
+      gap: 12px;
+    }
+  }
+
+  .b-sessions-page {
+    margin-bottom: 120px;
+
+    &__head {
+      margin-bottom: 18px;
+
+      p {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  // ✅ карточки сайдбара чуть компактнее
+  .b-sessions__tips,
+  .b-psy-picker {
+    padding: 16px;
+  }
+
+  .b-psy-search__list {
+    max-height: 40vh;
+  }
+
+  .b-psy-card {
+    padding: 10px;
+    grid-template-columns: 52px 1fr 22px;
+
+    &__avatar {
+      width: 52px;
+      height: 52px;
+    }
+
+    &__sub,
+    &__price {
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+
+  // ✅ календарь
+  .b-calendar {
+    padding: 14px;
+
+    &__head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    &__subtitle {
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    // toolbar: перенос + читаемо
+    .fc-header-toolbar {
+      flex-wrap: wrap !important;
+      gap: 10px !important;
+      margin-bottom: 10px !important;
+    }
+
+    .fc-toolbar-chunk {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .fc-toolbar-title {
+      font-size: 20px;
+      line-height: 24px;
+    }
+
+    .fc-button {
+      padding: 7px 10px !important;
+      font-size: 14px !important;
+      border-radius: 12px !important;
+    }
+
+    .fc-event {
+      font-size: 13px;
+      line-height: 15px;
+      border-radius: 10px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  // ✅ мобильный комфорт
+  .b-sessions-page {
+    margin-bottom: 96px;
+  }
+
+  .b-alert {
+    padding: 14px 14px;
+  }
+
+  .b-sessions__tips,
+  .b-psy-picker {
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .b-psy-card {
+    border-radius: 14px;
+
+    &__name {
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    &__sub {
+      font-size: 14px;
+      line-height: 18px;
+    }
+  }
+
+  // ✅ календарь на мобилке:
+  // - шапку упрощаем
+  // - легенду делаем компактнее
+  // - toolbar делаем прокручиваемым (если не влазит)
+  .b-calendar {
+    padding: 12px;
+    border-radius: 16px;
+
+    &__legend {
+      gap: 6px;
+    }
+
+    .b-badge {
+      font-size: 12px;
+      line-height: 14px;
+      padding: 5px 8px;
+      gap: 6px;
+    }
+
+    .fc-toolbar-title {
+      font-size: 18px;
+      line-height: 22px;
+    }
+
+    .fc-button {
+      padding: 6px 9px !important;
+      font-size: 13px !important;
+      border-radius: 12px !important;
+    }
+
+    // ✅ view buttons часто не влазят → делаем горизонтальный скролл
+    .fc-header-toolbar .fc-toolbar-chunk:last-child {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 2px;
+
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .fc-header-toolbar .fc-toolbar-chunk:last-child .fc-button-group {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    // ✅ уменьшить отступы сетки
+    .fc-scrollgrid,
+    .fc-scrollgrid-section > td {
+      border-color: rgba($gray, 0.45) !important;
+    }
+
+    .fc-col-header-cell-cushion {
+      padding: 8px 6px !important;
+      font-size: 12px !important;
+    }
+
+    .fc-timegrid-slot-label-cushion {
+      font-size: 12px !important;
+    }
+
+    .fc-event {
+      font-size: 12px;
+      line-height: 14px;
+      padding: 2px 6px;
+    }
+  }
+
+  // ✅ скролл для списков в сайдбаре
+  .b-psy-search__list,
+  .b-schedule-editor__days {
+    scrollbar-width: thin;
+    scrollbar-color: rgba($black, 0.18) rgba($gray, 0.08);
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba($gray, 0.08);
+      border-radius: 999px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba($black, 0.18);
+      border-radius: 999px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba($black, 0.28);
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  // ✅ ультра-мобилка: ещё компактнее
+  .b-calendar {
+    padding: 10px;
+
+    .fc-toolbar-title {
+      font-size: 16px;
+    }
+
+    .fc-button {
+      padding: 6px 8px !important;
+      font-size: 12px !important;
+    }
+
+    .fc-event {
+      font-size: 11px;
+      line-height: 13px;
+    }
+  }
+}

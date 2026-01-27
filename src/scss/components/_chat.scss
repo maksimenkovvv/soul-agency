@@ -593,10 +593,14 @@
       }
     }
 
+    // =========================
+    // ✅ UPDATED: bubble row + bubble (keep original style)
+    // =========================
     &__bubble-row {
       display: flex;
       margin-bottom: 10px;
       padding: 0 2px;
+      align-items: flex-end;
 
       &.me {
         justify-content: flex-end;
@@ -606,11 +610,23 @@
     &__bubble {
       max-width: min(640px, 80%);
       border-radius: 20px;
-      padding: 12px 14px;
+      padding: 12px 14px 10px;
       background-color: $whiteBg;
       border: 1px solid rgba($gray, 0.55);
       box-shadow: 0 8px 22px rgba($blackFull, 0.05);
       position: relative;
+      min-width: 0;
+
+      // subtle highlight (fits your current pastel theme)
+      &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.35;
+        background: radial-gradient(circle at 18% 10%, rgba($purple, 0.10), transparent 42%),
+        radial-gradient(circle at 80% 0%, rgba($blue, 0.07), transparent 40%);
+      }
 
       // bubble tail
       &::after {
@@ -628,15 +644,24 @@
       }
 
       p {
+        position: relative;
+        z-index: 1;
+        margin: 0;
         font-size: 18px;
         line-height: 24px;
         white-space: pre-wrap;
         word-break: break-word;
+        color: rgba($black, 0.9);
       }
 
       &.me {
         background: linear-gradient(180deg, rgba($mint, 0.75), rgba($mint, 0.5));
         border-color: rgba($mint, 0.55);
+
+        &::before {
+          opacity: 0.25;
+          background: radial-gradient(circle at 20% 10%, rgba($white, 0.22), transparent 42%);
+        }
 
         &::after {
           left: auto;
@@ -651,6 +676,95 @@
 
       &.is-deleted {
         opacity: 0.9;
+      }
+
+      // ✅ NEW: reply preview inside bubble (matches your markup: button.chat__reply)
+      .chat__reply {
+        width: 100%;
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+
+        margin: 0 0 8px;
+        padding: 9px 10px;
+
+        border-radius: 14px;
+        border: 1px solid rgba($gray, 0.45);
+        background: rgba($gray, 0.10);
+        text-align: left;
+        cursor: pointer;
+
+        transition: transform $transition, background $transition, border-color $transition, box-shadow $transition;
+        position: relative;
+        z-index: 1;
+
+        &:hover {
+          transform: translateY(-1px);
+          background: rgba($gray, 0.14);
+          box-shadow: 0 14px 36px rgba($blackFull, 0.08);
+          border-color: rgba($purple, 0.25);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &:focus-visible {
+          outline: 2px solid rgba($purple, 0.45);
+          outline-offset: 2px;
+        }
+
+        .bar {
+          width: 4px;
+          border-radius: 999px;
+          background: linear-gradient(180deg, rgba($blue, 0.95), rgba($purple, 0.95));
+          opacity: 0.95;
+          flex: 0 0 auto;
+        }
+
+        .body {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          flex: 1;
+        }
+
+        .who {
+          font-size: 13px;
+          line-height: 16px;
+          font-weight: 900;
+          color: rgba($black, 0.78);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .txt {
+          font-size: 13px;
+          line-height: 16px;
+          color: rgba($black, 0.60);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      // reply inside "me" bubble (mint-tinted)
+      &.me {
+        .chat__reply {
+          border-color: rgba($mint, 0.55);
+          background: rgba($mint, 0.20);
+
+          &:hover {
+            background: rgba($mint, 0.26);
+            border-color: rgba($mint, 0.70);
+          }
+
+          .bar {
+            background: linear-gradient(180deg, rgba($white, 0.92), rgba($white, 0.55));
+          }
+        }
       }
     }
 
@@ -691,7 +805,9 @@
       }
     }
 
-    // message menu button inside bubble
+    // =========================
+    // ✅ UPDATED: menu button behavior (same classes, nicer UX)
+    // =========================
     &__bubble-actions {
       display: flex;
       justify-content: flex-end;
@@ -705,19 +821,44 @@
       height: 32px;
       border-radius: 10px;
       border: 1px solid rgba($grayLight, 0.55);
-      background-color: rgba($grayLight, 0.12);
+      background-color: rgba($whiteBg, 0.82);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
+
       opacity: 0;
       transform: translateY(-2px);
-      transition: opacity $transition, transform $transition;
+      transition: opacity $transition, transform $transition, background $transition, box-shadow $transition;
+
       position: absolute;
       top: 0;
       right: 0;
+
+      svg {
+        width: 18px;
+        height: 18px;
+        stroke: rgba($black, 0.75);
+      }
+
+      &:hover {
+        background-color: rgba($whiteBg, 0.95);
+        box-shadow: 0 14px 36px rgba($blackFull, 0.10);
+        transform: translateY(-3px);
+      }
+
+      &:active {
+        transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba($purple, 0.45);
+        outline-offset: 2px;
+      }
     }
 
-    &__bubble:hover {
+    &__bubble:hover,
+    &__bubble:focus-within {
       .chat__bubble-menu {
         opacity: 1;
         transform: translateY(0);

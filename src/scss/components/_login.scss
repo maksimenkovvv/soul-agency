@@ -1,148 +1,345 @@
 .login {
-    margin: 40px 0;
+  margin: 40px 0;
+  padding: 0 12px; // ✅ моб. отступы по краям
+
+  // ---- tokens ----
+  $accent: #8885ff;
+
+  // единый shell-контрол: бордер всегда есть (transparent) => нет “прыжка” по высоте
+  @mixin control-shell {
+    outline: none;
+    border: 1px solid transparent;
+    background-color: rgba($gray, 0.4);
+    border-radius: 12px;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:hover,
+    &:focus {
+      border-color: $accent;
+      box-shadow: 0 0 0 4px rgba($accent, 0.18);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+
+    background-color: #fff;
+    border-radius: 24px;
+    padding: clamp(22px, 6vw, 100px);
+
+    min-height: 760px;
+  }
+
+  &__title {
+    font-size: 32px;
+    margin-bottom: 60px;
+  }
+
+  &__subtitle {
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 60px;
+  }
+
+  &__form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  &__label {
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 700;
+  }
+
+  // ✅ обычный input
+  &__input {
+    @include control-shell;
+
+    height: 52px;
+    padding: 13px 18px;
+    font-size: 18px;
+    line-height: 22px;
+
+    // input внутри wrapper (пароли)
+    &--inner {
+      height: 100%;
+      width: 100%;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+      border-radius: 0;
+      outline: none;
+
+      &:hover,
+      &:focus {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+      }
+    }
+  }
+
+  // ✅ wrapper для парольного поля — тот же стиль что и input
+  &__field-wrap {
+    @include control-shell;
+
+    height: 52px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &.is-focus {
+      border-color: $accent;
+      box-shadow: 0 0 0 4px rgba($accent, 0.18);
+      transform: translateY(-1px);
+    }
+
+    &.is-disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+  }
+
+  // ✅ кнопка-глаз
+  &__eye {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+    cursor: pointer;
+
+    padding: 6px;
+    border-radius: 10px;
+
+    color: rgba(0, 0, 0, 0.55);
+    transition: transform 140ms ease, opacity 140ms ease, color 140ms ease, background-color 140ms ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      background: rgba(0, 0, 0, 0.04);
+      color: rgba(0, 0, 0, 0.75);
+    }
+
+    &.is-open {
+      color: rgba(0, 0, 0, 0.9);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      background: transparent;
+    }
+  }
+
+  // ===== captcha =====
+  &__captcha {
+    margin-top: 10px;
+
+    &.is-disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  &__captcha-hint {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+
+  &__captcha-error {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: rgba(255, 0, 0, 0.75);
+  }
+
+  &__captcha-off {
+    margin-top: 10px;
+    font-size: 12px;
+    opacity: 0.65;
+
+    code {
+      font-size: 12px;
+    }
+  }
+
+  // ===== policy =====
+  &__policy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 48px 0 48px;
+  }
+
+  // ===== buttons group =====
+  &__group {
+    display: flex;
+    gap: 15px;
+
+    &-btn {
+      width: 100%;
+    }
+  }
+
+  // если есть "Назад" + "Продолжить" — делим пополам на десктопе
+  &--with-back {
+    .login__group-btn {
+      width: 50%;
+    }
+  }
+
+  // ===== footer =====
+  &__footer {
+    display: flex;
+    margin-top: auto;
+    gap: 10px;
+    flex-direction: column;
+    align-items: center;
+
+    p,
+    button {
+      font-size: 18px;
+      line-height: 22px;
+      font-weight: 700;
+    }
+
+    button {
+      color: #6755e0;
+    }
+
+    &-title {
+      margin-top: 60px;
+    }
+  }
+
+  &__footer-link {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  // ===== code inputs =====
+  &__code-inputs-wrapper {
+    margin-bottom: 10px;
+  }
+
+  &__code-inputs {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  &__code-input {
+    @include control-shell;
+
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    text-align: center;
+
+    &.is-filled {
+      border-color: rgba($accent, 0.65);
+      box-shadow: 0 0 0 4px rgba($accent, 0.10);
+    }
+  }
+
+  &__code-meta {
+    margin-top: 12px;
+  }
+
+  // -------------------- RESPONSIVE --------------------
+
+  @media (max-width: 1024px) {
+    &__wrapper {
+      min-height: 700px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin: 24px 0;
 
     &__wrapper {
-        display: flex;
-        flex-direction: column;
-        max-width: 800px;
-        min-height: 970px;
-        width: 100%;
-        background-color: #fff;
-        border-radius: 24px;
-        padding: 100px;
-
-        &:has(.login__subtitle) {
-            .login__title {
-                margin-bottom: 32px;
-            }
-        }
+      border-radius: 18px;
+      min-height: auto;
     }
 
     &__title {
-        font-size: 32px;
-        margin-bottom: 60px;
+      font-size: 28px;
+      margin-bottom: 28px;
     }
-
 
     &__subtitle {
-        font-size: 18px;
-        line-height: 22px;
-        margin-bottom: 60px;
-    }
-
-    &__form-group {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 24px;
-    }
-
-    &__label {
-        font-size: 18px;
-
-        line-height: 22px;
-        font-weight: 700;
-    }
-
-    &__input {
-        outline: none;
-        border: none;
-        background-color: rgba($gray, 0.4);
-        height: 48px;
-        border-radius: 12px;
-        padding: 13px 20px;
-        font-size: 18px;
-        line-height: 22px;
-
-        &-visible {
-            display: flex;
-            position: absolute;
-            bottom: 16px;
-            right: 22px;
-            cursor: pointer;
-        }
-
-        &:hover,
-        &:focus {
-            border: 1px solid #8885FF;
-        }
-
-    }
-
-    &__policy {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin: 48px 0 48px;
-    }
-
-    &__button {
-        width: 100%;
-    }
-
-    &__footer {
-        display: flex;
-        margin-top: auto;
-        gap: 10px;
-        flex-direction: column;
-        align-items: center;
-
-        p,
-        button {
-            font-size: 18px;
-            line-height: 22px;
-            font-weight: 700;
-        }
-
-        button {
-            color: #6755E0;
-        }
-
-        &-title {
-            margin-top: 60px;
-        }
+      margin-bottom: 28px;
     }
 
     &__code-inputs {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        margin-bottom: 32px;
+      gap: 12px;
     }
 
     &__code-input {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
-        text-align: center;
-        border: 1px rgba($gray, 0.4);
-        border-radius: 10px;
-        outline: none;
-        background-color: rgba($gray, 0.4);
+      width: clamp(44px, 12vw, 60px);
+      height: clamp(44px, 12vw, 60px);
+      font-size: clamp(18px, 5vw, 24px);
+    }
+  }
 
-        &:focus,
-        &:hover,
-        &[value]:not([value=""]) {
-            border: 1px solid #8885FF;
-        }
+  @media (max-width: 480px) {
+    &__title {
+      font-size: 24px;
     }
 
-    &__resend-code {
-        text-align: center;
-        color: $blue;
-        font-size: 14px;
-        margin-bottom: 60px;
+    &__label {
+      font-size: 16px;
+      line-height: 20px;
     }
 
-    &:has(.login__code-inputs-wrapper) {
-        .login__group {
-            display: flex;
-            gap: 15px;
-
-            &-btn {
-                width: 50%;
-            }
-        }
+    // ✅ iOS zoom fix: >=16px
+    &__input {
+      font-size: 16px;
+      line-height: 20px;
     }
+
+    &__code-inputs {
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    // ✅ на мобиле лучше столбиком
+    &--with-back {
+      .login__group {
+        flex-direction: column;
+      }
+      .login__group-btn {
+        width: 100%;
+      }
+    }
+
+    &__footer-title {
+      margin-top: 28px;
+    }
+  }
 }

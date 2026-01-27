@@ -3,156 +3,160 @@
 @import './components/all';
 
 .wrapper {
-  max-width: 1730px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 50px;
+    max-width: 1730px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 50px;
 
-  &:has(.main) {
-    .header {
-      margin-bottom: 100px;
+    &:has(.main) {
+        .header {
+            margin-bottom: 100px;
+        }
     }
-  }
 }
 
 .b-btn {
-  &,
-  a:link,
-  a:visited {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: $white;
-    background-color: $blackBg;
-    padding: 11px;
-    font-size: 22px;
-    line-height: 1.2;
-    font-weight: 400;
-    border-radius: 12px;
-  }
+
+    &,
+    a:link,
+    a:visited {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: $white;
+        background-color: $blackBg;
+        padding: 11px;
+        font-size: 22px;
+        line-height: 1.2;
+        font-weight: 400;
+        border-radius: 12px;
+    }
 }
 
 // Loading state for buttons
 .b-btn.is-loading {
-  opacity: 0.86;
-  pointer-events: none;
+    opacity: 0.86;
+    pointer-events: none;
 }
 
 .b-btn__spinner {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  border: 2px solid rgba($white, 0.35);
-  border-top-color: rgba($white, 0.95);
-  animation: bSpin 0.9s linear infinite;
-  margin-right: 10px;
-  flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid rgba($white, 0.35);
+    border-top-color: rgba($white, 0.95);
+    animation: bSpin 0.9s linear infinite;
+    margin-right: 10px;
+    flex: 0 0 auto;
 }
 
 .b-btn--transparent .b-btn__spinner {
-  border-color: rgba($black, 0.25);
-  border-top-color: rgba($black, 0.75);
+    border-color: rgba($black, 0.25);
+    border-top-color: rgba($black, 0.75);
 }
 
 @keyframes bSpin {
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .b-btn--transparent {
-  &,
-  a:link,
-  a:visited {
-    background-color: transparent;
-    border: 1px solid #31323566;
-    color: $black;
-  }
+
+    &,
+    a:link,
+    a:visited {
+        background-color: transparent;
+        border: 1px solid #31323566;
+        color: $black;
+    }
 }
 
+
 .b-tabs {
-  .tabs {
-    &__nav {
-      &-button {
-        opacity: 0.8;
+    .tabs {
+        &__nav {
 
-        &.active {
-          opacity: 1;
+            &-button {
+                opacity: 0.8;
+
+                &.active {
+                    opacity: 1;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
         }
 
-        &:hover {
-          cursor: pointer;
+        &__content {
+            &-item {
+                &:not(.active) {
+                    display: none;
+                }
+            }
         }
-      }
     }
-
-    &__content {
-      &-item {
-        &:not(.active) {
-          display: none;
-        }
-      }
-    }
-  }
 }
 
 .b-digit {
-  font-size: 48px;
-  line-height: 100%;
-  font-weight: 700;
-  color: $black;
-  margin-right: 24px;
-  max-width: 252px;
-  width: 100%;
+    font-size: 48px;
+    line-height: 100%;
+    font-weight: 700;
+    color: $black;
+    margin-right: 24px;
+    max-width: 252px;
+    width: 100%;
 }
 
 .label {
-  display: flex;
-  font-size: 14px;
-  line-height: 16px;
+    display: flex;
+    font-size: 14px;
+    line-height: 16px;
 
-  &:hover {
-    .label__checkbox-custom {
-      border: 2px solid rgba($gray, 0.6);
-    }
-  }
-
-  &__checkbox {
-    display: none;
-
-    &:checked + &-custom:before {
-      opacity: 1;
+    &:hover {
+        .label__checkbox-custom {
+            border: 2px solid rgba($gray, 0.6);
+        }
     }
 
-    &:checked + .label__checkbox-custom {
-      background-color: $blackBg;
-      border: 2px solid $blackBg;
+    &__checkbox {
+        display: none;
+
+        &:checked+&-custom:before {
+            opacity: 1;
+        }
+
+        &:checked+.label__checkbox-custom {
+            background-color: $blackBg;
+            border: 2px solid $blackBg;
+        }
+
+        &.error+.label__checkbox-custom {
+            border: 2px solid $redBg;
+        }
     }
 
-    &.error + .label__checkbox-custom {
-      border: 2px solid $redBg;
-    }
-  }
+    &__checkbox-custom {
+        position: relative;
+        display: block;
+        width: 24px;
+        height: 24px;
+        border: 2px solid rgba($gray, 0.4);
+        border-radius: 3px;
+        margin-right: 12px;
 
-  &__checkbox-custom {
-    position: relative;
-    display: block;
-    min-width: 24px;
-    height: 24px;
-    border: 2px solid rgba($gray, 0.4);
-    border-radius: 3px;
-    margin-right: 12px;
-
-    &:before {
-      content: url('../assets/img/check.svg');
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      right: 50%;
-      transform: translate(-50%, -50%);
-      width: fit-content;
-      max-height: 6px;
-      opacity: 0;
+        &:before {
+            content: url('../assets/img/check.svg');
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            right: 50%;
+            transform: translate(-50%, -50%);
+            width: fit-content;
+            max-height: 6px;
+            opacity: 0;
+        }
     }
-  }
 }

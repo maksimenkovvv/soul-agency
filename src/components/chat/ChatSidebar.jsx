@@ -1,5 +1,5 @@
 import React from "react";
-import { IconSearch } from "./chatIcons";
+import {IconSearch} from "./chatIcons";
 
 const fmtListTime = (d) => {
     const dd = d instanceof Date ? d : new Date(d);
@@ -11,27 +11,42 @@ const fmtListTime = (d) => {
         dd.getDate() === now.getDate();
 
     if (isToday) {
-        return new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(dd);
+        return new Intl.DateTimeFormat("ru-RU", {hour: "2-digit", minute: "2-digit"}).format(dd);
     }
-    return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit" }).format(dd);
+    return new Intl.DateTimeFormat("ru-RU", {day: "2-digit", month: "2-digit"}).format(dd);
 };
 
-function SkeletonRow() {
+function TypingBubble({text = "Печатает…"}) {
     return (
-        <div className="chat__dialog chat__skeleton" style={{ cursor: "default" }}>
-            <div className="chat__avatar chat__skeleton-box" />
-            <div className="chat__dialog-mid">
-                <div className="chat__skeleton-line w-60" />
-                <div className="chat__skeleton-line w-90" />
-            </div>
-            <div className="chat__dialog-right">
-                <div className="chat__skeleton-line w-30" />
+        <div className="chat__bubble-row">
+            <div className="chat__bubble typing" aria-live="polite">
+                <span className="typingDots" aria-hidden="true">
+                    <i/>
+                    <i/>
+                    <i/>
+                </span>
+                <span className="typingText">{text}</span>
             </div>
         </div>
     );
 }
 
-export default function ChatSidebar({ dialogs = [], loading, error, activeDialogId, onOpen }) {
+function SkeletonRow() {
+    return (
+        <div className="chat__dialog chat__skeleton" style={{cursor: "default"}}>
+            <div className="chat__avatar chat__skeleton-box"/>
+            <div className="chat__dialog-mid">
+                <div className="chat__skeleton-line w-60"/>
+                <div className="chat__skeleton-line w-90"/>
+            </div>
+            <div className="chat__dialog-right">
+                <div className="chat__skeleton-line w-30"/>
+            </div>
+        </div>
+    );
+}
+
+export default function ChatSidebar({dialogs = [], loading, error, activeDialogId, onOpen}) {
     const [q, setQ] = React.useState("");
 
     const filtered = React.useMemo(() => {
@@ -49,15 +64,15 @@ export default function ChatSidebar({ dialogs = [], loading, error, activeDialog
                 <div className="chat__sidebar-title">
                     <h2>Чаты</h2>
                     <span className="chat__pill">
-            <IconSearch style={{ width: 16, height: 16, stroke: "currentColor" }} />
+            <IconSearch style={{width: 16, height: 16, stroke: "currentColor"}}/>
                         {loading ? "Загрузка" : `${dialogs.length}`}
           </span>
                 </div>
 
                 <div className="b-search">
-                    <div className="search__wrapper" style={{ marginBottom: 0 }}>
+                    <div className="search__wrapper" style={{width: '100%'}}>
                         <input
-                            className="search__input"
+                            className="b-search__input"
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                             placeholder="Поиск диалогов"
@@ -69,15 +84,15 @@ export default function ChatSidebar({ dialogs = [], loading, error, activeDialog
             <div className="chat__sidebar-body">
                 {loading ? (
                     <>
-                        <SkeletonRow />
-                        <SkeletonRow />
-                        <SkeletonRow />
-                        <SkeletonRow />
+                        <SkeletonRow/>
+                        <SkeletonRow/>
+                        <SkeletonRow/>
+                        <SkeletonRow/>
                     </>
                 ) : error ? (
-                    <div style={{ padding: 12, opacity: 0.85 }}>{error}</div>
+                    <div style={{padding: 12, opacity: 0.85}}>{error}</div>
                 ) : filtered.length === 0 ? (
-                    <div style={{ padding: 12, opacity: 0.75 }}>Диалогов нет</div>
+                    <div style={{padding: 12, opacity: 0.75}}>Диалогов нет</div>
                 ) : (
                     filtered.map((d) => {
                         const active = String(activeDialogId) === String(d.id);
@@ -89,8 +104,10 @@ export default function ChatSidebar({ dialogs = [], loading, error, activeDialog
                                 onClick={() => onOpen?.(d.id)}
                             >
                                 <div className="chat__avatar chat__avatar--presence">
-                                    {d.avatarUrl ? <img src={d.avatarUrl} alt="" /> : <div className="chat__avatar-fallback" />}
-                                    <span className={`chat__presence ${d.online ? "online" : ""}`} />
+                                    {d.avatarUrl ? <img src={d.avatarUrl} alt=""/> :
+                                        <div className="chat__avatar-fallback"/>}
+                                    {d.type !== 'GROUP' ?
+                                        <span className={`chat__presence ${d.online ? "online" : ""}`}/> : null}
                                 </div>
 
                                 <div className="chat__dialog-mid">
@@ -100,7 +117,7 @@ export default function ChatSidebar({ dialogs = [], loading, error, activeDialog
                                     </div>
 
                                     <div className={`chat__last ${d.typing ? "is-typing" : ""}`}>
-                                        {d.typing ? "Печатает…" : (d.lastMessage || "")}
+                                        {d.typing ? 'Печатает...' : (d.lastMessage || "")}
                                     </div>
                                 </div>
 

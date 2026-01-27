@@ -1,5 +1,256 @@
 .psychologists {
-    &__header {
-        margin-bottom: 145px;
+  margin-bottom: 160px;
+
+  &__header {
+    display: flex;
+  }
+
+  &__item-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+
+  &__item {
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    height: fit-content;
+    background: $whiteBg; // на случай если картинка не загрузилась
+
+    &--skeleton {
+      border: 1px solid rgba($gray, 0.25);
+
+      .psychologists__item-image {
+        background: linear-gradient(90deg,
+                rgba($white, 0.6) 0%,
+                rgba($white, 0.92) 50%,
+                rgba($white, 0.6) 100%);
+        background-size: 200% 100%;
+        animation: psychologistsShimmer 1.2s ease-in-out infinite;
+      }
+
+      .psychologists__item-content {
+        position: static;
+        margin: 12px;
+        min-height: 120px;
+        background: rgba($blackBg, 0.03);
+        border: 1px solid rgba($gray, 0.25);
+      }
     }
+
+    &:hover {
+      .psychologists {
+        &__item-info {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &__item-image {
+    width: 100%;
+    overflow: hidden;
+
+    /* ✅ стабильная карточка, меньше скачков при загрузке */
+    aspect-ratio: 3 / 4;
+
+    img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+  }
+
+  &__item-info {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background-color: #FFFFFFD9;
+    backdrop-filter: blur(32px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    transition: $transition;
+
+    &__item {
+      font-size: 20px;
+      line-height: 100%;
+
+      span {
+        font-weight: 700;
+      }
+    }
+  }
+
+  &__item-content {
+    position: absolute;
+    inset: auto 20px 20px 20px;
+    background-color: $whiteBg;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid rgba($gray, 0.25);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
+
+    &__favourites {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      background-color: $whiteBg;
+      top: -40px;
+      left: 20px;
+      border: 1px solid rgba($gray, 0.25);
+      cursor: pointer;
+      padding: 0;
+
+      &.is-active {
+        border-color: rgba($blackBg, 0.15);
+      }
+    }
+
+    &__arrow {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      background-color: $blackBg;
+      border-radius: 10px;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+
+    &__name {
+      margin-bottom: 22px;
+      font-weight: 700;
+      font-size: 26px;
+      line-height: 1.2;
+      padding-right: 54px;
+    }
+
+    &__experience {
+      margin-bottom: 8px;
+      opacity: 0.9;
+
+      span {
+        font-weight: 700;
+      }
+    }
+
+    &__price {
+      font-weight: 700;
+    }
+  }
+}
+
+/* shimmer skeleton */
+@keyframes psychologistsShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ✅ Tablet: 2 columns */
+@media (max-width: 1100px) {
+  .psychologists {
+    margin-bottom: 120px;
+
+    &__item-wrapper {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    &__item-content {
+      inset: auto 16px 16px 16px;
+      padding: 16px;
+
+      &__arrow {
+        right: 16px;
+        top: 16px;
+      }
+
+      &__favourites {
+        left: 16px;
+      }
+    }
+  }
+}
+
+/* ✅ Mobile: 1 column */
+@media (max-width: 700px) {
+  .psychologists {
+    margin-bottom: 90px;
+
+    &__item-wrapper {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    &__item-image {
+      aspect-ratio: 4 / 5; // чуть “выше”, чтобы контент не давил
+    }
+
+    &__item-content {
+      inset: auto 12px 12px 12px;
+      padding: 14px;
+      border-radius: 14px;
+
+      &__arrow {
+        width: 38px;
+        height: 38px;
+        right: 12px;
+        top: 12px;
+        border-radius: 10px;
+      }
+
+      &__favourites {
+        width: 38px;
+        height: 38px;
+        top: -38px;
+        left: 12px;
+      }
+
+      &__name {
+        font-size: 17px;
+        margin-bottom: 12px;
+        padding-right: 52px;
+      }
+
+      &__experience {
+        font-size: 14px;
+      }
+
+      &__price {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+/* ✅ Very small: чуть плотнее */
+@media (max-width: 420px) {
+  .psychologists__item-content {
+    inset: auto 10px 10px 10px;
+    padding: 12px;
+  }
 }

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { blogApi } from "../api/blogApi";
 import Breadcrumbs from "../components/Breadcrumbs";
 import BreadcrumbsSchema from "../components/BreadcrumbsSchema";
+import Search from "../components/filters/Search";
 
 function formatDate(dt) {
     if (!dt) return "";
@@ -85,7 +86,10 @@ export default function Blog() {
                     </p>
                 </div>
 
+
+
                 <form className="b-blog__search" onSubmit={applySearch}>
+
                     <input
                         className="b-blog__search-input"
                         value={queryDraft}

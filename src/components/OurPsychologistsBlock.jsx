@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
-import image from "../assets/img/psychologist-1.webp";
+// src/components/OurPsychologistsBlock.jsx
+import React, { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import PsychologistModal from "./ui/PsychologistModal";
 import OurPsychologistTitle from "./OurPsychologistsBlockTitle";
 import { psychologistsApi } from "../api/psychologistsApi";
+import { appointmentsApi } from "../api/appointmentsApi";
 import { useAuth } from "../auth/authStore";
 import { useToast } from "../ui/toast/ToastProvider";
 import { useFavorites } from "../favorites/favoritesStore";
@@ -52,12 +52,9 @@ function normalizePsychologist(raw) {
 
     const price = raw?.price || formatPrice(raw) || "цена по запросу";
 
-    const avatarUrl =
-        raw?.avatarUrl || raw?.avatar_url || raw?.photoUrl || raw?.photo_url || "";
+    const avatarUrl = raw?.avatarUrl || raw?.avatar_url || raw?.photoUrl || raw?.photo_url || "";
 
-    const isFavourite = Boolean(
-        raw?.isFavourite ?? raw?.is_favourite ?? raw?.favourite ?? raw?.favorite
-    );
+    const isFavourite = Boolean(raw?.isFavourite ?? raw?.is_favourite ?? raw?.favourite ?? raw?.favorite);
 
     return { id, name, experience, price, avatarUrl, raw, isFavourite };
 }
@@ -93,7 +90,7 @@ function pickFirstArray(...candidates) {
 
 function getThemeIds(raw) {
     const arr = pickFirstArray(raw?.themes, raw?.themeIds, raw?.theme_ids);
-    return arr ? extractIds(arr) : null; // null = неизвестно (не фильтруем на фронте)
+    return arr ? extractIds(arr) : null;
 }
 
 function getMethodIds(raw) {
@@ -103,19 +100,16 @@ function getMethodIds(raw) {
 
 function hasIntersection(haveIds, selectedIds) {
     if (!selectedIds || selectedIds.length === 0) return true;
-    // если бэк не отдаёт эти поля — не ломаем выдачу (и полагаемся на серверный фильтр)
     if (haveIds == null) return true;
     if (haveIds.length === 0) return false;
 
     const set = new Set(haveIds.map(String));
-    // внутри одного фильтра — логика OR (достаточно совпадения с любым выбранным)
     return selectedIds.some((id) => set.has(String(id)));
 }
 
-// themes/methods: фильтруем на фронте как fallback,
-// но основной сценарий — серверная фильтрация (в request мы передаём themeIds/methodIds).
 function applyClientOnlyFilters(items, query) {
     if (!query) return items;
+
     const selectedThemeIds = extractIds(query.themes);
     const selectedMethodIds = extractIds(query.methods);
 
@@ -132,34 +126,31 @@ function applyClientOnlyFilters(items, query) {
     });
 }
 
+function pickMethodName(raw) {
+    return raw?.method?.name || raw?.methodName || raw?.methods || "—";
+}
+
+function pickThemesText(raw) {
+    const arr = raw?.themes;
+    if (Array.isArray(arr)) {
+        const names = arr.map((t) => (typeof t === "string" ? t : t?.name)).filter(Boolean);
+        if (names.length) return names.join(", ");
+    }
+    return raw?.themesText || raw?.themesName || raw?.themes || "—";
+}
+
 export default function OurPsychologists({
-    showTitle = true,
-    psychologistsLenght = null,
-    query,
-    allowLoadMore = false,
-}) {
-    // для модального окна
+                                             showTitle = true,
+                                             psychologistsLenght = null,
+                                             query,
+                                             allowLoadMore = false,
+                                         }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPsychologist, setSelectedPsychologist] = useState(null);
 
-    // В функции открытия модалки
-    const openPsychologistModal = (psychologist) => {
-        setSelectedPsychologist({
-            ...psychologist,
-            type: "psychologist"  // Добавляем тип
-        });
-        setModalOpen(true);
-        document.body.style.overflow = 'hidden';
-    };
-
-    // Функция для закрытия
-    const closePsychologistModal = () => {
-        setModalOpen(false);
-        setSelectedPsychologist(null);
-        document.body.style.overflow = 'auto';
-    };
-
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
     const auth = useAuth();
     const toast = useToast();
     const fav = useFavorites();
@@ -169,6 +160,14 @@ export default function OurPsychologists({
             ? auth.isAuthed
             : Boolean(auth?.user || auth?.me || auth?.profile || auth?.token);
 
+    // ✅ params после оплаты / из "Записей"
+    const bookingIdParam = searchParams.get("bookingId");
+    const psychologistIdParam = searchParams.get("psychologistId");
+    const paymentReturn = searchParams.get("payment") === "return";
+
+    // ✅ чтобы не открывать бесконечно
+    const autoOpenedRef = useRef(false);
+
     const limit = psychologistsLenght ?? null;
 
     const pageSize = useMemo(() => {
@@ -176,11 +175,11 @@ export default function OurPsychologists({
         return allowLoadMore ? 24 : 12;
     }, [limit, allowLoadMore]);
 
-    // ключ для перезагрузки данных при изменении фильтров (q/price/experience)
     const serverQueryKey = useMemo(() => {
         const themes = (query?.themes || [])
             .map((x) => (typeof x === "number" ? x : x?.id))
             .filter((v) => v != null);
+
         const methods = (query?.methods || [])
             .map((x) => (typeof x === "number" ? x : x?.id))
             .filter((v) => v != null);
@@ -202,6 +201,45 @@ export default function OurPsychologists({
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
 
+    const openModal = useCallback((p, extra = {}) => {
+        const raw = p?.raw || {};
+
+        const modalData = {
+            id: p.id,
+            name: p.name,
+            image: p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER,
+
+            age: raw?.age ?? raw?.userAge ?? raw?.user_age ?? null,
+            experience: raw?.experience ?? p.experience,
+
+            sessionDuration:
+                raw?.sessionDurationMinutes ??
+                raw?.session_duration_minutes ??
+                raw?.sessionDuration ??
+                50,
+
+            pricePerSession: raw?.pricePerSession ?? raw?.price_per_session ?? raw?.price ?? null,
+
+            method: pickMethodName(raw),
+            themes: pickThemesText(raw),
+
+            education: raw?.headline ?? "",
+            description: raw?.about ?? "",
+            availableDates: raw?.availableDates ?? raw?.available_dates ?? [],
+
+            ...extra,
+        };
+
+        setSelectedPsychologist(modalData);
+        setModalOpen(true);
+    }, []);
+
+    const closeModal = useCallback(() => {
+        setModalOpen(false);
+        setSelectedPsychologist(null);
+    }, []);
+
+    // ✅ загрузка списка психологов
     useEffect(() => {
         let alive = true;
 
@@ -235,8 +273,6 @@ export default function OurPsychologists({
 
                 const pn = Number(resp?.number);
                 if (Number.isFinite(pn) && pn >= 0) setPage(pn);
-
-                // избранное хранится в глобальном FavoritesStore
             } catch (e) {
                 if (!alive) return;
                 setError(e?.message || "Не удалось загрузить психологов");
@@ -249,14 +285,90 @@ export default function OurPsychologists({
         return () => {
             alive = false;
         };
-        // 👇 важно: при смене serverQueryKey делаем полный reload
     }, [pageSize, isAuthed, serverQueryKey]);
 
-    // только client-only filters (themes/methods)
-    const clientFiltered = useMemo(
-        () => applyClientOnlyFilters(items, query),
-        [items, query]
-    );
+    /**
+     * ✅ АВТО-ОТКРЫТИЕ после возврата оплаты:
+     * НИКОГДА не дергаем psychologistsApi.get(id) -> 404,
+     * а ищем психолога В УЖЕ ЗАГРУЖЕННОМ СПИСКЕ.
+     */
+    useEffect(() => {
+        if (autoOpenedRef.current) return;
+
+        const hasAutoParams = Boolean(bookingIdParam || psychologistIdParam);
+        if (!hasAutoParams) return;
+
+        // ждём пока список психологов будет загружен
+        if (loading) return;
+
+        autoOpenedRef.current = true;
+
+        (async () => {
+            try {
+                let psyId = psychologistIdParam ? String(psychologistIdParam) : null;
+                let appointment = null;
+
+                // если есть bookingId — лучше узнать точную инфу по записи
+                if (bookingIdParam) {
+                    if (!isAuthed) {
+                        toast.info("Войдите, чтобы открыть запись");
+                        navigate("/login");
+                        return;
+                    }
+
+                    appointment = await appointmentsApi.getOne(bookingIdParam);
+
+                    // ✅ если групповая — уводим на страницу групповых
+                    const t = appointment?.type || appointment?.bookingType;
+                    if (t === "GROUP") {
+                        navigate(`/sessions?bookingId=${appointment.id}&payment=return`, { replace: true });
+                        return;
+                    }
+
+                    // ✅ direct — берем психолога из appointment если есть
+                    if (appointment?.psychologistId != null) {
+                        psyId = String(appointment.psychologistId);
+                    }
+                }
+
+                if (!psyId) return;
+
+                // ✅ ИЩЕМ психолога ТОЛЬКО в items (никаких get(id) => 404)
+                const found = (items || []).find((x) => String(x.id) === String(psyId));
+                if (!found) {
+                    toast.error("Не удалось найти психолога в списке (попробуй обновить страницу)");
+                    return;
+                }
+
+                openModal(found, {
+                    bookingId: appointment?.id ? String(appointment.id) : bookingIdParam ? String(bookingIdParam) : null,
+                    paymentReturn: Boolean(paymentReturn),
+
+                    // если в appointment есть выбранное время
+                    initialStartDateTime: appointment?.startDateTime ?? null,
+                    initialEndDateTime: appointment?.endDateTime ?? null,
+
+                    // можешь использовать это в PsychologistModal, чтобы сразу раскрыть календарь
+                    autoOpenCalendar: true,
+                });
+            } catch (e) {
+                console.error(e);
+                toast.error(e?.message || "Не удалось открыть запись");
+            }
+        })();
+    }, [
+        bookingIdParam,
+        psychologistIdParam,
+        paymentReturn,
+        isAuthed,
+        loading,
+        items,
+        navigate,
+        openModal,
+        toast,
+    ]);
+
+    const clientFiltered = useMemo(() => applyClientOnlyFilters(items, query), [items, query]);
 
     const displayed = useMemo(() => {
         if (!limit) return clientFiltered;
@@ -272,6 +384,7 @@ export default function OurPsychologists({
 
         try {
             const nextPage = page + 1;
+
             const resp = await psychologistsApi.list({
                 page: nextPage,
                 size: pageSize,
@@ -322,204 +435,15 @@ export default function OurPsychologists({
         toast.error(msg, { title: "Избранное" });
     };
 
-    const psychologists = [
-        {
-            id: 1,
-            name: "Анна Смирнова",
-            experience: 8,
-            pricePerSession: 3500,
-            sessionDuration: 60,
-            image: image,
-            age: 35,
-            method: 'Гештальт-терапия',
-            themes: 'Самооценка',
-            education: "Самое кайфовое",
-            description: "Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений. Специализируюсь на когнитивно-поведенческой терапии. Помогаю в решении проблем тревожности, стресса и межличностных отношений.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        },
-        {
-            id: 2,
-            name: "Дмитрий Иванов",
-            experience: 12,
-            pricePerSession: 5000,
-            sessionDuration: 50,
-            image: image,
-            age: 42,
-            method: 'Отношения',
-            themes: 'КПТ',
-            education: "Самое кайфовое",
-            description: "Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.Эксперт в области семейной психологии и кризисных состояний. Работаю с парами и помогаю преодолевать жизненные трудности.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        },
-        {
-            id: 3,
-            name: "Мария Петрова",
-            experience: 5,
-            pricePerSession: 2800,
-            sessionDuration: 60,
-            image: image,
-            age: 29,
-            method: 'Гештальт-терапия',
-            themes: 'Самооценка',
-            education: "Самое кайфовое",
-            description: "Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.Специалист по работе с молодежью и проблемами самоопределения. Использую методы гештальт-терапии и арт-терапии.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        },
-        {
-            id: 4,
-            name: "Алексей Козлов",
-            experience: 15,
-            pricePerSession: 6500,
-            sessionDuration: 90,
-            image: image,
-            age: 48,
-            method: 'Отношения',
-            themes: 'МТД',
-            education: "Самое кайфовое",
-            description: "Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.Врач-психотерапевт с опытом работы в клинической психологии. Занимаюсь лечением депрессивных и тревожных расстройств.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        },
-        {
-            id: 5,
-            name: "Елена Соколова",
-            experience: 10,
-            pricePerSession: 4200,
-            sessionDuration: 60,
-            image: image,
-            age: 38,
-            method: 'Гештальт-терапия',
-            themes: 'Самооценка',
-            education: "Самое кайфовое",
-            description: "Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.Сертифицированный психолог-консультант. Работаю с вопросами самооценки, профессионального выгорания и личностного роста.",
-            availableDates: [
-                "19 сентября, 9:00",
-                "20 сентября, 10:30",
-                "21 сентября, 12:00"
-            ]
-        }
-    ];
+    // ✅ блокировка скролла
+    useEffect(() => {
+        const prev = document.body.style.overflow;
+        if (modalOpen) document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = prev;
+        };
+    }, [modalOpen]);
 
-    // return (
-    //     <div className="psychologists">
-    //         {showTitle && <OurPsychologistTitle />}
-
-    //         {error ? (
-    //             <div
-    //                 style={{
-    //                     marginTop: 12,
-    //                     padding: "10px 12px",
-    //                     borderRadius: 12,
-    //                     border: "1px solid rgba(0,0,0,0.08)",
-    //                     background: "rgba(255,0,0,0.06)",
-    //                 }}
-    //             >
-    //                 {error}
-    //             </div>
-    //         ) : null}
-
-    //         <div className="psychologists__item-wrapper">
-    //             {loading ? (
-    //                 Array.from({ length: limit || 3 }).map((_, i) => (
-    //                     <div key={i} className="psychologists__item psychologists__item--skeleton">
-    //                         <div className="psychologists__item-image" />
-    //                         <div className="psychologists__item-content" />
-    //                     </div>
-    //                 ))
-    //             ) : (
-    //                 displayed.map((p) => {
-    //                     const isFav = fav.isFavourite(p.id);
-    //                     const imgSrc = p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER;
-
-    //                     return (
-    //                         <div key={p.id} className="psychologists__item">
-    //                             <div className="psychologists__item-image">
-    //                                 <img
-    //                                     src={imgSrc}
-    //                                     alt={p.name}
-    //                                     onError={(e) => {
-    //                                         e.currentTarget.src = PLACEHOLDER;
-    //                                     }}
-    //                                 />
-    //                             </div>
-
-    //                             <div className="psychologists__item-content">
-    //                                 <button
-    //                                     type="button"
-    //                                     className={`psychologists__item-content__favourites ${isFav ? "is-active" : ""}`}
-    //                                     onClick={() => toggleFavourite(p.id)}
-    //                                     aria-label={isFav ? "Убрать из избранного" : "В избранное"}
-    //                                     title={isFav ? "Убрать из избранного" : "В избранное"}
-    //                                 >
-    //                                     <HeartIcon active={isFav} />
-    //                                 </button>
-
-    //                                 <Link to={`/psychologist/${p.id}`} className="psychologists__item-content__arrow">
-    //                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    //                                         <path
-    //                                             d="M1 8H15M15 8L8 1M15 8L8 15"
-    //                                             stroke="white"
-    //                                             strokeWidth="2"
-    //                                             strokeLinecap="round"
-    //                                             strokeLinejoin="round"
-    //                                         />
-    //                                     </svg>
-    //                                 </Link>
-
-    //                                 <p className="psychologists__item-content__name">{p.name}</p>
-    //                                 <p className="psychologists__item-content__experience">
-    //                                     <span>Опыт:</span> {p.experience}
-    //                                 </p>
-    //                                 <p className="psychologists__item-content__price">{p.price}</p>
-    //                             </div>
-    //                         </div>
-    //                     );
-    //                 })
-    //             )}
-    //         </div>
-
-    //         {!loading && displayed.length === 0 ? (
-    //             <div
-    //                 style={{
-    //                     marginTop: 16,
-    //                     padding: "14px 16px",
-    //                     borderRadius: 16,
-    //                     border: "1px solid rgba(0,0,0,0.08)",
-    //                     background: "rgba(136,133,255,0.10)",
-    //                     opacity: 0.95,
-    //                 }}
-    //             >
-    //                 Ничего не найдено. Попробуйте изменить фильтры.
-    //             </div>
-    //         ) : null}
-
-    //         {canLoadMore ? (
-    //             <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-    //                 <button type="button" className="b-btn" onClick={loadMore} disabled={loadingMore}>
-    //                     {loadingMore ? "Загрузка…" : "Показать ещё"}
-    //                 </button>
-    //             </div>
-    //         ) : null}
-    //     </div>
-    // );
-    //
-
-    // 👇 ВРЕМЕННЫЙ МАССИВ ДЛЯ ВСПЛЫВАШКИ У КАРТОЧКИ. ПОТОМ УБРАТЬ
     return (
         <div className="psychologists">
             {showTitle && <OurPsychologistTitle />}
@@ -539,62 +463,120 @@ export default function OurPsychologists({
             ) : null}
 
             <div className="psychologists__item-wrapper">
-                {psychologists.map((psychologist) =>
-                    <div id={psychologist.id} className="psychologists__item">
-                        <div className="psychologists__item-image">
-                            <img
-                                src={psychologist.image}
-                                alt={psychologist.name}
-                            />
+                {loading ? (
+                    Array.from({ length: limit || 3 }).map((_, i) => (
+                        <div key={i} className="psychologists__item psychologists__item--skeleton">
+                            <div className="psychologists__item-image" />
+                            <div className="psychologists__item-content" />
                         </div>
+                    ))
+                ) : (
+                    displayed.map((p) => {
+                        const isFav = fav.isFavourite(p.id);
+                        const imgSrc = p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER;
 
-                        <div className="psychologists__item-info">
-                            <div className="psychologists__item-info__item"><span>Образование:</span> более {psychologist.experience} лет</div>
-                            <div className="psychologists__item-info__item"><span>Метод:</span> {psychologist.method}</div>
-                            <div className="psychologists__item-info__item"><span>Темы:</span> {psychologist.themes}</div>
-                        </div>
+                        const raw = p?.raw || {};
+                        const method = pickMethodName(raw);
+                        const themes = pickThemesText(raw);
 
-                        <div className="psychologists__item-content">
-                            <button
-                                type="button"
-                                className="psychologists__item-content__favourites"
-                                aria-label="В избранное"
-                                title="В избранное"
-                            >
-                            </button>
-
-                            <button
-                                type='button'
-                                className="psychologists__item-content__arrow"
-                                onClick={() => openPsychologistModal(psychologist)}
-                                aria-label={`Подробнее о психологе ${psychologist.name}`}
-                            >
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M1 8H15M15 8L8 1M15 8L8 15"
-                                        stroke="white"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
+                        return (
+                            <div key={p.id} className="psychologists__item">
+                                <div className="psychologists__item-image">
+                                    <img
+                                        src={imgSrc}
+                                        alt={p.name}
+                                        onError={(e) => {
+                                            e.currentTarget.src = PLACEHOLDER;
+                                        }}
                                     />
-                                </svg >
-                            </button >
+                                </div>
 
-                            <p className="psychologists__item-content__name">{psychologist.name}</p>
-                            <p className="psychologists__item-content__experience">
-                                <span>Опыт:</span> {psychologist.experience} лет
-                            </p >
-                            <p className="psychologists__item-content__price">{psychologist.sessionDuration}мин {psychologist.pricePerSession}₽</p>
-                        </div >
-                    </div >
+                                <div className="psychologists__item-info">
+                                    <div className="psychologists__item-info__item">
+                                        <span>Опыт:</span> {p.experience}
+                                    </div>
+                                    <div className="psychologists__item-info__item">
+                                        <span>Метод:</span> {method}
+                                    </div>
+                                    <div className="psychologists__item-info__item">
+                                        <span>Темы:</span> {themes}
+                                    </div>
+                                </div>
+
+                                <div className="psychologists__item-content">
+                                    <button
+                                        type="button"
+                                        className={`psychologists__item-content__favourites ${isFav ? "is-active" : ""}`}
+                                        onClick={() => toggleFavourite(p.id)}
+                                        aria-label={isFav ? "Убрать из избранного" : "В избранное"}
+                                        title={isFav ? "Убрать из избранного" : "В избранное"}
+                                    >
+                                        <HeartIcon active={isFav} />
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="psychologists__item-content__arrow"
+                                        onClick={() => openModal(p)}
+                                        aria-label={`Подробнее о психологе ${p.name}`}
+                                        title="Подробнее"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path
+                                                d="M1 8H15M15 8L8 1M15 8L8 15"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    <Link to={`/psychologist/${p.id}`} className="psychologists__item-content__name">
+                                        {p.name}
+                                    </Link>
+
+                                    <p className="psychologists__item-content__experience">
+                                        <span>Опыт:</span> {p.experience}
+                                    </p>
+
+                                    <p className="psychologists__item-content__price">{p.price}</p>
+                                </div>
+                            </div>
+                        );
+                    })
                 )}
-            </ div>
+            </div>
+
+            {!loading && displayed.length === 0 ? (
+                <div
+                    style={{
+                        marginTop: 16,
+                        padding: "14px 16px",
+                        borderRadius: 16,
+                        border: "1px solid rgba(0,0,0,0.08)",
+                        background: "rgba(136,133,255,0.10)",
+                        opacity: 0.95,
+                    }}
+                >
+                    Ничего не найдено. Попробуйте изменить фильтры.
+                </div>
+            ) : null}
+
+            {canLoadMore ? (
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+                    <button type="button" className="b-btn" onClick={loadMore} disabled={loadingMore}>
+                        {loadingMore ? "Загрузка…" : "Показать ещё"}
+                    </button>
+                </div>
+            ) : null}
+
             <PsychologistModal
                 isOpen={modalOpen}
                 psychologist={selectedPsychologist}
-                onClose={closePsychologistModal}
-                type={selectedPsychologist?.type || "psychologist"} // Передаем тип
+                onClose={closeModal}
+                type="psychologist"
             />
-        </div >
+        </div>
     );
 }
