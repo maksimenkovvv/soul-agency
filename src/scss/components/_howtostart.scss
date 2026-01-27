@@ -1,104 +1,120 @@
 .how-to-start {
+  position: relative;
+  margin-bottom: 160px;
+
+  &__header {
+    display: flex;
+    position: sticky;
+    top: 60px;
+    z-index: 1;
+  }
+
+  &__list {
     position: relative;
-    margin-bottom: 160px;
 
-    &__header {
-        display: flex;
-    }
+    &-item {
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      padding: 48px 48px 56px;
+      width: 100%;
+      position: sticky;
+      height: 70vh;
+      border-radius: 20px;
 
-    &__list {
-        position: relative;
-        min-height: 840px;
+      &:nth-child(1) {
+        z-index: 10;
+        top: 160px;
+      }
+      &:nth-child(2) {
+        z-index: 20;
+        top: 280px;
+      }
+      &:nth-child(3) {
+        z-index: 30;
+        top: 400px;
+      }
+      &:nth-child(4) {
+        z-index: 40;
+        top: 520px;
+      }
 
-        &-item {
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 48px 48px 56px;
-            width: 100%;
+      &--white {
+        background-color: $whiteBg;
+      }
 
-            &:last-child {
-                border-radius: 20px;
-            }
+      &--mint {
+        background-color: $mintBg;
+      }
 
-            &--white {
-                background-color: $whiteBg;
-            }
+      &--purple {
+        background-color: $purpleBg;
+      }
 
-            &--mint {
-                background-color: $mintBg;
-            }
+      &--black {
+        background-color: $blackBg;
 
-            &--purple {
-                background-color: $purpleBg;
-            }
-
-            &--black {
-                background-color: $blackBg;
-
-                .how-to-start {
-                    &__list {
-                        &-item {
-                            &__header {
-                                &-step {
-                                    color: $gray;
-                                }
-
-                                &-title {
-                                    color: $gray;
-                                }
-
-                            }
-
-                            &__content {
-
-                                &-title {
-                                    color: $gray;
-                                }
-
-                                &-description {
-                                    color: $gray;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            &__header {
-                padding-bottom: 56px;
-                display: flex;
-
+        .how-to-start {
+          &__list {
+            &-item {
+              &__header {
                 &-step {
-                    font-weight: 700;
-                    margin-right: 24px;
-                    max-width: 252px;
-                    width: 100%;
-                    font-size: 32px;
-                    line-height: 1.2;
-                    color: $black;
+                  color: $gray;
                 }
 
                 &-title {
-                    margin: 0;
+                  color: $gray;
                 }
-            }
+              }
 
-            &__content {
-                &-wrapper {
-                    display: flex;
-                    gap: 24px;
-                }
-
+              &__content {
                 &-title {
-                    font-weight: 700;
-                    margin-bottom: 20px;
+                  color: $gray;
                 }
 
                 &-description {
-                    font-size: 18px;
-                    line-height: 22px;
+                  color: $gray;
                 }
+              }
             }
+          }
         }
+      }
+
+      &__header {
+        padding-bottom: 56px;
+        display: flex;
+
+        &-step {
+          font-weight: 700;
+          margin-right: 24px;
+          max-width: 252px;
+          width: 100%;
+          font-size: 32px;
+          line-height: 1.2;
+          color: $black;
+        }
+
+        &-title {
+          margin: 0;
+        }
+      }
+
+      &__content {
+        &-wrapper {
+          display: flex;
+          gap: 24px;
+        }
+
+        &-title {
+          font-weight: 700;
+          margin-bottom: 20px;
+        }
+
+        &-description {
+          font-size: 18px;
+          line-height: 22px;
+        }
+      }
     }
+  }
 }

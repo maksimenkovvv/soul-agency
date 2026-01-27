@@ -199,6 +199,7 @@
 
     &-btn {
       width: 100%;
+      margin-bottom: 20px;
     }
   }
 
@@ -262,7 +263,7 @@
 
     &.is-filled {
       border-color: rgba($accent, 0.65);
-      box-shadow: 0 0 0 4px rgba($accent, 0.10);
+      box-shadow: 0 0 0 4px rgba($accent, 0.1);
     }
   }
 
