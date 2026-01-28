@@ -1,0 +1,134 @@
+.b-activity {
+  margin-bottom: 230px;
+
+  .activity {
+    &__wrapper {
+      display: flex;
+      justify-content: center;
+    }
+    &__item {
+      display: flex;
+      width: 390px;
+      flex-direction: column;
+      min-height: 440px;
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid #d2d7db;
+      transition: $transition;
+      animation: float 8s ease-in-out infinite;
+
+      --translate-y: 0px;
+      --rotate: 0deg;
+      --scale: 1;
+      transform: translateY(var(--translate-y)) rotate(var(--rotate)) scale(var(--scale));
+
+      &:nth-child(1) {
+        margin-right: -70px;
+        --translate-y: -5px;
+        --rotate: 1.8deg;
+        animation-delay: 0s;
+      }
+
+      &:nth-child(2) {
+        --translate-y: 40px;
+        --rotate: 0deg;
+        animation-delay: 1.5s;
+      }
+
+      &:nth-child(3) {
+        margin-left: -50px;
+        --translate-y: -40px;
+        --rotate: -2.1deg;
+        animation-delay: 3s;
+      }
+
+      &:nth-child(4) {
+        margin-left: -90px;
+        --translate-y: 35px;
+        --rotate: 0.5deg;
+        animation-delay: 2.5s;
+      }
+
+      &--cta {
+        background-color: #acaafe;
+        z-index: 5;
+
+        .b-btn {
+          margin-top: auto;
+        }
+      }
+
+      &:hover {
+        --scale: 1.05;
+        z-index: 10;
+        animation-play-state: paused;
+      }
+
+      &-title {
+        margin: 0;
+        margin-bottom: 10px;
+      }
+
+      &-content {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+
+        &__image {
+          width: 154px;
+          display: flex;
+          height: 154px;
+          border-radius: 10px;
+          overflow: hidden;
+          margin-bottom: 24px;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+
+        &__info {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 8px;
+          margin-bottom: 15px;
+
+          &-date {
+            font-size: 18px;
+            line-height: 22px;
+            background-color: #d2d7db66;
+            border-radius: 12px;
+            padding: 13px 20px;
+            color: #313235;
+            width: 100%;
+          }
+        }
+      }
+
+      &-subtitle {
+        margin-top: auto;
+        font-size: 18px;
+        line-height: 22px;
+        color: #313235;
+        font-weight: 700;
+      }
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(var(--translate-y)) rotate(var(--rotate)) translateX(0) scale(var(--scale));
+    }
+
+    50% {
+      transform: translateY(calc(var(--translate-y) - 8px)) rotate(calc(var(--rotate) + 0.3deg)) translateX(6px) scale(var(--scale));
+    }
+
+    100% {
+      transform: translateY(var(--translate-y)) rotate(var(--rotate)) translateX(0) scale(var(--scale));
+    }
+  }
+}

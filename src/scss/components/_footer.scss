@@ -37,20 +37,16 @@ $accentColor: #8885ff;
 
     background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(14px) saturate(140%);
-    border: 1px solid rgba(49, 50, 53, 0.10);
+    border: 1px solid rgba(49, 50, 53, 0.1);
 
-    box-shadow:
-            0 10px 30px rgba(17, 24, 39, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
     transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 
     &:hover {
       transform: translateY(-1px);
       border-color: rgba($accentColor, 0.22);
-      box-shadow:
-              0 14px 40px rgba(17, 24, 39, 0.10),
-              inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      box-shadow: 0 14px 40px rgba(17, 24, 39, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.95);
     }
   }
 
@@ -59,6 +55,24 @@ $accentColor: #8885ff;
     align-items: center;
     gap: 8px;
     min-width: 0;
+  }
+
+  &__menu {
+    display: flex;
+    gap: 10px;
+
+    &-item {
+      transition: $transition;
+
+      a {
+        font-size: 16px;
+        line-height: 110%;
+      }
+
+      &:hover {
+        opacity: 0.5;
+      }
+    }
   }
 
   &__copy {
@@ -86,9 +100,9 @@ $accentColor: #8885ff;
     border-radius: 14px;
     text-decoration: none;
 
-    background: linear-gradient(135deg, rgba(136, 133, 255, 0.10), rgba(255, 255, 255, 0.65));
+    background: linear-gradient(135deg, rgba(136, 133, 255, 0.1), rgba(255, 255, 255, 0.65));
     border: 1px solid rgba(136, 133, 255, 0.22);
-    color: rgba(49, 50, 53, 0.90);
+    color: rgba(49, 50, 53, 0.9);
 
     overflow: hidden;
     transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
@@ -131,7 +145,7 @@ $accentColor: #8885ff;
     font-weight: 900;
 
     background: linear-gradient(135deg, $accentColor, darken($accentColor, 14%));
-    box-shadow: 0 8px 18px rgba($accentColor, 0.20);
+    box-shadow: 0 8px 18px rgba($accentColor, 0.2);
     flex: 0 0 auto;
   }
 
@@ -155,16 +169,31 @@ $accentColor: #8885ff;
 }
 
 @keyframes footerGlow {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 0.85; }
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
 }
 
 @keyframes heartBeat {
-  0% { transform: scale(1); }
-  14% { transform: scale(1.12); }
-  28% { transform: scale(1); }
-  42% { transform: scale(1.12); }
-  70% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.12);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.12);
+  }
+  70% {
+    transform: scale(1);
+  }
 }
 
 /* Responsive */

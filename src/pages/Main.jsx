@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TitleSection from '../components/TitleSection';
+import UpcomingActivity from '../components/UpcomingActivity';
 import Therapy from '../components/Therapy';
 import OurPsychologists from '../components/OurPsychologistsBlock';
 import HowToStart from '../components/HowToStart';
@@ -10,20 +10,18 @@ import Feedback from '../components/Feedback';
 import NewsCarousel from '../components/NewsCarousel';
 
 function Main() {
-    return (
-        <div className="main">
-            <TitleSection />
-            <Therapy />
-
-            <NewsCarousel />
-
-            <OurPsychologists psychologistsLenght={3} />
-            <HowToStart />
-            <PartTeam />
-            <Faq />
-            <Feedback />
-        </div>
-    );
+  return (
+    <div className="main">
+      <UpcomingActivity />
+      <Therapy />
+      <NewsCarousel />
+      <OurPsychologists psychologistsLenght={3} />
+      <HowToStart />
+      <PartTeam />
+      <Faq />
+      <Feedback />
+    </div>
+  );
 }
 
 export default Main;
