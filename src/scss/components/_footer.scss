@@ -28,9 +28,8 @@ $accentColor: #8885ff;
     z-index: 1;
 
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 10px;
+    flex-direction: column;
 
     padding: 14px 16px;
     border-radius: 20px;
@@ -50,47 +49,55 @@ $accentColor: #8885ff;
     }
   }
 
-  &__left {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-
   &__menu {
-    display: flex;
-    gap: 10px;
+    &--wrapper {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-    &-item {
-      transition: $transition;
+    &-title {
+      font-size: 22px;
+      line-height: 110%;
+      margin-bottom: 10px;
+    }
 
-      a {
+    &-list {
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+
+      &__item {
         font-size: 16px;
         line-height: 110%;
-      }
 
-      &:hover {
-        opacity: 0.5;
+        a {
+          transition: $transition;
+          font-size: inherit;
+          line-height: inherit;
+
+          &:hover {
+            opacity: 0.5;
+          }
+        }
+
       }
     }
   }
 
-  &__copy {
-    color: rgba(49, 50, 53, 0.78);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.15px;
-    white-space: nowrap;
-  }
-
-  &__heart {
-    display: inline-block;
-    filter: drop-shadow(0 8px 18px rgba($accentColor, 0.22));
-    animation: heartBeat 1.6s ease-in-out infinite;
+  &__bottom {
+    &-item {
+      text-align: center;
+    }
   }
 
   /* Бейдж AI-VAI — светлый чип */
   &__brand {
+    &--wrapper {
+      text-align: center;
+    }
+
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -105,7 +112,10 @@ $accentColor: #8885ff;
     color: rgba(49, 50, 53, 0.9);
 
     overflow: hidden;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    transition: transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
 
     &:hover {
       transform: translateY(-1px);
@@ -169,10 +179,12 @@ $accentColor: #8885ff;
 }
 
 @keyframes footerGlow {
+
   0%,
   100% {
     opacity: 0.55;
   }
+
   50% {
     opacity: 0.85;
   }
@@ -182,15 +194,19 @@ $accentColor: #8885ff;
   0% {
     transform: scale(1);
   }
+
   14% {
     transform: scale(1.12);
   }
+
   28% {
     transform: scale(1);
   }
+
   42% {
     transform: scale(1.12);
   }
+
   70% {
     transform: scale(1);
   }

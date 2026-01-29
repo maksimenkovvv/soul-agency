@@ -6,15 +6,16 @@
       display: flex;
       justify-content: center;
     }
+
     &__item {
       display: flex;
       width: 390px;
       flex-direction: column;
       min-height: 440px;
-      background-color: rgba(255, 255, 255, 0.85);
+      background-color: $whiteBg;
       border-radius: 18px;
       padding: 24px;
-      border: 1px solid #d2d7db;
+      border: 1px solid $gray;
       transition: $transition;
       animation: float 8s ease-in-out infinite;
 
@@ -51,10 +52,11 @@
       }
 
       &--cta {
-        background-color: #acaafe;
+        background-color: $purpleBg;
         z-index: 5;
 
         .b-btn {
+          font-weight: 700;
           margin-top: auto;
         }
       }
@@ -99,10 +101,10 @@
           &-date {
             font-size: 18px;
             line-height: 22px;
-            background-color: #d2d7db66;
+            background-color: rgba($gray, 0.4);
             border-radius: 12px;
             padding: 13px 20px;
-            color: #313235;
+            color: $black;
             width: 100%;
           }
         }
@@ -112,7 +114,7 @@
         margin-top: auto;
         font-size: 18px;
         line-height: 22px;
-        color: #313235;
+        color: $black;
         font-weight: 700;
       }
     }
