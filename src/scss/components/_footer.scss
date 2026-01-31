@@ -55,12 +55,30 @@ $accentColor: #8885ff;
       align-items: start;
       justify-content: space-between;
       gap: 16px;
+
+      @include mediaMax('tablet') {
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+    }
+
+    @include mediaMax('tablet') {
+
+      &:nth-child(1),
+      &:nth-child(2) {
+        display: none;
+      }
+
     }
 
     &-title {
       font-size: 22px;
       line-height: 110%;
       margin-bottom: 10px;
+
+      @include mediaMax('tablet') {
+        text-align: center;
+      }
     }
 
     &-list {

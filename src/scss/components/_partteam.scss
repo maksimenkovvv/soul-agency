@@ -1,6 +1,10 @@
 .team {
     margin-bottom: 160px;
 
+    @include mediaMax('tablet') {
+        margin-bottom: 250px;
+    }
+
     &__header {
         display: flex;
     }
@@ -34,6 +38,13 @@
             top: 50%;
             transform: translateY(-50%) rotateZ(-1.2deg);
             right: 0;
+
+            @include mediaMax('tablet') {
+                height: 234px;
+                top: 110%;
+                max-width: 276px;
+                right: 5px;
+            }
 
             &__title {
                 color: $black;

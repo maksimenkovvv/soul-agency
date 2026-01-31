@@ -1,12 +1,16 @@
 .news-carousel {
-  margin: 38px 0 18px;
+  margin-bottom: 120px;
   padding: 18px;
   border-radius: 24px;
   border: 1px solid rgba($gray, .6);
   background:
-          radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg,.28), transparent 60%),
-          radial-gradient(900px 220px at 80% 40%, rgba($mintBg,.22), transparent 60%),
-          rgba($lightbllue,.35);
+    radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, .28), transparent 60%),
+    radial-gradient(900px 220px at 80% 40%, rgba($mintBg, .22), transparent 60%),
+    rgba($lightbllue, .35);
+
+  @include mediaMax('tablet') {
+    margin-bottom: 80px;
+  }
 
   &__head {
     display: flex;
@@ -54,7 +58,9 @@
     cursor: pointer;
     transition: transform $transition, opacity $transition;
 
-    &:hover { transform: translateY(-1px); }
+    &:hover {
+      transform: translateY(-1px);
+    }
   }
 
   &__all {
@@ -71,9 +77,14 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
 
-    &:focus { outline: none; }
+    &:focus {
+      outline: none;
+    }
 
-    &::-webkit-scrollbar { height: 10px; }
+    &::-webkit-scrollbar {
+      height: 10px;
+    }
+
     &::-webkit-scrollbar-thumb {
       background: rgba($gray, .8);
       border-radius: 999px;
@@ -101,7 +112,7 @@
   &:hover {
     transform: translateY(-2px);
     border-color: rgba($gray, .9);
-    box-shadow: 0 18px 50px rgba(0,0,0,.08);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .08);
   }
 
   &__media {
@@ -157,6 +168,11 @@
 }
 
 @keyframes news-skeleton {
-  0% { background-position: 0% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: 0% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }

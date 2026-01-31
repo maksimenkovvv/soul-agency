@@ -1,6 +1,10 @@
 .faq {
     margin-bottom: 160px;
 
+    @include mediaMax('tablet') {
+        margin-bottom: 80px;
+    }
+
     &__header {
         display: flex;
     }
@@ -23,12 +27,24 @@
                 top: 34px;
                 right: 30px;
                 transition: transform $transition;
+
+                @include mediaMax('tablet') {
+                    max-width: 10px;
+                    top: 30px;
+                    right: 27px;
+                }
             }
 
             &__title {
                 font-weight: 700;
                 font-size: 22px;
                 line-height: 26px;
+
+                @include mediaMax('tablet') {
+                    font-size: 14px;
+                    line-height: 16px;
+                    padding-right: 30px;
+                }
             }
 
             &__description {
@@ -43,6 +59,11 @@
                     max-height $transition,
                     opacity $transition,
                     margin-top $transition;
+
+                @include mediaMax('tablet') {
+                    font-size: 14px;
+                    line-height: 16px;
+                }
             }
 
             &.open {
@@ -54,6 +75,11 @@
                     max-height: 500px;
                     opacity: 1;
                     margin-top: 16px;
+
+                    @include mediaMax('tablet') {
+                        margin-top: 24px;
+
+                    }
                 }
             }
         }

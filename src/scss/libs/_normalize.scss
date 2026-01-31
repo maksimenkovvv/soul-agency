@@ -8,29 +8,30 @@
     font-family: 'Circe', sans-serif;
 }
 
-:root{
-  --bg-0:#FAF7F4;
-  --bg-1:#F3F6FF;
-  --glow-mint: rgba(45, 212, 191, .18);
-  --glow-lav:  rgba(167, 139, 250, .16);
+:root {
+    --bg-0: #FAF7F4;
+    --bg-1: #F3F6FF;
+    --glow-mint: rgba(45, 212, 191, .18);
+    --glow-lav: rgba(167, 139, 250, .16);
 }
 
-body{
-  background:
-          radial-gradient(900px 600px at 15% 10%, var(--glow-lav), transparent 60%),
-          radial-gradient(900px 600px at 85% 20%, var(--glow-mint), transparent 55%),
-          linear-gradient(180deg, var(--bg-0), var(--bg-1));
-  min-height: 100vh;
+body {
+    background:
+        radial-gradient(900px 600px at 15% 10%, var(--glow-lav), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, var(--glow-mint), transparent 55%),
+        linear-gradient(180deg, var(--bg-0), var(--bg-1));
+    min-height: 100vh;
 }
 
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events:none;
-  opacity:.06; /* grain */
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  mix-blend-mode: multiply;
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .06;
+    /* grain */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
 }
 
 
@@ -55,6 +56,11 @@ button {
     line-height: 26px;
     font-weight: 400;
     background-color: transparent;
+
+    @include mediaMax('tablet') {
+        font-size: 14px;
+        line-height: 16px;
+    }
 }
 
 button {
@@ -67,6 +73,11 @@ h1,
     font-size: 48px;
     font-weight: 700;
     line-height: 1;
+
+    @include mediaMax('tablet') {
+        font-size: 22px;
+        line-height: 1.2px;
+    }
 }
 
 h2,
@@ -75,6 +86,12 @@ h2,
     font-weight: 700;
     line-height: 1;
     margin-bottom: 48px;
+
+    @include mediaMax('tablet') {
+        font-size: 28px;
+        line-height: 1.2;
+        margin-bottom: 40px;
+    }
 }
 
 h3,
@@ -83,4 +100,9 @@ h3,
     line-height: 1.2;
     font-weight: 700;
     margin-bottom: 40px;
+
+    @include mediaMax('tablet') {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
 }

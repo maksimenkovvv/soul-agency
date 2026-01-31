@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom'
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear(); //актуальная дата года, чтобы не менять вручную каждый год
+  const currentYear = new Date().getFullYear(); //актуальная дата года, чтобы не менять вручную
 
   const personalData = '/documents/personal_data.pdf';
   const privacyPolicy = '/documents/privacy_policy.pdf';

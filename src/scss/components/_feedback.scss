@@ -1,9 +1,14 @@
 .feedback {
     position: relative;
+    margin-bottom: 320px;
+
+    @include mediaMax('tablet') {
+        margin-bottom: 150px;
+    }
+
 
     &__header {
         display: flex;
-        margin-bottom: 320px;
     }
 
     &__button {
@@ -13,8 +18,15 @@
         max-width: 390px;
         width: 100%;
         position: absolute;
-        top: 12px;
+        top: 50px;
         right: 30%;
         transform: rotateZ(-3.7deg);
+
+        @include mediaMax('tablet') {
+            top: 60px;
+            right: 50%;
+            transform: translateX(50%) rotateZ(-3.7deg);
+            max-width: 280px;
+        }
     }
 }

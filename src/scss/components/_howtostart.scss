@@ -2,15 +2,27 @@
   position: relative;
   margin-bottom: 160px;
 
+  @include mediaMax('tablet') {
+    margin-bottom: 80px;
+  }
+
   &__header {
     display: flex;
     position: sticky;
     top: 60px;
     z-index: 1;
+
+    @include mediaMax('tablet') {
+      top: 45px;
+    }
   }
 
   &__list {
     position: relative;
+
+    @include mediaMax('tablet') {
+      margin: 0 -25px;
+    }
 
     &-item {
       border-top-left-radius: 20px;
@@ -21,21 +33,44 @@
       height: 70vh;
       border-radius: 20px;
 
+      @include mediaMax('tablet') {
+        padding: 32px 24px 48px;
+      }
+
       &:nth-child(1) {
         z-index: 10;
         top: 160px;
+
+        @include mediaMax('tablet') {
+          top: 120px;
+        }
       }
+
       &:nth-child(2) {
         z-index: 20;
         top: 280px;
+
+        @include mediaMax('tablet') {
+          top: 200px;
+        }
       }
+
       &:nth-child(3) {
         z-index: 30;
         top: 400px;
+
+        @include mediaMax('tablet') {
+          top: 280px;
+        }
       }
+
       &:nth-child(4) {
         z-index: 40;
         top: 520px;
+
+        @include mediaMax('tablet') {
+          top: 360px;
+        }
       }
 
       &--white {
@@ -92,10 +127,19 @@
           font-size: 32px;
           line-height: 1.2;
           color: $black;
+
+          @include mediaMax('tablet') {
+            max-width: 63px;
+            font-size: 18px;
+          }
         }
 
         &-title {
           margin: 0;
+
+          @include mediaMax('tablet') {
+            font-size: 18px;
+          }
         }
       }
 
@@ -103,11 +147,20 @@
         &-wrapper {
           display: flex;
           gap: 24px;
+
+          @include mediaMax('tablet') {
+            flex-direction: column;
+            gap: 32px;
+          }
         }
 
         &-title {
           font-weight: 700;
           margin-bottom: 20px;
+
+          @include mediaMax('tablet') {
+            margin-bottom: 12px;
+          }
         }
 
         &-description {

@@ -1,0 +1,26 @@
+@use 'sass:map';
+
+@mixin mediaMax($breakpoint) {
+    $deviceType: map.get($breakpoints, $breakpoint);
+
+    @media (max-width: #{$deviceType - 1 + 'px'}) {
+        @content;
+    }
+}
+
+@mixin mediaMin($breakpoint) {
+    $deviceType: map.get($breakpoints, $breakpoint);
+
+    @media (min-width: #{$deviceType + 'px'}) {
+        @content;
+    }
+}
+
+@mixin mediaMinMax($breakpointMin, $breakpointMax) {
+    $minWidth: map.get($breakpoints, $breakpointMin);
+    $maxWidth: map.get($breakpoints, $breakpointMax);
+
+    @media (min-width: #{$minWidth + 'px'}) and (max-width: #{$maxWidth - 1 + 'px'}) {
+        @content;
+    }
+}

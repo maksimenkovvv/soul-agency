@@ -1,6 +1,10 @@
 .b-activity {
   margin-bottom: 230px;
 
+  @include mediaMax('tablet') {
+    margin-bottom: 140px;
+  }
+
   .activity {
     &__wrapper {
       display: flex;
@@ -85,6 +89,11 @@
           overflow: hidden;
           margin-bottom: 24px;
 
+          @include mediaMax('tablet') {
+            width: 86px;
+            height: 86px;
+          }
+
           img {
             width: 100%;
             height: 100%;
@@ -106,6 +115,12 @@
             padding: 13px 20px;
             color: $black;
             width: 100%;
+
+            @include mediaMax('tablet') {
+              font-size: 14px;
+              line-height: 16px;
+              padding: 12px 16px;
+            }
           }
         }
       }
@@ -116,6 +131,26 @@
         line-height: 22px;
         color: $black;
         font-weight: 700;
+      }
+
+      @include mediaMax('tablet') {
+        animation: unset;
+        width: 270px;
+        min-height: 340px;
+        animation-delay: unset !important;
+        transform: none;
+        margin: 0 auto;
+
+        &:nth-child(1),
+        &:nth-child(2),
+        &:nth-child(3),
+        &:nth-child(4) {
+          margin: 0 auto;
+        }
+
+        &:hover {
+          --scale: 1;
+        }
       }
     }
   }
