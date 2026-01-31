@@ -2,7 +2,8 @@
   margin-bottom: 230px;
 
   @include mediaMax('tablet') {
-    margin-bottom: 140px;
+    overflow-x: clip;
+    margin: 0 -25px 140px -25px;
   }
 
   .activity {

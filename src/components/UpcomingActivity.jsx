@@ -38,7 +38,7 @@ function UpcomingActivity() {
   }, []);
 
   const swiperConfig = {
-    slidesPerView: 1.2,
+    slidesPerView: 1.3,
     spaceBetween: 0,
     centeredSlides: true,
     speed: 500,
