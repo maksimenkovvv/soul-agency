@@ -8,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import '../scss/swiper-custom.scss';
 
-import photo from '../assets/img/psychologist-3.webp';
+import photo from '../assets/img/psychologist-3.webp'; {/*заглушка для фото*/ }
 
 function UpcomingActivity() {
   const [isMobile, setIsMobile] = useState(false);
@@ -52,11 +52,12 @@ function UpcomingActivity() {
     },
   };
 
-  // если не мобилка, рендерим обычную разметку без swiper
+  // если не мобилка, то рендерим обычную разметку без swiper
   if (!isMobile) {
     return (
       <div className="b-activity">
         <div className="activity__wrapper">
+          {/*⬇️ПЕРВЫЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--single">
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
@@ -74,6 +75,7 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Ближайший сеанс</div>
           </div>
+          {/*⬆️ПЕРВЫЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬆️*/}
           <div className="activity__item activity__item--cta">
             <div className="activity__item-title b-title-h3">
               Говорим о сложном — просто. <br /> Давайте с нами — без давления
@@ -82,6 +84,7 @@ function UpcomingActivity() {
               Подобрать психолога
             </Link>
           </div>
+          {/*⬇️БЛОК ГРУППОВОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--group">
             <div className="activity__item-title b-title-h3">Название групповой сессии</div>
             <div className="activity__item-content">
@@ -99,6 +102,8 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Групповое событие</div>
           </div>
+          {/*⬆️БЛОК ГРУППОВОЙ СЕССИИ⬆️*/}
+          {/*⬇️ВТОРОЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--single">
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
@@ -116,6 +121,7 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Ближайший сеанс</div>
           </div>
+          {/*⬆️ВТОРОЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬆️*/}
         </div>
       </div>
     );
@@ -130,6 +136,7 @@ function UpcomingActivity() {
         className="activity__wrapper swiper-activity"
       >
         <SwiperSlide>
+          {/*⬇️ПЕРВЫЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--single">
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
@@ -147,6 +154,7 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Ближайший сеанс</div>
           </div>
+          {/*⬆️ПЕРВЫЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬆️*/}
         </SwiperSlide>
         <SwiperSlide>
           <div className="activity__item activity__item--cta">
@@ -159,6 +167,7 @@ function UpcomingActivity() {
           </div>
         </SwiperSlide>
         <SwiperSlide>
+          {/*⬇️БЛОК ГРУППОВОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--group">
             <div className="activity__item-title b-title-h3">Название групповой сессии</div>
             <div className="activity__item-content">
@@ -176,8 +185,10 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Групповое событие</div>
           </div>
+          {/*⬆️БЛОК ГРУППОВОЙ СЕССИИ⬆️*/}
         </SwiperSlide>
         <SwiperSlide>
+          {/*⬇️ВТОРОЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬇️*/}
           <div className="activity__item activity__item--single">
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
@@ -195,6 +206,7 @@ function UpcomingActivity() {
             </div>
             <div className="activity__item-subtitle">Ближайший сеанс</div>
           </div>
+          {/*⬆️ВТОРОЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬆️*/}
         </SwiperSlide>
       </Swiper>
     </div>
