@@ -18,19 +18,15 @@
       overflow: hidden;
 
       &--forbidden {
-        background: linear-gradient(
-                        180deg,
-                        rgba($purpleBg, 0.18) 0%,
-                        rgba($whiteBg, 1) 46%
-        );
+        background: linear-gradient(180deg,
+            rgba($purpleBg, 0.18) 0%,
+            rgba($whiteBg, 1) 46%);
       }
 
       &--notfound {
-        background: linear-gradient(
-                        180deg,
-                        rgba($lightbllue, 0.55) 0%,
-                        rgba($whiteBg, 1) 46%
-        );
+        background: linear-gradient(180deg,
+            rgba($lightbllue, 0.55) 0%,
+            rgba($whiteBg, 1) 46%);
       }
 
       &:before,
@@ -187,7 +183,7 @@
 }
 
 /* ✅ Tablet / small desktop */
-@media (max-width: 1100px) {
+@include mediaMax('tablet') {
   .b-error {
     margin: 42px 0 140px;
 
@@ -225,7 +221,7 @@
 }
 
 /* ✅ Mobile */
-@media (max-width: 640px) {
+@include mediaMax('mobile') {
   .b-error {
     margin: 28px 0 110px;
 

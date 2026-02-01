@@ -1,7 +1,8 @@
 .b-appointments-cards {
   height: 100%;
   display: grid;
-  min-width: 0; /* важно, чтобы гриды не раздували контейнер */
+  min-width: 0;
+  /* важно, чтобы гриды не раздували контейнер */
 
   .appointments-cards {
     &__items {
@@ -18,7 +19,8 @@
       padding: 24px;
       border-radius: 18px;
       background-color: $whiteBg;
-      min-width: 0; /* чтобы текст/внутренности не ломали сетку */
+      min-width: 0;
+      /* чтобы текст/внутренности не ломали сетку */
 
       &-top {
         display: flex;
@@ -128,7 +130,7 @@
 }
 
 /* ✅ 2 колонки (ноут/планшет) */
-@media (max-width: 1200px) {
+@include mediaMax('tablet') {
   .b-appointments-cards {
     .appointments-cards {
       &__items {
@@ -157,7 +159,7 @@
 }
 
 /* ✅ 1 колонка (мобилка) */
-@media (max-width: 700px) {
+@include mediaMax('mobile') {
   .b-appointments-cards {
     .appointments-cards {
       &__items {
@@ -241,6 +243,7 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+
 .appointments-cards__badge--cancelled {
   background: rgba(148, 163, 184, 0.16);
   color: rgba(148, 163, 184, 1);

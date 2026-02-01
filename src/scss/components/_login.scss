@@ -273,13 +273,13 @@
 
   // -------------------- RESPONSIVE --------------------
 
-  @media (max-width: 1024px) {
+  @include mediaMax('tablet') {
     &__wrapper {
       min-height: 700px;
     }
   }
 
-  @media (max-width: 768px) {
+  @include mediaMax('mobile') {
     margin: 24px 0;
 
     &__wrapper {
@@ -334,6 +334,7 @@
       .login__group {
         flex-direction: column;
       }
+
       .login__group-btn {
         width: 100%;
       }

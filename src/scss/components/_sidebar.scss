@@ -13,7 +13,8 @@
   .sidebar {
     &__info {
       position: relative;
-      padding-right: 56px; /* чтобы settings не перекрывал тексты */
+      padding-right: 56px;
+      /* чтобы settings не перекрывал тексты */
 
       &-photo {
         display: flex;
@@ -86,7 +87,8 @@
       gap: 6px;
 
       &-item {
-        padding: 0; /* теперь кнопка внутри */
+        padding: 0;
+        /* теперь кнопка внутри */
       }
     }
 
@@ -120,7 +122,7 @@
 }
 
 /* ✅ Tablet */
-@media (max-width: 1100px) {
+@include mediaMax('tablet') {
   .dashboard {
     grid-template-columns: 360px minmax(0, 1fr);
     gap: 32px;
@@ -242,7 +244,8 @@
     .sidebar__tabBtn {
       width: auto;
       padding: 10px 12px;
-      border-radius: 999px; /* чипсы */
+      border-radius: 999px;
+      /* чипсы */
       font-size: 14px;
       line-height: 16px;
       white-space: nowrap;

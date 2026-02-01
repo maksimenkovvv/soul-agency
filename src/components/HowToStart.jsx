@@ -1,5 +1,7 @@
 import React from 'react';
 
+import btnTg from '../assets/img/tg-btn.svg'
+
 function HowToStart() {
     return (
         <div className="how-to-start">
@@ -9,6 +11,7 @@ function HowToStart() {
                     Как начать терапию?
                 </h2>
             </div>
+
             <div className="how-to-start__list">
                 <div className="how-to-start__list-item how-to-start__list-item--white">
                     <div className="how-to-start__list-item__header">

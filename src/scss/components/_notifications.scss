@@ -69,7 +69,8 @@
     box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
     padding: 18px;
     z-index: 50;
-    max-width: calc(100vw - 24px); /* safety */
+    max-width: calc(100vw - 24px);
+    /* safety */
   }
 
   &__head {
@@ -306,24 +307,61 @@
 
 /* ✅ NEW animations for notify bell */
 @keyframes bellRing {
-  0% { transform: rotate(0deg); }
-  15% { transform: rotate(12deg); }
-  30% { transform: rotate(-12deg); }
-  45% { transform: rotate(10deg); }
-  60% { transform: rotate(-10deg); }
-  75% { transform: rotate(6deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(12deg);
+  }
+
+  30% {
+    transform: rotate(-12deg);
+  }
+
+  45% {
+    transform: rotate(10deg);
+  }
+
+  60% {
+    transform: rotate(-10deg);
+  }
+
+  75% {
+    transform: rotate(6deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes notifPing {
-  0% { transform: scale(0.98); opacity: 0; }
-  20% { opacity: 0.45; }
-  100% { transform: scale(1.12); opacity: 0; }
+  0% {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.45;
+  }
+
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
 }
 
 @keyframes badgePop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
 }
 
 /* =======================
@@ -433,7 +471,8 @@
     margin-top: 12px;
     display: flex;
     gap: 12px;
-    flex-wrap: wrap; /* адаптив */
+    flex-wrap: wrap;
+    /* адаптив */
   }
 }
 
@@ -539,10 +578,21 @@
     opacity: 0.8;
     white-space: nowrap;
 
-    &.SESSION { background: rgba($mintBg, 0.5); }
-    &.MESSAGE { background: rgba($lightbllue, 0.8); }
-    &.SYSTEM { background: rgba($grayDark, 0.8); }
-    &.FAV { background: rgba($purpleBg, 0.35); }
+    &.SESSION {
+      background: rgba($mintBg, 0.5);
+    }
+
+    &.MESSAGE {
+      background: rgba($lightbllue, 0.8);
+    }
+
+    &.SYSTEM {
+      background: rgba($grayDark, 0.8);
+    }
+
+    &.FAV {
+      background: rgba($purpleBg, 0.35);
+    }
   }
 
   &__body {
@@ -652,20 +702,23 @@
     height: 70px;
     border-radius: 18px;
     border: 1px solid rgba($gray, 0.25);
-    background: linear-gradient(
-                    90deg,
-                    rgba($white, 0.6) 0%,
-                    rgba($white, 0.92) 50%,
-                    rgba($white, 0.6) 100%
-    );
+    background: linear-gradient(90deg,
+        rgba($white, 0.6) 0%,
+        rgba($white, 0.92) 50%,
+        rgba($white, 0.6) 100%);
     background-size: 200% 100%;
     animation: notifShimmer 1.2s ease-in-out infinite;
   }
 }
 
 @keyframes notifShimmer {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
 /* =======================
@@ -673,7 +726,7 @@
    ======================= */
 
 /* <= 1024px: чуть компактнее dropdown/page */
-@media (max-width: 1024px) {
+@include mediaMax('tablet') {
   .notify {
     &__dropdown {
       width: 380px;
@@ -691,7 +744,7 @@
 }
 
 /* <= 768px: шапка страницы в колонку, row-actions аккуратнее */
-@media (max-width: 768px) {
+@include mediaMax('mobile') {
   .notif-page {
     padding: 18px;
 

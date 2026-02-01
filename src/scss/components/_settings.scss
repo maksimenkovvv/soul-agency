@@ -442,7 +442,7 @@
 }
 
 /* <= 1200px: уменьшаем gap и фото */
-@media (max-width: 1200px) {
+@include mediaMax('tablet') {
   .b-settings {
     .settings {
       &__wrapper {
@@ -557,7 +557,7 @@
 }
 
 /* <= 640px: компактнее, кнопки/шрифты меньше */
-@media (max-width: 640px) {
+@include mediaMax('mobile') {
   .b-settings {
     .settings {
       &__wrapper {

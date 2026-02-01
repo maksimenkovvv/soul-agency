@@ -10,6 +10,9 @@ import { useAuth } from "../auth/authStore";
 import { useToast } from "../ui/toast/ToastProvider";
 import { useFavorites } from "../favorites/favoritesStore";
 
+import openBtn from "../assets/img/info.svg"
+import closeBtn from "../assets/img/close.svg"
+
 const API_BASE = process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080";
 
 function resolveUrl(u) {
@@ -140,11 +143,11 @@ function pickThemesText(raw) {
 }
 
 export default function OurPsychologists({
-                                             showTitle = true,
-                                             psychologistsLenght = null,
-                                             query,
-                                             allowLoadMore = false,
-                                         }) {
+    showTitle = true,
+    psychologistsLenght = null,
+    query,
+    allowLoadMore = false,
+}) {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedPsychologist, setSelectedPsychologist] = useState(null);
 
@@ -444,6 +447,14 @@ export default function OurPsychologists({
         };
     }, [modalOpen]);
 
+    // кнопка показа инфы о психологе для адаптива
+    const [openInfoIds, setOpenInfoIds] = useState([]);
+    const toggleInfo = (id) => {
+        setOpenInfoIds((prev) =>
+            prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+        );
+    };
+
     return (
         <div className="psychologists">
             {showTitle && <OurPsychologistTitle />}
@@ -492,14 +503,25 @@ export default function OurPsychologists({
                                 </div>
 
                                 <div className="psychologists__item-info">
-                                    <div className="psychologists__item-info__item">
-                                        <span>Опыт:</span> {p.experience}
+                                    <div
+                                        className="psychologists__item-info__close"
+                                        onClick={() => toggleInfo(p.id)}
+                                    >
+                                        <img src={openInfoIds.includes(p.id) ? closeBtn : openBtn} alt="" />
                                     </div>
-                                    <div className="psychologists__item-info__item">
-                                        <span>Метод:</span> {method}
-                                    </div>
-                                    <div className="psychologists__item-info__item">
-                                        <span>Темы:</span> {themes}
+                                    <div
+                                        className={`psychologists__item-info__wrapper ${openInfoIds.includes(p.id) ? "is-open" : ""
+                                            }`}
+                                    >
+                                        <div className="psychologists__item-info__item">
+                                            <span>Опыт:</span> {p.experience}
+                                        </div>
+                                        <div className="psychologists__item-info__item">
+                                            <span>Метод:</span> {method}
+                                        </div>
+                                        <div className="psychologists__item-info__item">
+                                            <span>Темы:</span> {themes}
+                                        </div>
                                     </div>
                                 </div>
 

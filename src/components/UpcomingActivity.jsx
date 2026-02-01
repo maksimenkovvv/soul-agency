@@ -17,7 +17,7 @@ function UpcomingActivity() {
   // проверяем ширину экрана
   useEffect(() => {
     const checkScreenSize = () => {
-      const mobile = window.innerWidth < 1239;
+      const mobile = window.innerWidth < 1240;
       setIsMobile(mobile);
 
       // если у нас есть инициализированный swiper и мы перешли на десктоп

@@ -231,7 +231,7 @@ $accentColor: #8885ff;
 }
 
 /* Responsive */
-@media (max-width: 640px) {
+@include mediaMax('mobile') {
   .app-footer {
     padding: 18px 0 26px;
 

@@ -154,7 +154,38 @@
           }
         }
 
+        &:last-child {
+          .how-to-start__list-item__content {
+            &-title {
+              padding-left: 53px;
+
+              @include mediaMax('tablet') {
+                padding-left: 40px;
+
+              }
+
+              &:before {
+                content: '';
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                background-color: $gray;
+                border-radius: 50%;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+
+                @include mediaMax('tablet') {
+                  width: 24px;
+                  height: 24px;
+                }
+              }
+            }
+          }
+        }
+
         &-title {
+          position: relative;
           font-weight: 700;
           margin-bottom: 20px;
 

@@ -11,7 +11,7 @@ $grayText: #4a4a4a;
     &__header {
       margin-bottom: 80px;
 
-      @media (max-width: 768px) {
+      @include mediaMax('mobile') {
         margin-bottom: 40px;
       }
     }
@@ -35,11 +35,11 @@ $grayText: #4a4a4a;
       gap: 120px;
       align-items: start;
 
-      @media (max-width: 1024px) {
+      @include mediaMax('tablet') {
         gap: 60px;
       }
 
-      @media (max-width: 768px) {
+      @include mediaMax('mobile') {
         grid-template-columns: 1fr;
         gap: 80px;
       }
@@ -48,7 +48,7 @@ $grayText: #4a4a4a;
     &__visual {
       position: relative;
 
-      @media (min-width: 769px) {
+      @include mediaMax('mobile') {
         top: 20px;
       }
     }
@@ -65,7 +65,7 @@ $grayText: #4a4a4a;
         object-fit: cover;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
 
-        @media (max-width: 768px) {
+        @include mediaMax('mobile') {
           width: 100%;
           max-width: 100%;
         }
@@ -112,11 +112,11 @@ $grayText: #4a4a4a;
         color: $blackFull;
       }
 
-      @media (max-width: 1200px) {
+      @include mediaMax('tablet') {
         right: -20px;
       }
 
-      @media (max-width: 768px) {
+      @include mediaMax('mobile') {
         position: relative;
         bottom: auto;
         right: auto;

@@ -65,11 +65,11 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
 
-    @media (max-width: 1200px) {
+    @include mediaMax('tablet') {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    @media (max-width: 720px) {
+    @include mediaMax('mobile') {
       grid-template-columns: 1fr;
     }
   }
@@ -110,7 +110,7 @@
   &:hover {
     transform: translateY(-2px);
     border-color: rgba($gray, .9);
-    box-shadow: 0 18px 50px rgba(0,0,0,.08);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .08);
   }
 
   &__media {
@@ -126,9 +126,9 @@
 
     &--empty {
       background:
-              radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg,.35), transparent 60%),
-              radial-gradient(900px 220px at 80% 40%, rgba($mintBg,.25), transparent 60%),
-              rgba($lightbllue, .55);
+        radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, .35), transparent 60%),
+        radial-gradient(900px 220px at 80% 40%, rgba($mintBg, .25), transparent 60%),
+        rgba($lightbllue, .55);
     }
   }
 
@@ -184,15 +184,22 @@
 }
 
 @keyframes blog-skeleton {
-  0% { background-position: 0% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: 0% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .b-blog-post {
   max-width: 980px;
   margin: 0 auto 80px;
 
-  &__head { margin-bottom: 18px; }
+  &__head {
+    margin-bottom: 18px;
+  }
 
   &__back {
     display: inline-block;
@@ -200,7 +207,9 @@
     color: rgba($black, .75);
     text-decoration: none;
 
-    &:hover { color: $black; }
+    &:hover {
+      color: $black;
+    }
   }
 
   &__title {
@@ -210,7 +219,9 @@
     margin: 0 0 10px;
     color: $black;
 
-    @media (max-width: 720px) { font-size: 34px; }
+    @include mediaMax('mobile') {
+      font-size: 34px;
+    }
   }
 
   &__meta {
@@ -230,7 +241,7 @@
     border-radius: 18px;
     overflow: hidden;
     border: 1px solid rgba($gray, .6);
-    background: rgba($lightbllue,.45);
+    background: rgba($lightbllue, .45);
 
     img {
       width: 100%;
@@ -300,7 +311,7 @@
       opacity: .92;
       transform: translateY(-1px);
       border-color: rgba($gray, .85);
-      box-shadow: 0 12px 26px rgba(0,0,0,.06);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, .06);
     }
 
     &:active {
@@ -336,37 +347,55 @@
   font-size: 18px;
   line-height: 1.65;
 
-  @media (max-width: 720px) {
+  @include mediaMax('mobile') {
     padding: 16px;
     font-size: 16px;
   }
 
-  h2, h3, h4 {
+  h2,
+  h3,
+  h4 {
     margin: 20px 0 10px;
     line-height: 1.2;
     font-weight: 900;
   }
 
-  h2 { font-size: 28px; }
-  h3 { font-size: 22px; }
-  h4 { font-size: 18px; }
+  h2 {
+    font-size: 28px;
+  }
 
-  p { margin: 10px 0; color: rgba($black, .92); }
+  h3 {
+    font-size: 22px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  p {
+    margin: 10px 0;
+    color: rgba($black, .92);
+  }
 
   a {
     color: $blue;
     text-decoration: underline;
     text-underline-offset: 3px;
 
-    &:hover { opacity: .85; }
+    &:hover {
+      opacity: .85;
+    }
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin: 10px 0 10px 22px;
     padding: 0;
   }
 
-  li { margin: 6px 0; }
+  li {
+    margin: 6px 0;
+  }
 
   blockquote {
     margin: 14px 0;
@@ -416,7 +445,8 @@
     border-radius: 16px;
     border: 1px solid rgba($gray, .6);
 
-    th, td {
+    th,
+    td {
       border-bottom: 1px solid rgba($gray, .6);
       padding: 10px 12px;
       text-align: left;
@@ -428,7 +458,9 @@
       font-weight: 800;
     }
 
-    tr:last-child td { border-bottom: none; }
+    tr:last-child td {
+      border-bottom: none;
+    }
   }
 }
 
@@ -439,7 +471,7 @@
     gap: 18px;
     align-items: start;
 
-    @media (max-width: 1100px) {
+    @include mediaMax('tablet') {
       grid-template-columns: 1fr;
     }
   }
@@ -451,7 +483,7 @@
     flex-direction: column;
     gap: 14px;
 
-    @media (max-width: 1100px) {
+    @include mediaMax('tablet') {
       position: static;
       top: auto;
     }
@@ -538,7 +570,7 @@
     &:hover {
       transform: translateY(-1px);
       border-color: rgba($gray, .85);
-      box-shadow: 0 16px 36px rgba(0,0,0,.08);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .08);
     }
   }
 
