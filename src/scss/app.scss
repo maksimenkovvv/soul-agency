@@ -7,6 +7,9 @@
   width: 100%;
   margin: 0 auto;
   padding: 0 50px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 
   &:has(.main) {
     .header {
@@ -20,7 +23,6 @@
 }
 
 .b-btn {
-
   &,
   a:link,
   a:visited {
@@ -72,7 +74,6 @@
 }
 
 .b-btn--transparent {
-
   &,
   a:link,
   a:visited {
@@ -139,16 +140,16 @@
   &__checkbox {
     display: none;
 
-    &:checked+&-custom:before {
+    &:checked + &-custom:before {
       opacity: 1;
     }
 
-    &:checked+.label__checkbox-custom {
+    &:checked + .label__checkbox-custom {
       background-color: $blackBg;
       border: 2px solid $blackBg;
     }
 
-    &.error+.label__checkbox-custom {
+    &.error + .label__checkbox-custom {
       border: 2px solid $redBg;
     }
   }
@@ -177,17 +178,18 @@
 
   &__text {
     a {
-
       &,
-      a:link,
-      a:visited {
+      &:link,
+      &:visited {
         font-size: inherit;
         line-height: inherit;
         color: inherit;
+        transition: $transition;
+        text-decoration: underline;
       }
 
       &:hover {
-        text-decoration: underline;
+        opacity: 0.6;
       }
     }
   }

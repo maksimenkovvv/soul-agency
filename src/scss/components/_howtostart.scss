@@ -161,19 +161,20 @@
 
               @include mediaMax('tablet') {
                 padding-left: 40px;
-
               }
 
               &:before {
-                content: '';
-                position: absolute;
-                width: 32px;
-                height: 32px;
-                background-color: $gray;
                 border-radius: 50%;
+
+                content: '';
+                height: 32px;
                 left: 0;
+                position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
+                width: 32px;
+                background-color: #8cc9d8;
+                background-image: radial-gradient(circle at 18% 78%, rgb(115, 237, 194) 0%, rgba(115, 237, 194, 0) 62%), radial-gradient(circle at 82% 22%, rgb(167, 171, 247) 0%, rgba(167, 171, 247, 0) 62%), radial-gradient(circle at 50% 50%, rgb(140, 201, 216) 0%, rgb(140, 201, 216) 100%);
 
                 @include mediaMax('tablet') {
                   width: 24px;

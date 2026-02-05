@@ -11,7 +11,8 @@
     border: 1px solid transparent;
     background-color: rgba($gray, 0.4);
     border-radius: 12px;
-    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease;
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease,
+      background-color 160ms ease;
     -webkit-appearance: none;
     appearance: none;
 
@@ -132,7 +133,8 @@
     border-radius: 10px;
 
     color: rgba(0, 0, 0, 0.55);
-    transition: transform 140ms ease, opacity 140ms ease, color 140ms ease, background-color 140ms ease;
+    transition: transform 140ms ease, opacity 140ms ease, color 140ms ease,
+      background-color 140ms ease;
 
     &:hover {
       transform: translateY(-1px);
@@ -154,7 +156,7 @@
 
   // ===== captcha =====
   &__captcha {
-    margin-top: 10px;
+    margin: 10px 0;
 
     &.is-disabled {
       opacity: 0.6;

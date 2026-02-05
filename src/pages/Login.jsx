@@ -1025,7 +1025,15 @@ export default function Login() {
                       >
                         Пользовательского соглашения
                       </a>{' '}
-                      и даю согласие на обработку персональных данных в соответствии с{' '}
+                      и даю согласие на{' '}
+                      <a
+                        href={personalData}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Обработку персональных данных
+                      </a>{' '}
+                      в соответствии с{' '}
                       <a
                         href={privacyPolicy}
                         target="_blank"
