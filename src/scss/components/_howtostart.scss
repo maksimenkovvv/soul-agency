@@ -8,17 +8,23 @@
 
   &__header {
     display: flex;
-    position: sticky;
-    top: 60px;
-    z-index: 1;
+    position: relative;
+    padding-top: 60px;
+  }
 
-    @include mediaMax('tablet') {
-      top: 45px;
-    }
+  &__button {
+    width: 156px;
+    height: 156px;
+    background-color: $blackBg;
+    z-index: 15;
+    margin-left: auto;
+    top: 80px;
+    margin-bottom: -80px;
   }
 
   &__list {
     position: relative;
+    overflow: visible;
 
     @include mediaMax('tablet') {
       margin: 0 -25px;
@@ -29,64 +35,32 @@
       border-top-right-radius: 20px;
       padding: 48px 48px 56px;
       width: 100%;
-      position: sticky;
-      height: 70vh;
+      min-height: 619px;
       border-radius: 20px;
+      position: relative;
 
       @include mediaMax('tablet') {
         padding: 32px 24px 48px;
       }
 
-      &:nth-child(1) {
-        z-index: 10;
-        top: 160px;
-
-        @include mediaMax('tablet') {
-          top: 120px;
-        }
-      }
-
-      &:nth-child(2) {
-        z-index: 20;
-        top: 280px;
-
-        @include mediaMax('tablet') {
-          top: 200px;
-        }
-      }
-
-      &:nth-child(3) {
-        z-index: 30;
-        top: 400px;
-
-        @include mediaMax('tablet') {
-          top: 280px;
-        }
-      }
-
-      &:nth-child(4) {
-        z-index: 40;
-        top: 520px;
-
-        @include mediaMax('tablet') {
-          top: 360px;
-        }
-      }
-
       &--white {
         background-color: $whiteBg;
+        z-index: 10;
       }
 
       &--mint {
         background-color: $mintBg;
+        z-index: 20;
       }
 
       &--purple {
         background-color: $purpleBg;
+        z-index: 30;
       }
 
       &--black {
         background-color: $blackBg;
+        z-index: 40;
 
         .how-to-start {
           &__list {
@@ -165,7 +139,7 @@
 
               &:before {
                 border-radius: 50%;
-
+                border: 1px solid $whiteBg;
                 content: '';
                 height: 32px;
                 left: 0;
@@ -174,7 +148,19 @@
                 transform: translateY(-50%);
                 width: 32px;
                 background-color: #8cc9d8;
-                background-image: radial-gradient(circle at 18% 78%, rgb(115, 237, 194) 0%, rgba(115, 237, 194, 0) 62%), radial-gradient(circle at 82% 22%, rgb(167, 171, 247) 0%, rgba(167, 171, 247, 0) 62%), radial-gradient(circle at 50% 50%, rgb(140, 201, 216) 0%, rgb(140, 201, 216) 100%);
+                background-image: radial-gradient(
+                    circle at 18% 78%,
+
+                    rgb(115, 237, 194) 0%,
+
+                    rgba(115, 237, 194, 0) 62%
+                  ),
+                  radial-gradient(
+                    circle at 82% 22%,
+                    rgb(167, 171, 247) 0%,
+                    rgba(167, 171, 247, 0) 62%
+                  ),
+                  radial-gradient(circle at 50% 50%, rgb(140, 201, 216) 0%, rgb(140, 201, 216) 100%);
 
                 @include mediaMax('tablet') {
                   width: 24px;

@@ -2,12 +2,12 @@ import React from 'react';
 
 import UpcomingActivity from '../components/UpcomingActivity';
 import Therapy from '../components/Therapy';
+import NewsCarousel from '../components/NewsCarousel';
 import OurPsychologists from '../components/OurPsychologistsBlock';
 import HowToStart from '../components/HowToStart';
 import PartTeam from '../components/PartTeam';
 import Faq from '../components/Faq';
 import Feedback from '../components/Feedback';
-import NewsCarousel from '../components/NewsCarousel';
 
 function Main() {
   return (
