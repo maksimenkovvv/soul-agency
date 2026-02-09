@@ -9,7 +9,6 @@
   &__header {
     display: flex;
     position: relative;
-    padding-top: 60px;
   }
 
   &__button {
@@ -25,22 +24,27 @@
   &__list {
     position: relative;
     overflow: visible;
+    height: 980px;
 
     @include mediaMax('tablet') {
       margin: 0 -25px;
+      height: 620px;
     }
 
     &-item {
+      will-change: transform;
       border-top-left-radius: 20px;
       border-top-right-radius: 20px;
       padding: 48px 48px 56px;
       width: 100%;
-      min-height: 619px;
+      min-height: 620px;
       border-radius: 20px;
       position: relative;
 
       @include mediaMax('tablet') {
         padding: 32px 24px 48px;
+        min-height: unset;
+        height: 380px;
       }
 
       &--white {
