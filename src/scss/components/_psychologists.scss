@@ -6,6 +6,9 @@
 
     p {
       margin-bottom: 30px;
+      @include mediaMax('tablet') {
+        margin-bottom: 20px;
+      }
     }
   }
 
@@ -27,7 +30,12 @@
       border: 1px solid rgba($gray, 0.25);
 
       .psychologists__item-image {
-        background: linear-gradient(90deg, rgba($white, 0.6) 0%, rgba($white, 0.92) 50%, rgba($white, 0.6) 100%);
+        background: linear-gradient(
+          90deg,
+          rgba($white, 0.6) 0%,
+          rgba($white, 0.92) 50%,
+          rgba($white, 0.6) 100%
+        );
         background-size: 200% 100%;
         animation: psychologistsShimmer 1.2s ease-in-out infinite;
       }

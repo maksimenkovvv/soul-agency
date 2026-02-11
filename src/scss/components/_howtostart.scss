@@ -12,13 +12,64 @@
   }
 
   &__button {
-    width: 156px;
-    height: 156px;
+    display: flex;
+    min-width: 156px;
     background-color: $blackBg;
-    z-index: 15;
-    margin-left: auto;
-    top: 80px;
-    margin-bottom: -80px;
+    z-index: 60;
+    align-items: center;
+    justify-content: center;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    position: absolute;
+    right: 0;
+    top: 20px;
+    padding: 48px 42px;
+    transition: $transition;
+    overflow: hidden;
+
+    @media (hover: hover) {
+      &:hover {
+        padding: 48px 48px;
+
+        span {
+          max-width: 144px;
+          margin-left: 32px;
+          overflow: visible;
+          transition: $transition;
+        }
+      }
+    }
+
+    img {
+      width: 72px;
+      height: 60px;
+      object-fit: cover;
+    }
+
+    span {
+      color: #d2d7db;
+      font-size: 32px;
+      line-height: 100%;
+      font-weight: 700;
+      max-width: 0;
+      overflow: hidden;
+      margin-left: 0;
+      transition: $transition;
+    }
+
+    @include mediaMax('tablet') {
+      top: 140px;
+      right: -25px;
+      min-width: unset;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+
+      img {
+        width: 23px;
+        height: 19px;
+      }
+    }
   }
 
   &__list {

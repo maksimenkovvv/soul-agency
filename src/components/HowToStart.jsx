@@ -66,14 +66,25 @@ function HowToStart() {
   return (
     <div
       ref={sectionRef}
-      className="how-to-start how-to-start--test"
+      className="how-to-start"
     >
       <div className="how-to-start__header">
         <div className="how-to-start__header-digit b-digit">02</div>
 
         <h2 className="how-to-start__header__title">Как начать терапию?</h2>
       </div>
-
+      <a
+        className="how-to-start__button"
+        href="https://t.me/buro_soul"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <img
+          src={btnTg}
+          alt=""
+        />
+        <span>Связаться</span>
+      </a>
       <div
         ref={wrapperRef}
         className="how-to-start__list"
@@ -81,7 +92,6 @@ function HowToStart() {
         <div className="how-to-start__list-item how-to-start__list-item--white">
           <div className="how-to-start__list-item__header">
             <div className="how-to-start__list-item__header-step">Шаг 1</div>
-
             <p className="how-to-start__list-item__header-title b-title-h3">Найди специалиста</p>
           </div>
 
