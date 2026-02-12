@@ -8,7 +8,7 @@
     align-items: end;
     margin-bottom: 24px;
 
-    @media (max-width: 900px) {
+    @include mediaMax('tablet') {
       grid-template-columns: 1fr;
       align-items: start;
     }
@@ -25,7 +25,7 @@
   &__subtitle {
     font-size: 18px;
     line-height: 1.4;
-    color: rgba($black, .8);
+    color: rgba($black, 0.8);
     margin: 0;
     max-width: 820px;
   }
@@ -35,7 +35,7 @@
     gap: 12px;
     align-items: center;
 
-    @media (max-width: 900px) {
+    @include mediaMax('tablet') {
       width: 100%;
     }
   }
@@ -45,16 +45,16 @@
     max-width: 100%;
     height: 44px;
     border-radius: 12px;
-    border: 1px solid rgba($gray, .75);
+    border: 1px solid rgba($gray, 0.75);
     padding: 0 14px;
     font-size: 16px;
     outline: none;
 
     &:focus {
-      border-color: rgba($black, .35);
+      border-color: rgba($black, 0.35);
     }
 
-    @media (max-width: 900px) {
+    @include mediaMax('tablet') {
       width: 100%;
       flex: 1;
     }
@@ -84,16 +84,16 @@
 
   &__pager-info {
     font-size: 16px;
-    color: rgba($black, .75);
+    color: rgba($black, 0.75);
   }
 
   &__empty {
     margin-top: 18px;
     padding: 18px;
-    border: 1px solid rgba($gray, .6);
+    border: 1px solid rgba($gray, 0.6);
     border-radius: 18px;
     background: $whiteBg;
-    color: rgba($black, .8);
+    color: rgba($black, 0.8);
   }
 }
 
@@ -102,20 +102,20 @@
   text-decoration: none;
   color: inherit;
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   overflow: hidden;
   transition: transform $transition, box-shadow $transition, border-color $transition;
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba($gray, .9);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, .08);
+    border-color: rgba($gray, 0.9);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
   }
 
   &__media {
     height: 190px;
-    background: rgba($lightbllue, .55);
+    background: rgba($lightbllue, 0.55);
 
     img {
       width: 100%;
@@ -125,10 +125,9 @@
     }
 
     &--empty {
-      background:
-        radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, .35), transparent 60%),
-        radial-gradient(900px 220px at 80% 40%, rgba($mintBg, .25), transparent 60%),
-        rgba($lightbllue, .55);
+      background: radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, 0.35), transparent 60%),
+        radial-gradient(900px 220px at 80% 40%, rgba($mintBg, 0.25), transparent 60%),
+        rgba($lightbllue, 0.55);
     }
   }
 
@@ -141,7 +140,7 @@
 
   &__meta {
     font-size: 14px;
-    color: rgba($black, .65);
+    color: rgba($black, 0.65);
   }
 
   &__title {
@@ -154,7 +153,7 @@
   &__desc {
     font-size: 15px;
     line-height: 1.35;
-    color: rgba($black, .78);
+    color: rgba($black, 0.78);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -170,14 +169,14 @@
   &__more {
     font-size: 14px;
     font-weight: 700;
-    color: rgba($black, .85);
+    color: rgba($black, 0.85);
   }
 
   &--skeleton {
     height: 320px;
     border-radius: 18px;
-    border: 1px solid rgba($gray, .6);
-    background: linear-gradient(90deg, rgba($gray, .18), rgba($gray, .28), rgba($gray, .18));
+    border: 1px solid rgba($gray, 0.6);
+    background: linear-gradient(90deg, rgba($gray, 0.18), rgba($gray, 0.28), rgba($gray, 0.18));
     background-size: 200% 100%;
     animation: blog-skeleton 1.2s ease-in-out infinite;
   }
@@ -204,7 +203,7 @@
   &__back {
     display: inline-block;
     margin-bottom: 14px;
-    color: rgba($black, .75);
+    color: rgba($black, 0.75);
     text-decoration: none;
 
     &:hover {
@@ -226,22 +225,22 @@
 
   &__meta {
     font-size: 14px;
-    color: rgba($black, .65);
+    color: rgba($black, 0.65);
     margin-bottom: 10px;
   }
 
   &__lead {
     font-size: 18px;
     line-height: 1.5;
-    color: rgba($black, .82);
+    color: rgba($black, 0.82);
     margin-bottom: 14px;
   }
 
   &__cover {
     border-radius: 18px;
     overflow: hidden;
-    border: 1px solid rgba($gray, .6);
-    background: rgba($lightbllue, .45);
+    border: 1px solid rgba($gray, 0.6);
+    background: rgba($lightbllue, 0.45);
 
     img {
       width: 100%;
@@ -258,17 +257,17 @@
 
   &__notfound {
     padding: 18px;
-    border: 1px solid rgba($gray, .6);
+    border: 1px solid rgba($gray, 0.6);
     border-radius: 18px;
     background: $whiteBg;
-    color: rgba($black, .8);
+    color: rgba($black, 0.8);
   }
 
   &__skeleton {
     height: 520px;
     border-radius: 18px;
-    border: 1px solid rgba($gray, .6);
-    background: linear-gradient(90deg, rgba($gray, .18), rgba($gray, .28), rgba($gray, .18));
+    border: 1px solid rgba($gray, 0.6);
+    background: linear-gradient(90deg, rgba($gray, 0.18), rgba($gray, 0.28), rgba($gray, 0.18));
     background-size: 200% 100%;
     animation: blog-skeleton 1.2s ease-in-out infinite;
   }
@@ -278,7 +277,7 @@
 .b-share {
   margin-top: 14px;
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   padding: 12px;
 
@@ -296,42 +295,43 @@
 
   &__btn {
     appearance: none;
-    border: 1px solid rgba($gray, .55);
-    background: rgba($lightbllue, .55);
-    color: rgba($black, .92);
+    border: 1px solid rgba($gray, 0.55);
+    background: rgba($lightbllue, 0.55);
+    color: rgba($black, 0.92);
     border-radius: 14px;
     padding: 10px 12px;
     font-weight: 800;
     font-size: 14px;
     line-height: 1;
     cursor: pointer;
-    transition: transform $transition, opacity $transition, border-color $transition, box-shadow $transition;
+    transition: transform $transition, opacity $transition, border-color $transition,
+      box-shadow $transition;
 
     &:hover {
-      opacity: .92;
+      opacity: 0.92;
       transform: translateY(-1px);
-      border-color: rgba($gray, .85);
-      box-shadow: 0 12px 26px rgba(0, 0, 0, .06);
+      border-color: rgba($gray, 0.85);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.06);
     }
 
     &:active {
       transform: translateY(0);
-      opacity: .9;
+      opacity: 0.9;
     }
 
     &:focus-visible {
       outline: none;
-      border-color: rgba($black, .45);
-      box-shadow: 0 0 0 3px rgba($mintBg, .35);
+      border-color: rgba($black, 0.45);
+      box-shadow: 0 0 0 3px rgba($mintBg, 0.35);
     }
   }
 
   &__btn--primary {
-    background: rgba($mintBg, .55);
-    border-color: rgba($black, .12);
+    background: rgba($mintBg, 0.55);
+    border-color: rgba($black, 0.12);
 
     &:hover {
-      border-color: rgba($black, .3);
+      border-color: rgba($black, 0.3);
     }
   }
 }
@@ -339,7 +339,7 @@
 /* Типографика под готовый HTML */
 .b-prose {
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   padding: 22px;
   color: $black;
@@ -374,7 +374,7 @@
 
   p {
     margin: 10px 0;
-    color: rgba($black, .92);
+    color: rgba($black, 0.92);
   }
 
   a {
@@ -383,7 +383,7 @@
     text-underline-offset: 3px;
 
     &:hover {
-      opacity: .85;
+      opacity: 0.85;
     }
   }
 
@@ -400,28 +400,28 @@
   blockquote {
     margin: 14px 0;
     padding: 14px 16px;
-    border-left: 4px solid rgba($purpleBg, .9);
-    background: rgba($purpleBg, .14);
+    border-left: 4px solid rgba($purpleBg, 0.9);
+    background: rgba($purpleBg, 0.14);
     border-radius: 14px;
   }
 
   hr {
     border: none;
-    border-top: 1px solid rgba($gray, .7);
+    border-top: 1px solid rgba($gray, 0.7);
     margin: 18px 0;
   }
 
   img {
     max-width: 100%;
     border-radius: 16px;
-    border: 1px solid rgba($gray, .6);
+    border: 1px solid rgba($gray, 0.6);
     display: block;
     margin: 14px auto;
   }
 
   pre {
-    background: rgba($lightbllue, .65);
-    border: 1px solid rgba($gray, .6);
+    background: rgba($lightbllue, 0.65);
+    border: 1px solid rgba($gray, 0.6);
     border-radius: 16px;
     padding: 14px;
     overflow: auto;
@@ -430,11 +430,11 @@
   }
 
   code {
-    background: rgba($lightbllue, .55);
-    border: 1px solid rgba($gray, .55);
+    background: rgba($lightbllue, 0.55);
+    border: 1px solid rgba($gray, 0.55);
     border-radius: 10px;
     padding: 2px 8px;
-    font-size: .95em;
+    font-size: 0.95em;
   }
 
   table {
@@ -443,18 +443,18 @@
     margin: 14px 0;
     overflow: hidden;
     border-radius: 16px;
-    border: 1px solid rgba($gray, .6);
+    border: 1px solid rgba($gray, 0.6);
 
     th,
     td {
-      border-bottom: 1px solid rgba($gray, .6);
+      border-bottom: 1px solid rgba($gray, 0.6);
       padding: 10px 12px;
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      background: rgba($lightbllue, .55);
+      background: rgba($lightbllue, 0.55);
       font-weight: 800;
     }
 
@@ -492,7 +492,7 @@
 
 .b-toc {
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   padding: 14px;
 
@@ -511,30 +511,30 @@
   &__item {
     width: 100%;
     text-align: left;
-    border: 1px solid rgba($gray, .55);
-    background: rgba($lightbllue, .55);
+    border: 1px solid rgba($gray, 0.55);
+    background: rgba($lightbllue, 0.55);
     border-radius: 14px;
     padding: 10px 10px;
     cursor: pointer;
     transition: opacity $transition, transform $transition;
-    color: rgba($black, .9);
+    color: rgba($black, 0.9);
     font-weight: 700;
     line-height: 1.25;
 
     &:hover {
-      opacity: .92;
+      opacity: 0.92;
       transform: translateY(-1px);
     }
 
     &--h3 {
       padding-left: 14px;
       font-weight: 600;
-      background: rgba($lightbllue, .38);
+      background: rgba($lightbllue, 0.38);
     }
 
     &.is-active {
-      border-color: rgba($black, .45);
-      background: rgba($mintBg, .55);
+      border-color: rgba($black, 0.45);
+      background: rgba($mintBg, 0.55);
       transform: translateY(-1px);
     }
   }
@@ -542,7 +542,7 @@
 
 .b-related {
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   padding: 14px;
 
@@ -562,15 +562,15 @@
     display: block;
     text-decoration: none;
     color: inherit;
-    border: 1px solid rgba($gray, .55);
+    border: 1px solid rgba($gray, 0.55);
     border-radius: 14px;
     padding: 10px 12px;
     transition: transform $transition, box-shadow $transition, border-color $transition;
 
     &:hover {
       transform: translateY(-1px);
-      border-color: rgba($gray, .85);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, .08);
+      border-color: rgba($gray, 0.85);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
     }
   }
 
@@ -583,19 +583,19 @@
 
   &__item-meta {
     font-size: 13px;
-    color: rgba($black, .65);
+    color: rgba($black, 0.65);
   }
 
   &__empty {
     font-size: 14px;
-    color: rgba($black, .7);
+    color: rgba($black, 0.7);
   }
 
   &__skeleton {
     height: 180px;
     border-radius: 18px;
-    border: 1px solid rgba($gray, .6);
-    background: linear-gradient(90deg, rgba($gray, .18), rgba($gray, .28), rgba($gray, .18));
+    border: 1px solid rgba($gray, 0.6);
+    background: linear-gradient(90deg, rgba($gray, 0.18), rgba($gray, 0.28), rgba($gray, 0.18));
     background-size: 200% 100%;
     animation: blog-skeleton 1.2s ease-in-out infinite;
   }
@@ -606,7 +606,7 @@
   top: 0;
   z-index: 20;
   height: 6px;
-  background: rgba($gray, .35);
+  background: rgba($gray, 0.35);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 14px;

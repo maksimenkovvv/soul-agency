@@ -187,7 +187,7 @@
       min-height: 0; // ✅ для flex-scroll
       padding: 10px; // ✅ чтобы контент не прилипал к краям
 
-      >div {
+      > div {
         opacity: 1 !important;
         padding: 0 !important;
         font-size: 14px;
@@ -397,7 +397,8 @@
         gap: 16px;
 
         // Типографика
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+          sans-serif;
         font-size: 16px;
         font-weight: 500;
         line-height: 1.5;
@@ -570,7 +571,7 @@
 
       &:before,
       &:after {
-        content: "";
+        content: '';
         height: 1px;
         flex: 1;
         background-color: rgba($gray, 0.7);
@@ -619,18 +620,18 @@
 
       // subtle highlight (fits your current pastel theme)
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         inset: 0;
         pointer-events: none;
         opacity: 0.35;
-        background: radial-gradient(circle at 18% 10%, rgba($purple, 0.10), transparent 42%),
+        background: radial-gradient(circle at 18% 10%, rgba($purple, 0.1), transparent 42%),
           radial-gradient(circle at 80% 0%, rgba($blue, 0.07), transparent 40%);
       }
 
       // bubble tail
       &::after {
-        content: "";
+        content: '';
         position: absolute;
         bottom: 10px;
         left: -6px;
@@ -690,11 +691,12 @@
 
         border-radius: 14px;
         border: 1px solid rgba($gray, 0.45);
-        background: rgba($gray, 0.10);
+        background: rgba($gray, 0.1);
         text-align: left;
         cursor: pointer;
 
-        transition: transform $transition, background $transition, border-color $transition, box-shadow $transition;
+        transition: transform $transition, background $transition, border-color $transition,
+          box-shadow $transition;
         position: relative;
         z-index: 1;
 
@@ -743,7 +745,7 @@
         .txt {
           font-size: 13px;
           line-height: 16px;
-          color: rgba($black, 0.60);
+          color: rgba($black, 0.6);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -754,11 +756,11 @@
       &.me {
         .chat__reply {
           border-color: rgba($mint, 0.55);
-          background: rgba($mint, 0.20);
+          background: rgba($mint, 0.2);
 
           &:hover {
             background: rgba($mint, 0.26);
-            border-color: rgba($mint, 0.70);
+            border-color: rgba($mint, 0.7);
           }
 
           .bar {
@@ -830,7 +832,8 @@
 
       opacity: 0;
       transform: translateY(-2px);
-      transition: opacity $transition, transform $transition, background $transition, box-shadow $transition;
+      transition: opacity $transition, transform $transition, background $transition,
+        box-shadow $transition;
 
       position: absolute;
       top: 0;
@@ -844,7 +847,7 @@
 
       &:hover {
         background-color: rgba($whiteBg, 0.95);
-        box-shadow: 0 14px 36px rgba($blackFull, 0.10);
+        box-shadow: 0 14px 36px rgba($blackFull, 0.1);
         transform: translateY(-3px);
       }
 
@@ -936,7 +939,7 @@
         margin: 6px 6px 8px;
         max-width: none;
 
-        background: rgba($gray, 0.10);
+        background: rgba($gray, 0.1);
         border: 1px solid rgba($gray, 0.45);
         box-shadow: none;
 
@@ -1527,7 +1530,7 @@
       justify-content: center;
 
       &:hover {
-        background-color: rgba($gray, 0.20);
+        background-color: rgba($gray, 0.2);
       }
 
       svg {
@@ -1758,12 +1761,13 @@
       background: rgba($whiteBg, 0.72);
 
       box-shadow: 0 12px 36px rgba($blackFull, 0.08);
-      transition: background $transition, transform $transition, box-shadow $transition, border-color $transition;
+      transition: background $transition, transform $transition, box-shadow $transition,
+        border-color $transition;
 
       min-width: 0;
 
       &:hover {
-        background: rgba($whiteBg, 0.90);
+        background: rgba($whiteBg, 0.9);
         transform: translateY(-1px);
         box-shadow: 0 16px 46px rgba($blackFull, 0.12);
         border-color: rgba($purple, 0.35);
@@ -1779,7 +1783,7 @@
         justify-content: center;
 
         border: 1px solid rgba($gray, 0.55);
-        background: linear-gradient(180deg, rgba($gray, 0.10), rgba($gray, 0.06));
+        background: linear-gradient(180deg, rgba($gray, 0.1), rgba($gray, 0.06));
 
         flex: 0 0 auto;
 
@@ -1834,7 +1838,7 @@
         border-radius: 999px;
 
         border: 1px solid rgba($blue, 0.35);
-        background: rgba($blue, 0.10);
+        background: rgba($blue, 0.1);
         color: rgba($black, 0.86);
 
         text-decoration: none;
@@ -1861,7 +1865,7 @@
 
         border: 1px solid rgba($purple, 0.35);
         background: rgba($purple, 0.12);
-        color: rgba($black, 0.90);
+        color: rgba($black, 0.9);
 
         cursor: pointer;
         transition: background $transition, transform $transition, border-color $transition;
@@ -1907,7 +1911,7 @@
       margin-bottom: 8px;
       border-radius: 14px;
       border: 1px solid rgba($gray, 0.55);
-      background: rgba($gray, 0.10);
+      background: rgba($gray, 0.1);
     }
 
     &__ctxreact {
@@ -1926,11 +1930,12 @@
       line-height: 18px;
 
       cursor: pointer;
-      transition: transform $transition, background $transition, box-shadow $transition, border-color $transition;
+      transition: transform $transition, background $transition, box-shadow $transition,
+        border-color $transition;
 
       &:hover {
         transform: translateY(-1px);
-        border-color: rgba($purple, 0.40);
+        border-color: rgba($purple, 0.4);
         box-shadow: 0 14px 36px rgba($blackFull, 0.12);
         background: rgba($whiteBg, 1);
       }
@@ -1971,7 +1976,8 @@
       gap: 8px;
 
       cursor: pointer;
-      transition: transform $transition, background $transition, border-color $transition, box-shadow $transition;
+      transition: transform $transition, background $transition, border-color $transition,
+        box-shadow $transition;
 
       .e {
         font-size: 16px;
@@ -1982,13 +1988,13 @@
         font-size: 13px;
         line-height: 14px;
         font-weight: 900;
-        color: rgba($black, 0.70);
+        color: rgba($black, 0.7);
       }
 
       &:hover {
         transform: translateY(-1px);
         background: rgba($whiteBg, 1);
-        box-shadow: 0 14px 36px rgba($blackFull, 0.10);
+        box-shadow: 0 14px 36px rgba($blackFull, 0.1);
         border-color: rgba($purple, 0.35);
       }
 
@@ -1998,7 +2004,7 @@
 
       &.me {
         border-color: rgba($blue, 0.45);
-        background: rgba($blue, 0.10);
+        background: rgba($blue, 0.1);
 
         .c {
           color: rgba($black, 0.78);
@@ -2021,7 +2027,7 @@
       justify-content: center;
 
       border: 1px dashed rgba($gray, 0.55);
-      background: rgba($gray, 0.10);
+      background: rgba($gray, 0.1);
 
       color: rgba($black, 0.65);
       font-weight: 900;
@@ -2035,7 +2041,7 @@
       &:hover {
         transform: translateY(-1px);
         background: rgba($gray, 0.14);
-        border-color: rgba($purple, 0.40);
+        border-color: rgba($purple, 0.4);
       }
     }
 
@@ -2047,7 +2053,7 @@
 
         &:hover {
           background: rgba($mint, 0.36);
-          border-color: rgba($mint, 0.70);
+          border-color: rgba($mint, 0.7);
         }
       }
 
@@ -2159,7 +2165,8 @@
 
       color: rgba($black, 0.72);
 
-      transition: background $transition, transform $transition, border-color $transition, color $transition;
+      transition: background $transition, transform $transition, border-color $transition,
+        color $transition;
 
       &:hover {
         background: rgba($gray, 0.18);
@@ -2702,7 +2709,6 @@
 }
 
 @keyframes chatDot {
-
   0%,
   100% {
     transform: translateY(0);
@@ -2778,8 +2784,8 @@
   }
 }
 
-/* <= 980px: больше “в экран”, меньше жёстких пикселей */
-@media (max-width: 980px) {
+/* <= 1239px: больше “в экран”, меньше жёстких пикселей */
+@include mediaMax('tablet') {
   .b-chat {
     gap: 14px;
 

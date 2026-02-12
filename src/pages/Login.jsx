@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from '../api/authApi';
 import { useAuth } from '../auth/authStore';
+
+import logo from '../assets/img/logo.svg'; // логотип
 
 // ===== UI настройки =====
 const CODE_LEN = 5;
@@ -235,7 +237,10 @@ export default function Login() {
   const inCodeStep = isCodeMode || isRegistrationCodeMode;
   const hasBackButton = isCodeMode || isRegistrationCodeMode || isPasswordChangeMode;
 
-  const emailNormalized = useMemo(() => (formData.email || '').trim().toLowerCase(), [formData.email]);
+  const emailNormalized = useMemo(
+    () => (formData.email || '').trim().toLowerCase(),
+    [formData.email]
+  );
 
   const flowKey = useMemo(() => {
     const mode = isRegistrationCodeMode ? 'reg' : 'rec';
@@ -243,7 +248,10 @@ export default function Login() {
   }, [isRegistrationCodeMode, emailNormalized]);
 
   const fullCode = useMemo(() => code.join(''), [code]);
-  const isCodeComplete = useMemo(() => code.every((d) => typeof d === 'string' && d.length === 1), [code]);
+  const isCodeComplete = useMemo(
+    () => code.every((d) => typeof d === 'string' && d.length === 1),
+    [code]
+  );
 
   // ✅ ВАЖНО: НЕ useMemo() с Date.now()
   const isLocked = lockedUntilTs ? Date.now() < lockedUntilTs : false;
@@ -388,7 +396,11 @@ export default function Login() {
       return true;
     }
 
-    if ((err?.code === 'CODE_LOCKED' || err?.code === 'RESEND_TOO_SOON') && Number.isFinite(retry) && retry > 0) {
+    if (
+      (err?.code === 'CODE_LOCKED' || err?.code === 'RESEND_TOO_SOON') &&
+      Number.isFinite(retry) &&
+      retry > 0
+    ) {
       if (err?.code === 'RESEND_TOO_SOON') setResendUntilTs(now + retry * 1000);
       if (err?.code === 'CODE_LOCKED') {
         setLockedUntilTs(now + retry * 1000);
@@ -589,7 +601,11 @@ export default function Login() {
       } catch (err) {
         const applied = applyServerLimits(err);
         if (!applied && !Number.isFinite(err?.attemptsLeft)) consumeAttemptFallback();
-        showError(err?.status === 401 ? 'Сессия истекла. Повторите попытку.' : err?.message || 'Ошибка смены пароля');
+        showError(
+          err?.status === 401
+            ? 'Сессия истекла. Повторите попытку.'
+            : err?.message || 'Ошибка смены пароля'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -637,7 +653,11 @@ export default function Login() {
       } catch (err) {
         const applied = applyServerLimits(err);
         if (!applied && !Number.isFinite(err?.attemptsLeft)) consumeAttemptFallback();
-        showError(err?.status === 401 ? 'Сессия истекла. Запросите код заново.' : err?.message || 'Неверный код');
+        showError(
+          err?.status === 401
+            ? 'Сессия истекла. Запросите код заново.'
+            : err?.message || 'Неверный код'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -725,14 +745,33 @@ export default function Login() {
   };
 
   // ===== UI texts =====
-  const title = isPasswordChangeMode ? 'Смена пароля' : isCodeMode ? 'Сброс пароля' : isRegistrationCodeMode ? 'Регистрация' : isRecoveryMode ? 'Забыли пароль?' : isLoginMode ? 'Вход' : 'Регистрация';
+  const title = isPasswordChangeMode
+    ? 'Смена пароля'
+    : isCodeMode
+    ? 'Сброс пароля'
+    : isRegistrationCodeMode
+    ? 'Регистрация'
+    : isRecoveryMode
+    ? 'Забыли пароль?'
+    : isLoginMode
+    ? 'Вход'
+    : 'Регистрация';
 
-  const subtitle = isCodeMode || isRegistrationCodeMode ? 'Письмо уже в пути. Введите код — и продолжим.' : isRecoveryMode && !isCodeMode ? 'Введите e-mail, и мы отправим код для восстановления доступа' : '';
+  const subtitle =
+    isCodeMode || isRegistrationCodeMode
+      ? 'Письмо уже в пути. Введите код — и продолжим.'
+      : isRecoveryMode && !isCodeMode
+      ? 'Введите e-mail, и мы отправим код для восстановления доступа'
+      : '';
 
   const noticeStyle = noticeBoxStyle(notice?.type);
 
   // показывать капчу только там, где она нужна
-  const showCaptcha = !isCodeMode && !isRegistrationCodeMode && !isPasswordChangeMode && (isLoginMode || isRecoveryMode || (!isLoginMode && !isRecoveryMode));
+  const showCaptcha =
+    !isCodeMode &&
+    !isRegistrationCodeMode &&
+    !isPasswordChangeMode &&
+    (isLoginMode || isRecoveryMode || (!isLoginMode && !isRecoveryMode));
 
   return (
     <div className={`login ${hasBackButton ? 'login--with-back' : ''}`}>
@@ -861,7 +900,8 @@ export default function Login() {
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'none';
-                      e.currentTarget.style.opacity = canResend && !isLocked && !isLoading ? '1' : '0.55';
+                      e.currentTarget.style.opacity =
+                        canResend && !isLocked && !isLoading ? '1' : '0.55';
                     }}
                   >
                     Выслать код повторно
@@ -873,7 +913,11 @@ export default function Login() {
             <>
               <div className="login__form-group">
                 <label className="login__label">Новый пароль</label>
-                <div className={`login__field-wrap ${focus.newPassword ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''}`}>
+                <div
+                  className={`login__field-wrap ${focus.newPassword ? 'is-focus' : ''} ${
+                    isLoading ? 'is-disabled' : ''
+                  }`}
+                >
                   <input
                     type={showNewPassword ? 'text' : 'password'}
                     name="newPassword"
@@ -900,7 +944,11 @@ export default function Login() {
 
               <div className="login__form-group">
                 <label className="login__label">Повторить пароль</label>
-                <div className={`login__field-wrap ${focus.confirmPassword ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''}`}>
+                <div
+                  className={`login__field-wrap ${focus.confirmPassword ? 'is-focus' : ''} ${
+                    isLoading ? 'is-disabled' : ''
+                  }`}
+                >
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
@@ -959,7 +1007,11 @@ export default function Login() {
                 <div className="login__form-group">
                   <label className="login__label">Пароль</label>
 
-                  <div className={`login__field-wrap ${focus.password ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''}`}>
+                  <div
+                    className={`login__field-wrap ${focus.password ? 'is-focus' : ''} ${
+                      isLoading ? 'is-disabled' : ''
+                    }`}
+                  >
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="password"
@@ -1051,7 +1103,9 @@ export default function Login() {
                       disabled={isLoading}
                     />
                     <span className="label__checkbox-custom" />
-                    <span className="label__text">Я подтверждаю, что мне исполнилось 18 лет и имею право пользоваться сервисом.</span>
+                    <span className="label__text">
+                      Я подтверждаю, что мне исполнилось 18 лет и имею право пользоваться сервисом.
+                    </span>
                   </label>
 
                   <label className="login__policy-label label">
@@ -1061,7 +1115,9 @@ export default function Login() {
                       disabled={isLoading}
                     />
                     <span className="label__checkbox-custom" />
-                    <span className="label__text">Хочу получать информацию о персональных предложениях и акциях.</span>
+                    <span className="label__text">
+                      Хочу получать информацию о персональных предложениях и акциях.
+                    </span>
                   </label>
                 </div>
               )}
@@ -1085,22 +1141,36 @@ export default function Login() {
               className="login__group-btn login__button b-btn"
               disabled={isLoading || (inCodeStep && isLocked)}
             >
-              {isLoading ? 'Подождите...' : isPasswordChangeMode ? 'Сменить' : isCodeMode || isRegistrationCodeMode ? 'Продолжить' : isRecoveryMode ? 'Выслать код' : isLoginMode ? 'Войти' : 'Зарегистрироваться'}
+              {isLoading
+                ? 'Подождите...'
+                : isPasswordChangeMode
+                ? 'Сменить'
+                : isCodeMode || isRegistrationCodeMode
+                ? 'Продолжить'
+                : isRecoveryMode
+                ? 'Выслать код'
+                : isLoginMode
+                ? 'Войти'
+                : 'Зарегистрироваться'}
             </button>
           </div>
         </form>
 
         <div className="login__footer">
-          {!isRecoveryMode && !isCodeMode && !isPasswordChangeMode && !isRegistrationCodeMode && isLoginMode && (
-            <button
-              type="button"
-              className="login__footer-link"
-              onClick={toggleRecoveryMode}
-              disabled={isLoading}
-            >
-              Забыли пароль?
-            </button>
-          )}
+          {!isRecoveryMode &&
+            !isCodeMode &&
+            !isPasswordChangeMode &&
+            !isRegistrationCodeMode &&
+            isLoginMode && (
+              <button
+                type="button"
+                className="login__footer-link"
+                onClick={toggleRecoveryMode}
+                disabled={isLoading}
+              >
+                Забыли пароль?
+              </button>
+            )}
 
           {(isRecoveryMode || isCodeMode || isPasswordChangeMode) && !isRegistrationCodeMode ? (
             <p>
@@ -1131,6 +1201,8 @@ export default function Login() {
                 className="login__footer-link"
                 onClick={() => {
                   setIsLoginMode(false);
+                  setIsRecoveryMode(false);
+                  setIsCodeMode(false);
                   clearNotice();
                 }}
                 disabled={isLoading}
@@ -1146,6 +1218,8 @@ export default function Login() {
                 className="login__footer-link"
                 onClick={() => {
                   setIsLoginMode(true);
+                  setIsRecoveryMode(false);
+                  setIsCodeMode(false);
                   clearNotice();
                 }}
                 disabled={isLoading}
@@ -1155,13 +1229,23 @@ export default function Login() {
             </p>
           ) : null}
 
-          <p className="login__footer-title">БюроДуши</p>
+          <Link
+            to="/"
+            className="login__footer-title"
+            aria-label="На главную"
+          >
+            <img
+              src={logo}
+              alt="БюроДуши"
+            />
+          </Link>
         </div>
 
         {/* подсказка, если ключ не задан */}
         {!CAPTCHA_SITE_KEY ? (
           <div className="login__captcha-off">
-            ⚠️ Капча отключена: добавь <b>REACT_APP_SMARTCAPTCHA_SITEKEY</b> в <code>.env.local</code>.
+            ⚠️ Капча отключена: добавь <b>REACT_APP_SMARTCAPTCHA_SITEKEY</b> в{' '}
+            <code>.env.local</code>.
           </div>
         ) : null}
       </div>

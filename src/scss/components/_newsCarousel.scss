@@ -2,11 +2,10 @@
   margin-bottom: 120px;
   padding: 18px;
   border-radius: 24px;
-  border: 1px solid rgba($gray, .6);
-  background:
-    radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, .28), transparent 60%),
-    radial-gradient(900px 220px at 80% 40%, rgba($mintBg, .22), transparent 60%),
-    rgba($lightbllue, .35);
+  border: 1px solid rgba($gray, 0.6);
+  background: radial-gradient(1200px 240px at 20% 20%, rgba($purpleBg, 0.28), transparent 60%),
+    radial-gradient(900px 220px at 80% 40%, rgba($mintBg, 0.22), transparent 60%),
+    rgba($lightbllue, 0.35);
 
   @include mediaMax('tablet') {
     margin-bottom: 80px;
@@ -19,7 +18,7 @@
     gap: 16px;
     margin-bottom: 14px;
 
-    @media (max-width: 900px) {
+    @include mediaMax('tablet') {
       flex-direction: column;
       align-items: flex-start;
     }
@@ -34,7 +33,7 @@
 
   &__subtitle {
     font-size: 16px;
-    color: rgba($black, .75);
+    color: rgba($black, 0.75);
   }
 
   &__actions {
@@ -48,7 +47,7 @@
     width: 44px;
     height: 44px;
     border-radius: 14px;
-    border: 1px solid rgba($gray, .65);
+    border: 1px solid rgba($gray, 0.65);
     background: $whiteBg;
     font-size: 26px;
     line-height: 1;
@@ -86,14 +85,14 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba($gray, .8);
+      background: rgba($gray, 0.8);
       border-radius: 999px;
     }
   }
 
   &__empty {
     padding: 14px;
-    color: rgba($black, .75);
+    color: rgba($black, 0.75);
   }
 }
 
@@ -102,7 +101,7 @@
   min-width: 340px;
   max-width: 340px;
   background: $whiteBg;
-  border: 1px solid rgba($gray, .6);
+  border: 1px solid rgba($gray, 0.6);
   border-radius: 18px;
   overflow: hidden;
   text-decoration: none;
@@ -111,13 +110,13 @@
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba($gray, .9);
-    box-shadow: 0 18px 50px rgba(0, 0, 0, .08);
+    border-color: rgba($gray, 0.9);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
   }
 
   &__media {
     height: 160px;
-    background: rgba($lightbllue, .55);
+    background: rgba($lightbllue, 0.55);
 
     img {
       width: 100%;
@@ -136,7 +135,7 @@
 
   &__meta {
     font-size: 13px;
-    color: rgba($black, .65);
+    color: rgba($black, 0.65);
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
@@ -152,7 +151,7 @@
   &__desc {
     font-size: 14px;
     line-height: 1.35;
-    color: rgba($black, .78);
+    color: rgba($black, 0.78);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -161,7 +160,7 @@
 
   &--skeleton {
     height: 260px;
-    background: linear-gradient(90deg, rgba($gray, .18), rgba($gray, .28), rgba($gray, .18));
+    background: linear-gradient(90deg, rgba($gray, 0.18), rgba($gray, 0.28), rgba($gray, 0.18));
     background-size: 200% 100%;
     animation: news-skeleton 1.2s ease-in-out infinite;
   }

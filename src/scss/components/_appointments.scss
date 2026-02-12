@@ -1,24 +1,35 @@
 .b-appointments {
-    width: 100%;
-    height: fit-content;
+  width: 100%;
+  height: fit-content;
 
-    .appointments {
-        &-client {
-            height: 100%;
+  .appointments {
+    &-client {
+      height: 100%;
 
-            .b-search {
-                display: flex;
-                max-width: none;
-                gap: 24px;
-                margin-bottom: 32px;
+      .b-search {
+        display: flex;
+        max-width: none;
+        gap: 24px;
+        margin-bottom: 32px;
 
-                .search {
-                    &-input {
-                        max-width: 390px;
-                        height: auto;
-                    }
-                }
-            }
+        @include mediaMax('tablet') {
+          flex-direction: column;
+          &__appFilters {
+            width: 100%;
+            margin: 0;
+          }
+          &__icon {
+            top: 20%;
+          }
         }
+
+        .search {
+          &-input {
+            max-width: 390px;
+            height: auto;
+          }
+        }
+      }
     }
+  }
 }

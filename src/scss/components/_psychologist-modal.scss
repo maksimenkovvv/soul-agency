@@ -550,7 +550,7 @@
       }
     }
 
-    @media (max-width: 860px) {
+    @include mediaMax('tablet') {
       &__content {
         &::-webkit-scrollbar {
           width: 6px;
