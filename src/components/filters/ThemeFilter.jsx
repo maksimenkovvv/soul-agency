@@ -1,6 +1,8 @@
 import React from 'react';
 import { dictApi } from '../../api/dictApi';
 
+import closeBtn from '../../assets/img/close-filters.svg';
+
 const ThemeFilter = ({ onApply, value }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedOptions, setSelectedOptions] = React.useState([]);
@@ -56,11 +58,20 @@ const ThemeFilter = ({ onApply, value }) => {
       }
     };
 
+    // Блокировка скролла на мобильных устройствах
+    if (isOpen && window.innerWidth <= 1239) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      // Восстанавливаем скролл при размонтировании
+      document.body.style.overflow = '';
     };
-  }, []);
+  }, [isOpen]); // Добавлен isOpen в зависимости
 
   const isSelected = (opt) => {
     const id = opt?.id;
@@ -150,9 +161,21 @@ const ThemeFilter = ({ onApply, value }) => {
         className="filter-options"
         aria-hidden={!isOpen}
       >
+        <button
+          className="filter-options__close"
+          onClick={() => setIsOpen(false)}
+        >
+          <img
+            src={closeBtn}
+            alt="Закрыть"
+          />
+        </button>
+        <div className="filter-options__header">Тема</div>
         {loading ? <div className="filter__state">Загрузка…</div> : null}
         {!loading && loadError ? <div className="filter__state">{loadError}</div> : null}
-        {!loading && !loadError && (themes || []).length === 0 ? <div className="filter__state">Тем нет</div> : null}
+        {!loading && !loadError && (themes || []).length === 0 ? (
+          <div className="filter__state">Тем нет</div>
+        ) : null}
 
         {(themes || []).map((theme, index) => {
           const title = theme?.title;
@@ -161,7 +184,9 @@ const ThemeFilter = ({ onApply, value }) => {
           return (
             <div
               key={index}
-              className={`filter-option ${selected ? 'selected' : ''} ${disabled ? 'is-disabled' : ''}`}
+              className={`filter-option ${selected ? 'selected' : ''} ${
+                disabled ? 'is-disabled' : ''
+              }`}
               onClick={() => {
                 if (!disabled) toggleOption(theme);
               }}

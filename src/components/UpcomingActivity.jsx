@@ -8,7 +8,10 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import '../scss/swiper-custom.scss';
 
-import photo from '../assets/img/psychologist-3.webp'; {/*заглушка для фото*/ }
+import photo from '../assets/img/psychologist-3.webp';
+{
+  /*заглушка для фото*/
+}
 
 function UpcomingActivity() {
   const [isMobile, setIsMobile] = useState(false);
@@ -44,9 +47,11 @@ function UpcomingActivity() {
     speed: 500,
     initialSlide: 1,
     enabled: isMobile, //отключаем/включаем swiper
-    pagination: isMobile ? {
-      clickable: true,
-    } : false,
+    pagination: isMobile
+      ? {
+          clickable: true,
+        }
+      : false,
     onSwiper: (swiper) => {
       swiperRef.current = swiper;
     },
@@ -62,13 +67,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
@@ -77,10 +100,13 @@ function UpcomingActivity() {
           </div>
           {/*⬆️ПЕРВЫЙ БЛОК ОДИНОЧНОЙ СЕССИИ⬆️*/}
           <div className="activity__item activity__item--cta">
-            <div className="activity__item-title b-title-h3">
+            <h1 className="activity__item-title b-title-h3">
               Говорим о сложном — просто. <br /> Давайте с нами — без давления
-            </div>
-            <Link to="/psychologist" className="b-btn b-btn--transparent">
+            </h1>
+            <Link
+              to="/psychologist"
+              className="b-btn b-btn--transparent"
+            >
               Подобрать психолога
             </Link>
           </div>
@@ -89,13 +115,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Название групповой сессии</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
@@ -108,13 +152,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
@@ -141,13 +203,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
@@ -158,10 +238,13 @@ function UpcomingActivity() {
         </SwiperSlide>
         <SwiperSlide>
           <div className="activity__item activity__item--cta">
-            <div className="activity__item-title b-title-h3">
+            <h1 className="activity__item-title b-title-h3">
               Говорим о сложном — просто. <br /> Давайте с нами — без давления
-            </div>
-            <Link to="/psychologist" className="b-btn b-btn--transparent">
+            </h1>
+            <Link
+              to="/psychologist"
+              className="b-btn b-btn--transparent"
+            >
               Подобрать психолога
             </Link>
           </div>
@@ -172,13 +255,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Название групповой сессии</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
@@ -193,13 +294,31 @@ function UpcomingActivity() {
             <div className="activity__item-title b-title-h3">Петрова Наталья</div>
             <div className="activity__item-content">
               <div className="activity__item-content__image">
-                <img src={photo} alt="" />
+                <img
+                  src={photo}
+                  alt=""
+                />
               </div>
               <div className="activity__item-content__info">
                 <div className="activity__item-content__info-date">19 сентября, 9:00</div>
-                <a href="#" className="b-btn activity__item-content__info-button">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <a
+                  href="#"
+                  className="b-btn activity__item-content__info-button"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12H19M19 12L12 5M19 12L12 19"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </a>
               </div>
