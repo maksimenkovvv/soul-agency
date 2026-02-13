@@ -23,6 +23,10 @@
     gap: 12px;
     flex: 0 0 auto;
     min-width: 0;
+
+    @include mediaMax('tablet') {
+      overflow-y: scroll;
+    }
   }
 
   .filter {

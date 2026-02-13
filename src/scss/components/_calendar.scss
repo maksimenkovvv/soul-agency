@@ -367,7 +367,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 68vh;
+    max-height: max-content;
     overflow: auto;
     padding-right: 6px;
   }
@@ -882,6 +882,16 @@
     }
 
     // toolbar: перенос + читаемо
+    .fc-header-toolbar .fc-toolbar-chunk {
+      display: flex;
+      gap: 8px;
+    }
+    .fc-header-toolbar .fc-toolbar-chunk .fc-button-group {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
     .fc-header-toolbar {
       flex-wrap: wrap !important;
       gap: 10px !important;
@@ -991,13 +1001,6 @@
       &::-webkit-scrollbar {
         display: none;
       }
-    }
-
-    .fc-header-toolbar .fc-toolbar-chunk:last-child .fc-button-group {
-      display: inline-flex;
-      gap: 8px;
-      flex-wrap: nowrap;
-      white-space: nowrap;
     }
 
     // ✅ уменьшить отступы сетки

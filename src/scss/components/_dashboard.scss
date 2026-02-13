@@ -1,11 +1,11 @@
 .dashboard {
   width: 100%;
-  display: grid;
-  grid-template-columns: 390px minmax(0, 1fr);
-  gap: 60px;
+  display: flex;
+  gap: 40px;
+  flex-direction: column;
   align-items: start;
 
-  >* {
+  > * {
     min-width: 0;
   }
 
