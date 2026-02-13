@@ -252,7 +252,7 @@
   }
 
   .fc-scrollgrid,
-  .fc-scrollgrid-section > td {
+  .fc-scrollgrid-section>td {
     border-color: rgba($gray, 0.55) !important;
   }
 
@@ -299,6 +299,17 @@
 
   .fc-break {
     background-color: rgba($lightbllue, 0.55) !important;
+  }
+
+  .fc-header-toolbar .fc-toolbar-chunk .fc-button-group {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .fc-header-toolbar {
+    gap: 10px;
   }
 }
 
@@ -400,6 +411,10 @@
     text-align: left;
     cursor: pointer;
 
+    @include mediaMax('mobile') {
+      flex-direction: column;
+    }
+
     &:hover {
       background-color: rgba($gray, 0.08);
     }
@@ -415,6 +430,12 @@
     align-items: center;
     gap: 10px;
     font-weight: 700;
+
+    @include mediaMax('mobile') {
+      flex-direction: column;
+      align-items: center;
+    }
+
   }
 
   &__warn {
@@ -546,6 +567,17 @@
     grid-template-columns: 1fr 24px 1fr 32px;
     gap: 10px;
     align-items: center;
+
+    @include mediaMax('mobile') {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .b-icon-btn {
+      @include mediaMax('mobile') {
+        width: 100%;
+      }
+    }
+
   }
 
   &__dash {
@@ -663,11 +695,11 @@
     }
   }
 
-  input:checked + .b-switch__ui {
+  input:checked+.b-switch__ui {
     background-color: $blackBg;
   }
 
-  input:checked + .b-switch__ui:before {
+  input:checked+.b-switch__ui:before {
     transform: translateX(18px);
   }
 }
@@ -814,6 +846,7 @@
 }
 
 @include mediaMax('tablet') {
+
   // ✅ одна колонка
   .b-sessions-layout {
     grid-template-columns: 1fr;
@@ -886,12 +919,7 @@
       display: flex;
       gap: 8px;
     }
-    .fc-header-toolbar .fc-toolbar-chunk .fc-button-group {
-      display: inline-flex;
-      gap: 8px;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-    }
+
     .fc-header-toolbar {
       flex-wrap: wrap !important;
       gap: 10px !important;
@@ -925,6 +953,7 @@
 }
 
 @include mediaMax('mobile') {
+
   // ✅ мобильный комфорт
   .b-sessions-page {
     margin-bottom: 96px;
@@ -1005,7 +1034,7 @@
 
     // ✅ уменьшить отступы сетки
     .fc-scrollgrid,
-    .fc-scrollgrid-section > td {
+    .fc-scrollgrid-section>td {
       border-color: rgba($gray, 0.45) !important;
     }
 
@@ -1053,6 +1082,7 @@
 }
 
 @media (max-width: 420px) {
+
   // ✅ ультра-мобилка: ещё компактнее
   .b-calendar {
     padding: 10px;

@@ -5,7 +5,7 @@
   align-items: start;
 
   @include mediaMax('tablet') {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   &__left {
