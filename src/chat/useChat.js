@@ -1959,7 +1959,13 @@ export function useChat() {
      */
     const openDialog = React.useCallback(
         (dialogId) => {
-            const did = String(dialogId);
+            const did = dialogId == null ? "" : String(dialogId).trim();
+            // ✅ allow closing dialog (useful on mobile: back to list)
+            if (!did) {
+                setActiveDialogId(null);
+                return;
+            }
+
             setActiveDialogId(did);
 
             loadDialogDetails(did, { force: false });

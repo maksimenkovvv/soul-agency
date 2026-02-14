@@ -9,7 +9,9 @@ function roleTabs(role) {
         return ["Записи", "Избранное", "Платежи"];
     }
     // PSYCHOLOGIST / ADMIN
-    return ["Записи", "График работы", "Групповые сессии"];
+    // Важно: у психолога/админа должны быть доступны "мои" записи/платежи как у клиента,
+    // а также рабочие вкладки психолога.
+    return ["Мои записи", "Платежи", "Записи", "График работы", "Групповые сессии"];
 }
 
 export default function Dashboard() {
@@ -41,7 +43,7 @@ export default function Dashboard() {
 
     return (
         <div className="dashboard">
-            <Sidebar user={user} setActiveTab={setActiveTab} activeTab={activeTab} />
+            <Sidebar user={user} tabs={tabs} setActiveTab={setActiveTab} activeTab={activeTab} />
 
             <main className="dashboard__content">
                 <ContentArea activeTab={activeTab} user={user} />

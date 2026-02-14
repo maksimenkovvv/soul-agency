@@ -10,6 +10,7 @@ import ruLocale from "@fullcalendar/core/locales/ru";
 import { useAuth } from "../../auth/authStore";
 import { useWs } from "../../ws/wsStore";
 import { sessionsApi } from "../../api/sessionsApi";
+import { paymentsApi } from "../../api/paymentsApi";
 import Modal from "../ui/Modal";
 import { useToast } from "../../ui/toast/ToastProvider";
 import {
@@ -89,6 +90,11 @@ function prettyBookingStatus(status) {
 function isAwaitingPaymentStatus(status) {
     const s = String(status || "").toUpperCase();
     return s === "PENDING_PAYMENT" || s === "PENDING";
+}
+
+function isPaidBookingStatus(status) {
+    const s = String(status || "").toUpperCase();
+    return s === "PAID" || s === "CONFIRMED" || s === "SUCCEEDED";
 }
 
 // ---- remember own bookings / hold / payment-started ----
@@ -213,6 +219,7 @@ export default function BookingCalendar({
     const [bookingModal, setBookingModal] = useState(null); // booking | null
     const [dayOffModal, setDayOffModal] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [refunding, setRefunding] = useState(false);
 
     // ✅ таймер (видимый) для pending брони
     const [holdLeftMs, setHoldLeftMs] = useState(0);
@@ -347,15 +354,21 @@ export default function BookingCalendar({
         return (bookings || []).filter((b) => isBlockingBookingStatus(b?.status));
     }, [bookings]);
 
-    // ✅ определение "моя ли бронь" (безопасно)
+    // ✅ определение "моя ли бронь" (строго: только брони текущего пользователя)
+    // ВАЖНО: роль ADMIN не означает "моя бронь" — иначе появятся кнопки отмены/возврата на чужих записях.
     const isMineBooking = useCallback(
         (b) => {
             if (!b) return false;
-            if (effectiveRole === "ADMIN") return true;
+
             const cid = getClientIdFromBooking(b);
             if (cid && me?.id && String(cid) === String(me.id)) return true;
-            if (b?.mine != null) return Boolean(b.mine);
+
+            // backend-флаг mine доверяем ТОЛЬКО для клиента (на админке он иногда означает "доступно")
+            if (effectiveRole === "CLIENT" && b?.mine != null) return Boolean(b.mine);
+
+            // fallback: если мы сами создавали бронь на этом устройстве
             if (b?.id && me?.id && isRememberedOwnBooking(b.id, me.id)) return true;
+
             return false;
         },
         [effectiveRole, me?.id]
@@ -375,9 +388,15 @@ export default function BookingCalendar({
                 const awaiting = isAwaitingPaymentStatus(status);
                 const mine = isMineBooking(b);
 
-                // ✅ клиенту показываем "Ожидает оплаты" только если это его бронь
+                // ✅ подпись для "моей" записи
+                // - для pending: «Ожидает оплаты»
+                // - для остальных: «Ваша запись» (понятно, что это именно вы)
                 const title =
-                    awaiting && mine ? "Ожидает оплаты" : base.title || "Занято";
+                    awaiting && mine
+                        ? "Ожидает оплаты"
+                        : mine
+                            ? "Ваша запись"
+                            : base.title || "Занято";
 
                 const classNames = Array.isArray(base.classNames)
                     ? [...base.classNames]
@@ -525,6 +544,35 @@ export default function BookingCalendar({
     }, [bookingModal, isMineBooking]);
 
     const canPayThisBooking = canBook && awaitingPayment && isOwnBooking;
+
+    const paidBooking = useMemo(() => {
+        if (!bookingModal) return false;
+        if (bookingModal?.paid === true) return true;
+        if (bookingModal?.telemostUrl || bookingModal?.joinUrl) return true;
+        return isPaidBookingStatus(bookingModal?.status);
+    }, [bookingModal]);
+
+    const bookingStartMs = useMemo(() => {
+        const s = bookingModal?.startDateTime ? new Date(bookingModal.startDateTime).getTime() : null;
+        return Number.isFinite(s) ? s : null;
+    }, [bookingModal?.startDateTime]);
+
+    const isFutureBooking = useMemo(() => {
+        if (!bookingStartMs) return false;
+        return bookingStartMs > Date.now();
+    }, [bookingStartMs]);
+
+    // ✅ возврат обычно возможен, если до старта больше 24 часов
+    const canRefundThisBooking = useMemo(() => {
+        if (!paidBooking || !isOwnBooking || !isFutureBooking) return false;
+        if (!bookingStartMs) return false;
+        return bookingStartMs - Date.now() >= 24 * 60 * 60 * 1000;
+    }, [paidBooking, isOwnBooking, isFutureBooking, bookingStartMs]);
+
+    const canCancelPaidBooking = useMemo(() => {
+        return paidBooking && isOwnBooking && isFutureBooking;
+    }, [paidBooking, isOwnBooking, isFutureBooking]);
+
 
     // ✅ восстановим holdExpiresAt из localStorage если есть
     useEffect(() => {
@@ -707,11 +755,91 @@ export default function BookingCalendar({
 
     const handleCancelBooking = async () => {
         if (!bookingModal?.id) return;
+        if (!isOwnBooking) {
+            toast.info("Отменить можно только свою запись");
+            return;
+        }
         autoCancelOnceRef.current = true;
         const id = bookingModal.id;
         await cancelBookingById(id);
         setBookingModal(null);
     };
+
+    // ✅ отменить уже оплаченную консультацию (если доступно на бэке)
+    const handleCancelPaidBooking = async () => {
+        if (!bookingModal?.id) return;
+        if (!isOwnBooking) {
+            toast.info("Отменить можно только свою сессию");
+            return;
+        }
+        autoCancelOnceRef.current = true;
+        const id = bookingModal.id;
+
+        try {
+            await cancelBookingById(id, { toastMsg: "Сессия отменена" });
+            setBookingModal(null);
+        } catch (e) {
+            // cancelBookingById уже покажет toast
+        }
+    };
+
+    function extractPaymentId(b) {
+        return (
+            b?.paymentId ??
+            b?.payment_id ??
+            b?.payment?.id ??
+            b?.lastPaymentId ??
+            b?.last_payment_id ??
+            null
+        );
+    }
+
+    // ✅ запрос возврата денег по paymentId (если до сессии > 24ч)
+    const handleRefundBooking = async () => {
+        if (!bookingModal?.id) return;
+        if (!isOwnBooking) {
+            toast.info("Вернуть деньги можно только по своей записи");
+            return;
+        }
+        if (!canRefundThisBooking) {
+            toast.info("Возврат доступен, если до начала сессии больше 24 часов.");
+            return;
+        }
+
+        setRefunding(true);
+        try {
+            let paymentId = extractPaymentId(bookingModal);
+
+            // если в модалке не было paymentId — попробуем получить детали брони
+            if (!paymentId) {
+                try {
+                    const full = await sessionsApi.getBooking(bookingModal.id);
+                    paymentId = extractPaymentId(full);
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            if (!paymentId) {
+                toast.error("Не удалось определить paymentId для возврата (нужно добавить в DTO брони)");
+                return;
+            }
+
+            await paymentsApi.refund(paymentId);
+
+            toast.success("Запрос на возврат отправлен ✅");
+            setBookingModal(null);
+
+            // обновим календарь, чтобы слот освободился, если бэк так делает
+            await load();
+        } catch (e) {
+            console.error(e);
+            toast.error(e?.message || "Не удалось оформить возврат");
+        } finally {
+            setRefunding(false);
+        }
+    };
+
 
     // ✅ запрос статуса оплаты
     const handleCheckPaymentStatus = async (bookingId) => {
@@ -834,6 +962,10 @@ export default function BookingCalendar({
     // ✅ redirect-flow на ЮKassa
     const handleProceedToPayment = async () => {
         if (!bookingModal?.id) return;
+        if (!isOwnBooking) {
+            toast.info("Оплатить может только владелец брони");
+            return;
+        }
 
         paymentStartedRef.current = true;
         autoCancelOnceRef.current = true;
@@ -1033,13 +1165,47 @@ export default function BookingCalendar({
                             )}
                         </>
                     ) : (
-                        <button
-                            className="b-btn b-btn--transparent"
-                            onClick={() => setBookingModal(null)}
-                            disabled={saving}
-                        >
-                            Закрыть
-                        </button>
+                        <>
+                            {canCancelPaidBooking ? (
+                                <button
+                                    className="b-btn b-btn--transparent"
+                                    onClick={handleCancelPaidBooking}
+                                    disabled={saving}
+                                    title={!isFutureBooking ? "Нельзя отменить прошедшую сессию" : ""}
+                                >
+                                    Отменить сессию
+                                </button>
+                            ) : null}
+
+                            {canRefundThisBooking ? (
+                                <button
+                                    className="b-btn b-btn--transparent"
+                                    onClick={handleRefundBooking}
+                                    disabled={saving || refunding}
+                                    title={!canRefundThisBooking ? "Возврат доступен, если до начала больше 24 часов" : ""}
+                                >
+                                    {refunding ? "Оформляем..." : "Вернуть деньги"}
+                                </button>
+                            ) : null}
+
+                            {!canCancelPaidBooking && !canRefundThisBooking ? (
+                                <button
+                                    className="b-btn b-btn--transparent"
+                                    onClick={() => setBookingModal(null)}
+                                    disabled={saving}
+                                >
+                                    Закрыть
+                                </button>
+                            ) : (
+                                <button
+                                    className="b-btn b-btn--transparent"
+                                    onClick={() => setBookingModal(null)}
+                                    disabled={saving || refunding}
+                                >
+                                    Закрыть
+                                </button>
+                            )}
+                        </>
                     )
                 }
             >

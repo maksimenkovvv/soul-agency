@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { notificationsApi } from "../api/notificationsApi";
 import { useNotifications } from "../notifications/notificationsStore";
 import { useToast } from "../ui/toast/ToastProvider";
+import NotificationModal from "../components/ui/NotificationModal";
 
 function nowIso() {
   return new Date().toISOString();
@@ -133,6 +134,8 @@ export default function Notifications() {
   const { unreadNotificationsCount, markAllRead, refreshPreview } = useNotifications();
 
   const [onlyUnread, setOnlyUnread] = React.useState(true);
+  const [selectedNotif, setSelectedNotif] = React.useState(null);
+  const [notifModalOpen, setNotifModalOpen] = React.useState(false);
   const [items, setItems] = React.useState([]);
   const [cursor, setCursor] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -184,18 +187,19 @@ export default function Notifications() {
   }, [onlyUnread]);
 
   const onOpen = async (n) => {
-    // Optimistic read marking in this list
+    if (!n) return;
+
+    // mark as read locally + on server
     if (!n.readAt) {
       setItems((prev) => (prev || []).map((x) => (x.id === n.id ? { ...x, readAt: nowIso() } : x)));
       try {
         await notificationsApi.markRead(n.id);
-        refreshPreview?.();
-      } catch {
-        // just resync later
-      }
+      } catch {}
     }
-    const href = n.linkUrl;
-    if (href) navigate(href);
+
+    // ✅ open modal to read (instead of immediate redirect)
+    setSelectedNotif(n);
+    setNotifModalOpen(true);
   };
 
   const onReadAll = async () => {
@@ -324,6 +328,24 @@ export default function Notifications() {
           )}
         </div>
       )}
+      <NotificationModal
+              open={notifModalOpen}
+              notification={selectedNotif}
+              onClose={() => {
+                setNotifModalOpen(false);
+                setSelectedNotif(null);
+              }}
+              onGo={(href) => {
+                if (!href) return;
+                setNotifModalOpen(false);
+                setSelectedNotif(null);
+                if (/^https?:\/\//i.test(String(href))) {
+                  window.open(href, "_blank", "noopener,noreferrer");
+                } else {
+                  navigate(href);
+                }
+              }}
+            />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useNotifications } from "../notifications/notificationsStore";
+import NotificationModal from "./ui/NotificationModal";
 
 function formatTime(iso) {
     if (!iso) return "";
@@ -91,6 +92,9 @@ export default function NotificationBell() {
 
     const [open, setOpen] = useState(false);
 
+    const [selectedNotif, setSelectedNotif] = useState(null);
+    const [notifModalOpen, setNotifModalOpen] = useState(false);
+
     // ✅ ring state
     const [ring, setRing] = useState(false);
     const prevBadgeRef = useRef(0);
@@ -177,16 +181,11 @@ export default function NotificationBell() {
     }, [open]);
 
     const openNotif = (n) => {
+        if (!n) return;
         markRead(n.id);
         setOpen(false);
-
-        const href = n?.linkUrl || n?.meta?.href;
-        if (href) navigate(href);
-        else {
-            const t = String(n?.type || "").toUpperCase();
-            if (t.includes("CHAT") || t.includes("MESSAGE")) navigate("/chat");
-            else if (t.includes("SESSION") || t.includes("APPOINT") || t.includes("BOOK")) navigate("/sessions");
-        }
+        setSelectedNotif(n);
+        setNotifModalOpen(true);
     };
 
     return (
@@ -297,6 +296,26 @@ export default function NotificationBell() {
                     </div>
                 </div>
             )}
+
+            <NotificationModal
+                open={notifModalOpen}
+                notification={selectedNotif}
+                onClose={() => {
+                    setNotifModalOpen(false);
+                    setSelectedNotif(null);
+                }}
+                onGo={(href) => {
+                    if (!href) return;
+                    setNotifModalOpen(false);
+                    setSelectedNotif(null);
+                    if (/^https?:\/\//i.test(String(href))) {
+                        window.open(href, "_blank", "noopener,noreferrer");
+                    } else {
+                        navigate(href);
+                    }
+                }}
+            />
+
         </div>
     );
 }

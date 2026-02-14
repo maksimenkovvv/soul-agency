@@ -220,6 +220,7 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
             : Boolean(auth?.isAuthed ?? auth?.token ?? auth?.me);
 
     const bookingIdParam = searchParams.get("bookingId");
+    const groupSessionIdParam = searchParams.get("groupSessionId");
     const paymentReturn = searchParams.get("payment") === "return";
 
     const autoOpenedRef = useRef(false);
@@ -246,8 +247,70 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
     // ✅ модалка
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
+    const [myGroupMap, setMyGroupMap] = useState(() => new Map());
+
+    // ✅ карта "уже записан" для групповых (sessionId -> bookingId?)
+    useEffect(() => {
+        let alive = true;
+
+        (async () => {
+            try {
+                const data = isAuthed
+                    ? await appointmentsApi.listMyAll().catch(() => [])
+                    : appointmentsApi.listLocalGroupJoins();
+
+                const list = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data?.items)
+                        ? data.items
+                        : Array.isArray(data?.content)
+                            ? data.content
+                            : [];
+
+                const m = new Map();
+
+                for (const a of list || []) {
+                    const t = String(a?.type || a?.bookingType || a?.appointmentType || "").toUpperCase();
+                    if (t !== "GROUP") continue;
+
+                    const sid = pickGroupSessionIdFromAppointment(a);
+                    if (!sid) continue;
+
+                    const bid = a?.id ?? a?.bookingId ?? a?.booking_id ?? null;
+                    m.set(String(sid), bid != null ? String(bid) : "");
+                }
+
+                if (!alive) return;
+                setMyGroupMap(m);
+            } catch (e) {
+                // ignore
+            }
+        })();
+
+        return () => {
+            alive = false;
+        };
+    }, [isAuthed]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const [detailLoading, setDetailLoading] = useState(false);
     const [payLoading, setPayLoading] = useState(false);
+
+    // ✅ если map обновился (например, после join) — обновим модалку
+    useEffect(() => {
+        if (!modalOpen) return;
+        if (!selectedSession?.id) return;
+
+        const sid = String(selectedSession.id);
+        const joined = myGroupMap.has(sid);
+        const bid = myGroupMap.get(sid) || null;
+
+        setSelectedSession((prev) => {
+            if (!prev || String(prev.id) !== sid) return prev;
+            if (Boolean(prev.alreadyJoined) === joined && String(prev.joinedBookingId || "") === String(bid || "")) return prev;
+            return { ...prev, alreadyJoined: joined, joinedBookingId: bid };
+        });
+    }, [myGroupMap, modalOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
     const closeModal = () => {
         setModalOpen(false);
@@ -267,9 +330,15 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
             const d = await sessionsApi.getPublicGroupSession(row.id);
             const normalized = normalizeGroupSession(d);
 
+            const sid = String(normalized?.id ?? row.id);
+            const joined = myGroupMap.has(sid) || Boolean(extra?.alreadyJoined);
+            const bid = extra?.joinedBookingId || myGroupMap.get(sid) || null;
+
             setSelectedSession(
                 toPsychologistModalSession(normalized, {
                     paymentReturn: Boolean(paymentReturn),
+                    alreadyJoined: joined,
+                    joinedBookingId: bid,
                     ...extra,
                 })
             );
@@ -285,6 +354,20 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
     const handlePay = async (sessionObj) => {
         const sessionId = sessionObj?.id;
         if (!sessionId) return;
+
+        const sid = String(sessionId);
+        const already = Boolean(sessionObj?.alreadyJoined) || myGroupMap.has(sid);
+
+        // ✅ если уже записан — не начинаем оплату повторно
+        if (already) {
+            const tele = sessionObj?.telemostUrl;
+            if (tele) {
+                window.open(tele, "_blank", "noopener,noreferrer");
+                return;
+            }
+            toast.info("Вы уже записались на эту сессию");
+            return;
+        }
 
         // ✅ если уже есть paymentUrl — просто уходим
         if (sessionObj?.paymentUrl) {
@@ -302,13 +385,31 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
             setPayLoading(true);
 
             // 1) join (если уже вступил — ок)
+            let joinRes = null;
             try {
                 if (typeof sessionsApi?.joinGroupSession === "function") {
-                    await sessionsApi.joinGroupSession(sessionId);
+                    joinRes = await sessionsApi.joinGroupSession(sessionId);
                 }
             } catch (e) {
                 // ignore (already joined etc.)
             }
+
+            const joinedBookingId =
+                joinRes?.bookingId || joinRes?.id || joinRes?.booking?.id || null;
+
+            // ✅ запоминаем локально, чтобы UI мог отрисовать "уже записан"
+            appointmentsApi.rememberLocalGroupJoin(sessionId, joinedBookingId, {
+                title: sessionObj?.title || sessionObj?.name || null,
+                coverUrl: sessionObj?.image || null,
+                status: "PAID",
+            });
+
+            // ✅ обновляем map в памяти
+            setMyGroupMap((prev) => {
+                const m = new Map(prev);
+                m.set(sid, joinedBookingId != null ? String(joinedBookingId) : "");
+                return m;
+            });
 
             // 2) start payment
             let pay = null;
@@ -332,6 +433,7 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
             setPayLoading(false);
         }
     };
+
 
     // ✅ авто-открытие: /sessions?bookingId=67&payment=return
     useEffect(() => {
@@ -424,6 +526,23 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
             cancelled = true;
         };
     }, [bookingIdParam, paymentReturn, isAuthed, navigate, toast]);
+
+
+    // ✅ авто-открытие по groupSessionId: /sessions?groupSessionId=123
+    useEffect(() => {
+        if (autoOpenedRef.current) return;
+        if (!groupSessionIdParam) return;
+
+        autoOpenedRef.current = true;
+
+        const sid = String(groupSessionIdParam);
+        const joined = myGroupMap.has(sid);
+        const bid = myGroupMap.get(sid) || null;
+
+        // открываем напрямую, даже если список ещё не загружен
+        openSession({ id: sid }, { alreadyJoined: joined, joinedBookingId: bid });
+    }, [groupSessionIdParam]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
     // ✅ загрузка списка групповых
     useEffect(() => {
@@ -577,7 +696,7 @@ export default function OurGroupSessions({ showTitle = true, query, allowLoadMor
                                     <button
                                         type="button"
                                         className="psychologists__item-content__arrow"
-                                        onClick={() => openSession(s)}
+                                        onClick={() => openSession(s, { alreadyJoined: myGroupMap.has(String(s.id)), joinedBookingId: myGroupMap.get(String(s.id)) || null })}
                                         aria-label={`Подробнее: ${s.title}`}
                                         title="Подробнее"
                                     >

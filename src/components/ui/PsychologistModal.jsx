@@ -27,6 +27,7 @@ function PsychologistModal({
                                onPay, // вызывается в session режиме по кнопке снизу
                                loading = false,
                                payLabel = "Перейти к оплате",
+                               payLoading = false,
                            }) {
     const ANIM_MS = 280;
 
@@ -142,6 +143,12 @@ function PsychologistModal({
 
     const placesLabel = capacityClients ? `${participantsCount}/${capacityClients}` : String(participantsCount);
 
+    const alreadyJoined = Boolean(psychologist?.alreadyJoined) ||
+        Boolean(psychologist?.joinedBookingId) ||
+        ["PAID", "JOINED", "BOOKED", "CONFIRMED", "SUCCEEDED"].includes(String(psychologist?.status || "").toUpperCase());
+
+    const paymentReturnFlag = Boolean(psychologist?.paymentReturn);
+
     const renderContent = () => {
         // ======= GROUP SESSION =======
         if (type === "session") {
@@ -220,21 +227,69 @@ function PsychologistModal({
                         <div className="psychologist-modal__bottom-price">{priceLabel}</div>
                         <div className="psychologist-modal__bottom-date">{psychologist.date || "—"}</div>
 
-                        <button
-                            type="button"
-                            className="psychologist-modal__bottom-button b-btn"
-                            onClick={() => (onPay ? onPay(psychologist) : alert("Оплата/Запись"))}
-                            disabled={loading}
-                            title={loading ? "Загрузка..." : payLabel}
-                        >
-                            {loading ? "Загрузка…" : payLabel}
-                        </button>
+                        {alreadyJoined ? (
+                            <>
+                                {paymentReturnFlag ? (
+                                    <div
+                                        style={{
+                                            width: "100%",
+                                            marginTop: 10,
+                                            padding: "10px 12px",
+                                            borderRadius: 12,
+                                            background: "rgba(46, 204, 113, 0.12)",
+                                            border: "1px solid rgba(46, 204, 113, 0.22)",
+                                            fontSize: 13,
+                                        }}
+                                    >
+                                        ✅ Оплата/запись принята. Если доступна ссылка — откройте встречу ниже.
+                                    </div>
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: "100%",
+                                            marginTop: 10,
+                                            padding: "10px 12px",
+                                            borderRadius: 12,
+                                            background: "rgba(136, 133, 255, 0.10)",
+                                            border: "1px solid rgba(0,0,0,0.08)",
+                                            fontSize: 13,
+                                        }}
+                                    >
+                                        Вы уже записались на эту групповую сессию.
+                                    </div>
+                                )}
+
+                                <button
+                                    type="button"
+                                    className="psychologist-modal__bottom-button b-btn"
+                                    onClick={() => {
+                                        if (psychologist?.telemostUrl) {
+                                            window.open(psychologist.telemostUrl, "_blank", "noopener,noreferrer");
+                                        }
+                                    }}
+                                    disabled={!psychologist?.telemostUrl}
+                                    title={!psychologist?.telemostUrl ? "Ссылка будет доступна ближе к началу" : "Открыть встречу"}
+                                >
+                                    {psychologist?.telemostUrl ? "Открыть встречу" : "Ссылка недоступна"}
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                type="button"
+                                className="psychologist-modal__bottom-button b-btn"
+                                onClick={() => (onPay ? onPay(psychologist) : alert("Оплата/Запись"))}
+                                disabled={loading || payLoading}
+                                title={loading || payLoading ? "Загрузка..." : payLabel}
+                            >
+                                {loading || payLoading ? "Загрузка…" : payLabel}
+                            </button>
+                        )}
                     </div>
                 </>
             );
         }
 
-        // ======= PSYCHOLOGIST (встроенный календарь) =======
+// ======= PSYCHOLOGIST (встроенный календарь) =======
         return (
             <>
                 <div className="psychologist-modal__avatar">

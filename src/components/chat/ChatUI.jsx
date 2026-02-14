@@ -299,6 +299,38 @@ export default function ChatUI() {
 
     const [viewer, setViewer] = React.useState({ open: false, index: 0 });
 
+    // ✅ Mobile UX (Telegram-like): on small screens show list OR chat, with Back button
+    const [isMobile, setIsMobile] = React.useState(() => {
+        try {
+            return window.matchMedia('(max-width: 768px)').matches;
+        } catch {
+            return false;
+        }
+    });
+
+    React.useEffect(() => {
+        let mql;
+        try {
+            mql = window.matchMedia('(max-width: 768px)');
+        } catch {
+            return;
+        }
+
+        const onChange = (e) => setIsMobile(!!e.matches);
+        // Safari
+        if (mql.addEventListener) mql.addEventListener('change', onChange);
+        else mql.addListener(onChange);
+
+        // initial
+        setIsMobile(!!mql.matches);
+
+        return () => {
+            if (!mql) return;
+            if (mql.removeEventListener) mql.removeEventListener('change', onChange);
+            else mql.removeListener(onChange);
+        };
+    }, []);
+
     /* -------------------- scroll remember (per dialog) -------------------- */
 
     const scrollStoreRef = React.useRef(new Map()); // did -> state
@@ -988,7 +1020,7 @@ export default function ChatUI() {
     /* -------------------- render -------------------- */
 
     return (
-        <div className="b-chat">
+        <div className={`b-chat ${isMobile ? "b-chat--mobile" : ""} ${isMobile ? (activeDialog ? "b-chat--mobile-main" : "b-chat--mobile-list") : ""}`}>
             <ChatSidebar
                 dialogs={dialogs}
                 loading={dialogsLoading}
@@ -1031,6 +1063,20 @@ export default function ChatUI() {
 
 
                             <div className="chat__topbar-left">
+                                {isMobile ? (
+                                    <button
+                                        type="button"
+                                        className="chat__back"
+                                        onClick={() => openDialog(null)}
+                                        aria-label="Назад к списку"
+                                        title="Назад"
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </button>
+                                ) : null}
+
                                 <div className="chat__avatar">
                                     {activeDialog.avatarUrl ? <img src={activeDialog.avatarUrl} alt="" /> : <div className="chat__avatar-fallback" />}
                                 </div>

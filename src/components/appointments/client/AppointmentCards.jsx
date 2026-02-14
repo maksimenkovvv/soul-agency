@@ -135,9 +135,14 @@ function AppointmentCards({ filter }) {
             try {
                 setLoading(true);
                 setError("");
-
-                const data = await appointmentsApi.listMy();
-                const list = Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
+                const data = await appointmentsApi.listMyAll();
+                const list = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data?.content)
+                        ? data.content
+                        : Array.isArray(data?.items)
+                            ? data.items
+                            : [];
 
                 const normalized = list.map((a) => {
                     const statusGroup = getStatusGroup(a.startDateTime, a.endDateTime);
@@ -146,7 +151,21 @@ function AppointmentCards({ filter }) {
                     const status = String(a?.status || "").toUpperCase();
 
                     const paymentUrl = a.paymentUrl || a.confirmationUrl || a.payUrl || null;
-                    const telemostUrl = a.telemostUrl || a.joinUrl || null;
+                    const telemostUrl = a.telemostUrl || a.joinUrl || a.meetingUrl || null;
+
+                    const type = String(a?.type || a?.sessionType || "").toUpperCase() || null;
+                    const groupSessionId = a.groupSessionId || a.group_session_id || a.sessionId || a.session_id || null;
+
+                    // ✅ title/name for group sessions
+                    const displayName =
+                        type === "GROUP"
+                            ? a.sessionTitle || a.title || a.name || "Групповая сессия"
+                            : a.psychologistName || a.psychologist?.name || "Психолог";
+
+                    const photo =
+                        type === "GROUP"
+                            ? (a.sessionCoverUrl || a.coverUrl || a.imageUrl || photoFallback)
+                            : (a.psychologistAvatarUrl || a.psychologist?.avatarUrl || photoFallback);
 
                     // ✅ Платить можно ТОЛЬКО если pending
                     const canPay =
@@ -154,12 +173,21 @@ function AppointmentCards({ filter }) {
                         (status === "PENDING_PAYMENT" || status === "PENDING") &&
                         (statusGroup === "upcoming" || statusGroup === "today");
 
+                    // details link (supports bookingId OR direct groupSessionId)
+                    const detailsLink =
+                        type === "GROUP"
+                            ? groupSessionId
+                                ? `/sessions?groupSessionId=${encodeURIComponent(String(groupSessionId))}`
+                                : "/sessions"
+                            : buildDetailsLink(a);
+
                     return {
                         id: a.id,
-                        type: a.type,
+                        type,
+                        groupSessionId,
                         psychologistId: a.psychologistId,
-                        name: a.psychologistName || a.psychologist?.name || "Психолог",
-                        photo: a.psychologistAvatarUrl || a.psychologist?.avatarUrl || photoFallback,
+                        name: displayName,
+                        photo,
                         price: a.priceRub ?? a.priceAtTime ?? a.price ?? null,
                         startDateTime: a.startDateTime,
                         endDateTime: a.endDateTime,
@@ -171,6 +199,7 @@ function AppointmentCards({ filter }) {
 
                         paymentUrl,
                         telemostUrl,
+                        detailsLink,
                     };
                 });
 
@@ -278,7 +307,7 @@ function AppointmentCards({ filter }) {
                         const payUi = derivePaymentUi(appointment);
 
                         const isUpcoming = appointment.statusGroup === "upcoming" || appointment.statusGroup === "today";
-                        const detailsLink = buildDetailsLink(appointment);
+                        const detailsLink = appointment.detailsLink || buildDetailsLink(appointment);
 
                         return (
                             <div key={appointment.id} className="appointments-cards__item">
