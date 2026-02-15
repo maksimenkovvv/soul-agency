@@ -353,8 +353,8 @@ export default function OurPsychologists({
           bookingId: appointment?.id
             ? String(appointment.id)
             : bookingIdParam
-            ? String(bookingIdParam)
-            : null,
+              ? String(bookingIdParam)
+              : null,
           paymentReturn: Boolean(paymentReturn),
 
           // если в appointment есть выбранное время
@@ -500,116 +500,111 @@ export default function OurPsychologists({
       <div className="psychologists__item-wrapper">
         {loading
           ? Array.from({ length: limit || 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="psychologists__item psychologists__item--skeleton"
-              >
-                <div className="psychologists__item-image" />
-                <div className="psychologists__item-content" />
-              </div>
-            ))
+            <div
+              key={i}
+              className="psychologists__item psychologists__item--skeleton"
+            >
+              <div className="psychologists__item-image" />
+              <div className="psychologists__item-content" />
+            </div>
+          ))
           : displayed.map((p) => {
-              const isFav = fav.isFavourite(p.id);
-              const imgSrc = p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER;
+            const isFav = fav.isFavourite(p.id);
+            const imgSrc = p.avatarUrl ? resolveUrl(p.avatarUrl) : PLACEHOLDER;
 
-              const raw = p?.raw || {};
-              const method = pickMethodName(raw);
-              const themes = pickThemesText(raw);
+            const raw = p?.raw || {};
+            const method = pickMethodName(raw);
+            const themes = pickThemesText(raw);
 
-              return (
-                <div
-                  key={p.id}
-                  className="psychologists__item"
-                >
-                  <div className="psychologists__item-image">
+            return (
+              <div
+                key={p.id}
+                className="psychologists__item"
+              >
+                <div className="psychologists__item-image">
+                  <img
+                    src={imgSrc}
+                    alt={p.name}
+                    onError={(e) => {
+                      e.currentTarget.src = PLACEHOLDER;
+                    }}
+                  />
+                </div>
+
+                <div className="psychologists__item-info">
+                  <div
+                    className="psychologists__item-info__close"
+                    onClick={() => toggleInfo(p.id)}
+                  >
                     <img
-                      src={imgSrc}
-                      alt={p.name}
-                      onError={(e) => {
-                        e.currentTarget.src = PLACEHOLDER;
-                      }}
+                      src={openInfoIds.includes(p.id) ? closeBtn : openBtn}
+                      alt=""
                     />
                   </div>
-
-                  <div className="psychologists__item-info">
-                    <div
-                      className="psychologists__item-info__close"
-                      onClick={() => toggleInfo(p.id)}
-                    >
-                      <img
-                        src={openInfoIds.includes(p.id) ? closeBtn : openBtn}
-                        alt=""
-                      />
-                    </div>
-                    <div
-                      className={`psychologists__item-info__wrapper ${
-                        openInfoIds.includes(p.id) ? 'is-open' : ''
+                  <div
+                    className={`psychologists__item-info__wrapper ${openInfoIds.includes(p.id) ? 'is-open' : ''
                       }`}
-                    >
-                      <div className="psychologists__item-info__item">
-                        <span>Опыт:</span> {p.experience}
-                      </div>
-                      <div className="psychologists__item-info__item">
-                        <span>Метод:</span> {method}
-                      </div>
-                      <div className="psychologists__item-info__item">
-                        <span>Темы:</span> {themes}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="psychologists__item-content">
-                    <button
-                      type="button"
-                      className={`psychologists__item-content__favourites ${
-                        isFav ? 'is-active' : ''
-                      }`}
-                      onClick={() => toggleFavourite(p.id)}
-                      aria-label={isFav ? 'Убрать из избранного' : 'В избранное'}
-                      title={isFav ? 'Убрать из избранного' : 'В избранное'}
-                    >
-                      <HeartIcon active={isFav} />
-                    </button>
-
-                    <button
-                      type="button"
-                      className="psychologists__item-content__arrow"
-                      onClick={() => openModal(p)}
-                      aria-label={`Подробнее о психологе ${p.name}`}
-                      title="Подробнее"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                      >
-                        <path
-                          d="M1 8H15M15 8L8 1M15 8L8 15"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
-
-                    <Link
-                      to={`/psychologist/${p.id}`}
-                      className="psychologists__item-content__name"
-                    >
-                      {p.name}
-                    </Link>
-
-                    <p className="psychologists__item-content__experience">
+                  >
+                    <div className="psychologists__item-info__item">
                       <span>Опыт:</span> {p.experience}
-                    </p>
-
-                    <p className="psychologists__item-content__price">{p.price}</p>
+                    </div>
+                    <div className="psychologists__item-info__item">
+                      <span>Метод:</span> {method}
+                    </div>
+                    <div className="psychologists__item-info__item">
+                      <span>Темы:</span> {themes}
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="psychologists__item-content">
+                  <button
+                    type="button"
+                    className={`psychologists__item-content__favourites ${isFav ? 'is-active' : ''
+                      }`}
+                    onClick={() => toggleFavourite(p.id)}
+                    aria-label={isFav ? 'Убрать из избранного' : 'В избранное'}
+                    title={isFav ? 'Убрать из избранного' : 'В избранное'}
+                  >
+                    <HeartIcon active={isFav} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="psychologists__item-content__arrow"
+                    onClick={() => openModal(p)}
+                    aria-label={`Подробнее о психологе ${p.name}`}
+                    title="Подробнее"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                    >
+                      <path
+                        d="M1 8H15M15 8L8 1M15 8L8 15"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <p className="psychologists__item-content__name">
+                    {p.name}
+                  </p>
+
+                  <p className="psychologists__item-content__experience">
+                    <span>Опыт:</span> {p.experience}
+                  </p>
+
+                  <p className="psychologists__item-content__price">{p.price}</p>
+                </div>
+              </div>
+            );
+          })}
       </div>
 
       {!loading && displayed.length === 0 ? (

@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop'
 
 import Main from './pages/Main';
 import About from './pages/About';
@@ -21,6 +22,7 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 
 import NotFound from './pages/NotFound';
+
 
 import './scss/app.scss';
 
@@ -227,65 +229,67 @@ function App() {
       <div className="wrapper">
         {!hideHeader && <Header />}
 
-        <Routes>
-          <Route
-            path="/"
-            element={<Main />}
-          />
-          <Route
-            path="/about"
-            element={<About />}
-          />
-          <Route
-            path="/psychologist"
-            element={<Psychologist />}
-          />
-          <Route
-            path="/sessions"
-            element={<Sessions />}
-          />
-          <Route
-            path="/login"
-            element={<Login />}
-          />
-          <Route
-            path="/403"
-            element={<Forbidden />}
-          />
+        <ScrollToTop>
+          <Routes>
+            <Route
+              path="/"
+              element={<Main />}
+            />
+            <Route
+              path="/about"
+              element={<About />}
+            />
+            <Route
+              path="/psychologist"
+              element={<Psychologist />}
+            />
+            <Route
+              path="/sessions"
+              element={<Sessions />}
+            />
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+            <Route
+              path="/403"
+              element={<Forbidden />}
+            />
 
-          <Route
-            path="/blog"
-            element={<Blog />}
-          />
-          <Route
-            path="/blog/:slug"
-            element={<BlogPost />}
-          />
+            <Route
+              path="/blog"
+              element={<Blog />}
+            />
+            <Route
+              path="/blog/:slug"
+              element={<BlogPost />}
+            />
 
-          <Route element={<ProtectedRoute roles={['CLIENT', 'PSYCHOLOGIST', 'ADMIN']} />}>
-            <Route
-              path="/dashboard"
-              element={<Dashboard />}
-            />
-            <Route
-              path="/dashboard/settings"
-              element={<Settings />}
-            />
-            <Route
-              path="/chat"
-              element={<Chat />}
-            />
-            <Route
-              path="/notifications"
-              element={<Notifications />}
-            />
-          </Route>
+            <Route element={<ProtectedRoute roles={['CLIENT', 'PSYCHOLOGIST', 'ADMIN']} />}>
+              <Route
+                path="/dashboard"
+                element={<Dashboard />}
+              />
+              <Route
+                path="/dashboard/settings"
+                element={<Settings />}
+              />
+              <Route
+                path="/chat"
+                element={<Chat />}
+              />
+              <Route
+                path="/notifications"
+                element={<Notifications />}
+              />
+            </Route>
 
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
-        </Routes>
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
+          </Routes>
+        </ScrollToTop>
 
         {!hideFooter && <Footer />}
       </div>

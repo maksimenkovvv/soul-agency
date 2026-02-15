@@ -17,6 +17,11 @@
       font-size: 22px;
       line-height: 26px;
       font-weight: 700;
+
+      @include mediaMax('tablet') {
+        font-size: 20px;
+        line-height: 24px;
+      }
     }
 
     &__refresh {
@@ -35,9 +40,13 @@
 
     &__items {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
       min-width: 0;
+
+      @include mediaMax('tablet') {
+        grid-template-columns: minmax(0, 1fr);
+      }
     }
 
     &__item {
@@ -154,20 +163,6 @@
       font-size: 13px;
       line-height: 16px;
       color: rgba($black, 0.55);
-    }
-  }
-}
-
-@include mediaMax('tablet') {
-  .b-payments {
-    .payments {
-      &__items {
-        grid-template-columns: 1fr;
-      }
-
-      &__title {
-        font-size: 20px;
-      }
     }
   }
 }
