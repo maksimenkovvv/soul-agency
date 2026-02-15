@@ -154,7 +154,7 @@ function SmartCaptchaBox({ siteKey, onToken, onError, resetKey, disabled }) {
                 if (widgetIdRef.current != null && window.smartCaptcha?.reset) {
                     window.smartCaptcha.reset(widgetIdRef.current);
                 }
-            } catch {}
+            } catch { }
 
             try {
                 widgetIdRef.current = window.smartCaptcha.render(containerIdRef.current, {
@@ -174,7 +174,7 @@ function SmartCaptchaBox({ siteKey, onToken, onError, resetKey, disabled }) {
                 if (widgetIdRef.current != null && window.smartCaptcha?.reset) {
                     window.smartCaptcha.reset(widgetIdRef.current);
                 }
-            } catch {}
+            } catch { }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteKey, resetKey]);
@@ -244,6 +244,9 @@ export default function Login() {
     const [code, setCode] = useState(Array.from({ length: CODE_LEN }, () => ''));
     const [isPolicyChecked, setIsPolicyChecked] = useState(false);
     const [checkboxError, setCheckboxError] = useState(false);
+
+    const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
+    const [ageCheckboxError, setAgeCheckboxError] = useState(false);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
@@ -481,7 +484,9 @@ export default function Login() {
             confirmPassword: '',
         }));
         setIsPolicyChecked(false);
+        setIsAgeConfirmed(false);
         setCheckboxError(false);
+        setAgeCheckboxError(false);
         clearFieldErrors();
         clearNotice();
     };
@@ -818,6 +823,13 @@ export default function Login() {
         }
         setCheckboxError(false);
 
+        if (!isLoginMode && !isAgeConfirmed) {
+            setAgeCheckboxError(true);
+            showWarn('Подтвердите, что вам исполнилось 18 лет.');
+            return;
+        }
+        setAgeCheckboxError(false);
+
         const cap = requireCaptchaToken();
         if (cap === null) return;
 
@@ -885,9 +897,9 @@ export default function Login() {
 
     const noticeStyle = noticeBoxStyle(notice?.type);
 
-// ===== captcha visibility =====
+    // ===== captcha visibility =====
     const showCaptcha = captchaEnabled && !inCodeStep && !isPasswordChangeMode;
-// В code-step капча нужна для "Выслать код повторно" (backend обычно требует captchaToken)
+    // В code-step капча нужна для "Выслать код повторно" (backend обычно требует captchaToken)
     const showCaptchaInCode = captchaEnabled && inCodeStep;
 
     return (
@@ -982,16 +994,16 @@ export default function Login() {
                                             className="login__badge login__badge--danger"
                                             style={badgeStyle('danger')}
                                         >
-                      Блокировка: {formatMMSS(lockLeft || 0)}
-                    </span>
+                                            Блокировка: {formatMMSS(lockLeft || 0)}
+                                        </span>
                                     ) : (
                                         <span
                                             className="login__badge login__badge--info"
                                             style={badgeStyle('info')}
                                         >
-                      Попыток: {attemptsLeft}
+                                            Попыток: {attemptsLeft}
                                             {attemptsLeft > 0 ? ` / ${DEFAULT_MAX_ATTEMPTS}` : ''}
-                    </span>
+                                        </span>
                                     )}
 
                                     {!canResend ? (
@@ -999,15 +1011,15 @@ export default function Login() {
                                             className="login__badge login__badge--muted"
                                             style={badgeStyle('muted')}
                                         >
-                      Повтор через: {formatMMSS(resendLeft || 0)}
-                    </span>
+                                            Повтор через: {formatMMSS(resendLeft || 0)}
+                                        </span>
                                     ) : (
                                         <span
                                             className="login__badge login__badge--muted"
                                             style={badgeStyle('muted')}
                                         >
-                      Код: {CODE_LEN} цифр
-                    </span>
+                                            Код: {CODE_LEN} цифр
+                                        </span>
                                     )}
                                 </div>
 
@@ -1071,9 +1083,8 @@ export default function Login() {
                             <div className="login__form-group">
                                 <label className="login__label">Новый пароль</label>
                                 <div
-                                    className={`login__field-wrap ${focus.newPassword ? 'is-focus' : ''} ${
-                                        isLoading ? 'is-disabled' : ''
-                                    } ${fieldErrors.newPassword ? 'is-error' : ''}`}
+                                    className={`login__field-wrap ${focus.newPassword ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''
+                                        } ${fieldErrors.newPassword ? 'is-error' : ''}`}
                                 >
                                     <input
                                         type={showNewPassword ? 'text' : 'password'}
@@ -1105,9 +1116,8 @@ export default function Login() {
                             <div className="login__form-group">
                                 <label className="login__label">Повторить пароль</label>
                                 <div
-                                    className={`login__field-wrap ${focus.confirmPassword ? 'is-focus' : ''} ${
-                                        isLoading ? 'is-disabled' : ''
-                                    } ${fieldErrors.confirmPassword ? 'is-error' : ''}`}
+                                    className={`login__field-wrap ${focus.confirmPassword ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''
+                                        } ${fieldErrors.confirmPassword ? 'is-error' : ''}`}
                                 >
                                     <input
                                         type={showConfirmPassword ? 'text' : 'password'}
@@ -1178,9 +1188,8 @@ export default function Login() {
                                         <label className="login__label">Пароль</label>
 
                                         <div
-                                            className={`login__field-wrap ${focus.password ? 'is-focus' : ''} ${
-                                                isLoading ? 'is-disabled' : ''
-                                            } ${fieldErrors.password ? 'is-error' : ''}`}
+                                            className={`login__field-wrap ${focus.password ? 'is-focus' : ''} ${isLoading ? 'is-disabled' : ''
+                                                } ${fieldErrors.password ? 'is-error' : ''}`}
                                         >
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
@@ -1248,31 +1257,48 @@ export default function Login() {
                                         />
                                         <span className="label__checkbox-custom" />
                                         <span className="label__text">
-                      Я ознакомлен(а) и принимаю условия{' '}
+                                            Я ознакомлен(а) и принимаю условия{' '}
                                             <a
                                                 href={userAgreement}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                        Пользовательского соглашения
-                      </a>{' '}
+                                                Пользовательского соглашения
+                                            </a>{' '}
                                             и даю согласие на{' '}
                                             <a
                                                 href={personalData}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                        Обработку персональных данных
-                      </a>{' '}
+                                                Обработку персональных данных
+                                            </a>{' '}
                                             в соответствии с{' '}
                                             <a
                                                 href={privacyPolicy}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                        Политикой конфиденциальности.
-                      </a>
-                    </span>
+                                                Политикой конфиденциальности.
+                                            </a>
+                                        </span>
+                                    </label>
+
+                                    <label className="login__policy-label label">
+                                        <input
+                                            type="checkbox"
+                                            className={`label__checkbox ${ageCheckboxError ? 'error' : ''}`}
+                                            checked={isAgeConfirmed}
+                                            onChange={() => {
+                                                setIsAgeConfirmed((v) => !v);
+                                                setAgeCheckboxError(false);
+                                            }}
+                                            disabled={isLoading}
+                                        />
+                                        <span className="label__checkbox-custom" />
+                                        <span className="label__text">
+                                            Я подтверждаю, что мне исполнилось 18 лет и имею право пользоваться сервисом.
+                                        </span>
                                     </label>
 
                                     <label className="login__policy-label label">
@@ -1283,20 +1309,8 @@ export default function Login() {
                                         />
                                         <span className="label__checkbox-custom" />
                                         <span className="label__text">
-                      Я подтверждаю, что мне исполнилось 18 лет и имею право пользоваться сервисом.
-                    </span>
-                                    </label>
-
-                                    <label className="login__policy-label label">
-                                        <input
-                                            type="checkbox"
-                                            className="label__checkbox"
-                                            disabled={isLoading}
-                                        />
-                                        <span className="label__checkbox-custom" />
-                                        <span className="label__text">
-                      Хочу получать информацию о персональных предложениях и акциях.
-                    </span>
+                                            Хочу получать информацию о персональных предложениях и акциях.
+                                        </span>
                                     </label>
                                 </div>
                             )}

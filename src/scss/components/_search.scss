@@ -49,6 +49,18 @@
   &__apptFilters {
     margin-left: 10px;
     flex: 0 0 auto;
+
+    @include mediaMax('tablet') {
+      width: 100%;
+
+      .b-appointment-filters {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 6px;
+      }
+    }
+
   }
 }
 

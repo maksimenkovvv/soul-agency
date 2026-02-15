@@ -5,7 +5,7 @@ import PsychologistAppointments from './psycho/PsychologistAppointments';
 
 function Appointments({ user }) {
     return (
-        <div className="b-appointments">
+        <>
             {user.role === 'CLIENT' ? (
                 /*Компонент, выводящий контент во вкладке "Записи" в случае, если роль "Клиент"*/
                 <ClientAppointments user={user} />
@@ -13,7 +13,7 @@ function Appointments({ user }) {
                 /*Компонент, выводящий контент во вкладке "Записи" в случае, если роль "Психолог"*/
                 <PsychologistAppointments user={user} />
             )}
-        </div>
+        </>
     );
 }
 

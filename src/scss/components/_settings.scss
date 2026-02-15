@@ -151,9 +151,10 @@
                   }
 
                   &-visible {
+                    position: absolute;
                     transform: translateX(-50%);
                     right: 43%;
-                    bottom: 17px;
+                    bottom: 11px;
                   }
                 }
               }
@@ -524,7 +525,7 @@
           .login__input-visible {
             right: 14px !important;
             bottom: auto !important;
-            top: 40% !important;
+            top: 44% !important;
             transform: translateY(-50%) !important;
           }
         }

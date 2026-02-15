@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import {useAuth} from "../../../auth/authStore";
+import { useAuth } from "../../../auth/authStore";
 import BookingCalendar from "../../calendar/BookingCalendar";
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL ?? "http://localhost:8080";
@@ -34,18 +34,20 @@ function PsychologistAppointments() {
     // Если тут может оказаться ADMIN — тоже ок (тогда покажешь записи админа как “психолога”).
     // Если не надо — можно просто: if (role !== "PSYCHOLOGIST") return null;
     return (
-        <div className="b-sessions-page">
-            <div className="b-sessions-page__head">
-                <h2>Записи</h2>
-                <p>Ваши активные записи на сессии в календаре.</p>
-            </div>
+        <div className="b-appointments">
+            < div className="b-sessions-page" >
+                <div className="b-sessions-page__head">
+                    <h2>Записи</h2>
+                    <p>Ваши активные записи на сессии в календаре.</p>
+                </div>
 
-            <BookingCalendar
-                psychologist={psychologist}
-                mode="PSYCHOLOGIST"
-                // можно добавить колбэк, если внутри календаря будут действия
-                onBooked={null}
-            />
+                <BookingCalendar
+                    psychologist={psychologist}
+                    mode="PSYCHOLOGIST"
+                    // можно добавить колбэк, если внутри календаря будут действия
+                    onBooked={null}
+                />
+            </div >
         </div>
     );
 }

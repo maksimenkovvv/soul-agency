@@ -18,15 +18,17 @@ function ClientAppointments() {
     };
 
     return (
-        <div className="appointments-client">
-            {/* поиск */}
-            <Search
-                showAppointmentFilters={true}
-                onSearch={handleSearch}
-                onFilterChange={handleFilterChange}
-                currentFilter={filter}
-            />
-            <AppointmentCards filter={filter} />
+        <div className="b-appointments">
+            <div className="appointments-client">
+                {/* поиск */}
+                <Search
+                    showAppointmentFilters={true}
+                    onSearch={handleSearch}
+                    onFilterChange={handleFilterChange}
+                    currentFilter={filter}
+                />
+                <AppointmentCards filter={filter} />
+            </div>
         </div>
     );
 }
